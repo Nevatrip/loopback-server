@@ -1,6 +1,6 @@
 {
   "name": "nevatrip-rest",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "nevatrip",
   "keywords": [
     "loopback-application",
@@ -26,6 +26,7 @@
     "tslint:fix": "npm run tslint -- --fix",
     "pretest": "npm run clean && npm run build",
     "test": "lb-mocha --allow-console-logs \"dist/test\"",
+    "test:ci": "lb-mocha --allow-console-logs \"dist/test\"",
     "posttest": "npm run lint",
     "test:dev": "lb-mocha --allow-console-logs dist/test/**/*.js && npm run posttest",
     "migrate": "node ./dist/src/migrate",
