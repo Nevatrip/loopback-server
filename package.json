@@ -1,6 +1,6 @@
 {
   "name": "nevatrip-rest",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "nevatrip",
   "keywords": [
     "loopback-application",
@@ -15,6 +15,8 @@
     "build": "lb-tsc es2017 --outDir dist",
     "build:watch": "lb-tsc --watch",
     "clean": "lb-clean dist",
+    "docker:start": "./bin/start-dbs.sh",
+    "docker:stop": "./bin/stop-dbs.sh",
     "lint": "npm run prettier:check && npm run tslint",
     "lint:fix": "npm run tslint:fix && npm run prettier:fix",
     "prettier:cli": "lb-prettier \"**/*.ts\" \"**/*.js\"",
