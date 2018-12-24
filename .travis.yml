@@ -22,10 +22,10 @@ matrix:
       os: linux
       env: TASK=code-lint
       script: npm run lint
-    - node_js: '8'
-      os: linux
-      env: TASK=commit-lint
-      script: commitlint-travis
+    # - node_js: '8'
+    #   os: linux
+    #   env: TASK=commit-lint
+    #   script: commitlint-travis
 
 branches:
   only:
