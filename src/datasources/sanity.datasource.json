@@ -1,0 +1,20 @@
+{
+  "name": "sanity",
+  "connector": "rest",
+  "baseURL": "https://39dycnz5.api.sanity.io/v1/data/query/develop",
+  "operations": [
+    {
+      "template": {
+        "method": "GET",
+        "url": "https://39dycnz5.api.sanity.io/v1/data/query/develop",
+        "query": {
+          "query": "*[_type=='tour' && key.current=='{alias}']"
+        },
+        "responsePath": "$.result[0]"
+      },
+      "functions": {
+        "getServiceByAlias": ["alias"]
+      }
+    }
+  ]
+}
