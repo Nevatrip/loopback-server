@@ -8,7 +8,7 @@
         "method": "GET",
         "url": "https://39dycnz5.api.sanity.io/v1/data/query/develop",
         "query": {
-          "query": "*[_type=='tour' && key.current=='{alias}']"
+          "query": "*[_type=='tour' && key.current=='{alias}']\u007B...,'point':point->,'place':place->,'category':category->,'attractions':attractions[]->,'tourLanguage':tourLanguage[]->\u007Btitle,'icon':icon.asset->\u007D,'placeFeatures':placeFeatures[]->\u007Btitle,'icon':icon.asset->\u007D,'titleImage':titleImage.asset->\u007Burl\u007D.url\u007D"
         },
         "responsePath": "$.result[0]"
       },

@@ -1,0 +1,191 @@
+{
+  "definitions": {},
+  "type": "array",
+  "title": "The Root Schema",
+  "minItems": 2,
+  "maxItems": 3,
+  "items": {
+    "$id": "#/items",
+    "type": "object",
+    "title": "The Items Schema",
+    "required": [
+      "id",
+      "title",
+      "description",
+      "isAllDay",
+      "start",
+      "end",
+      "pier",
+      "place",
+      "provider",
+      "tickets"
+    ],
+    "properties": {
+      "id": {
+        "$id": "#/items/properties/id",
+        "type": "string",
+        "title": "The Id Schema",
+        "faker": "random.alphaNumeric"
+      },
+      "title": {
+        "$id": "#/items/properties/title",
+        "type": "string",
+        "title": "The Title Schema",
+        "pattern": "АКЦИЯ - Экскурсия под развод мостов на 2-палубном теплоходе 2019"
+      },
+      "description": {
+        "$id": "#/items/properties/description",
+        "type": "string",
+        "title": "The Description Schema",
+        "default": ""
+      },
+      "isAllDay": {
+        "$id": "#/items/properties/isAllDay",
+        "type": "boolean",
+        "title": "The Isallday Schema",
+        "default": false
+      },
+      "start": {
+        "$id": "#/items/properties/start",
+        "type": "string",
+        "title": "The Start Schema",
+        "default": "",
+        "examples": [
+          "2019-01-22T10:00:00.000Z"
+        ],
+        "pattern": "^(.*)$"
+      },
+      "end": {
+        "$id": "#/items/properties/end",
+        "type": "string",
+        "title": "The End Schema",
+        "default": "",
+        "examples": [
+          "2019-01-22T11:40:00.000Z"
+        ],
+        "pattern": "^(.*)$"
+      },
+      "recurrenceException": {
+        "$id": "#/items/properties/recurrenceException",
+        "type": "string",
+        "title": "The Recurrenceexception Schema",
+        "default": ""
+      },
+      "recurrenceId": {
+        "$id": "#/items/properties/recurrenceId",
+        "type": "string",
+        "title": "The Recurrenceid Schema",
+        "default": ""
+      },
+      "recurrenceRule": {
+        "$id": "#/items/properties/recurrenceRule",
+        "type": "string",
+        "title": "The Recurrencerule Schema",
+        "default": ""
+      },
+      "startTimezone": {
+        "$id": "#/items/properties/startTimezone",
+        "type": "string",
+        "title": "The Starttimezone Schema",
+        "default": ""
+      },
+      "endTimezone": {
+        "$id": "#/items/properties/endTimezone",
+        "type": "string",
+        "title": "The Endtimezone Schema",
+        "default": ""
+      },
+      "stopBefore": {
+        "$id": "#/items/properties/stopBefore",
+        "type": "integer",
+        "title": "The Stopbefore Schema",
+        "default": 0,
+        "pattern": "0|30|40|60|120"
+      },
+      "pier": {
+        "$id": "#/items/properties/pier",
+        "type": "string",
+        "title": "The Pier Schema",
+        "faker": "random.alphaNumeric"
+      },
+      "place": {
+        "$id": "#/items/properties/place",
+        "type": "string",
+        "title": "The Place Schema",
+        "faker": "random.alphaNumeric"
+      },
+      "provider": {
+        "$id": "#/items/properties/provider",
+        "type": "string",
+        "title": "The Provider Schema",
+        "faker": "random.alphaNumeric"
+      },
+      "tickets": {
+        "$id": "#/items/properties/tickets",
+        "type": "array",
+        "title": "The Tickets Schema",
+        "items": {
+          "$id": "#/items/properties/tickets/items",
+          "type": "object",
+          "title": "The Items Schema",
+          "required": [
+            "title",
+            "description",
+            "type",
+            "category",
+            "price",
+            "count"
+          ],
+          "properties": {
+            "title": {
+              "$id": "#/items/properties/tickets/items/properties/title",
+              "type": "string",
+              "title": "The Title Schema",
+              "default": "",
+              "examples": [
+                "Взрослый"
+              ],
+              "pattern": "Взрослый|Детский|Льготный"
+            },
+            "description": {
+              "$id": "#/items/properties/tickets/items/properties/description",
+              "type": "string",
+              "title": "The Description Schema",
+              "default": ""
+            },
+            "type": {
+              "$id": "#/items/properties/tickets/items/properties/type",
+              "type": "array",
+              "title": "The Type Schema",
+              "items": {
+                "$id": "#/items/properties/tickets/items/properties/type/items",
+                "type": "string",
+                "title": "The Items Schema",
+                "pattern": "adult|child|promo"
+              }
+            },
+            "category": {
+              "$id": "#/items/properties/tickets/items/properties/category",
+              "type": "string",
+              "title": "The Category Schema",
+              "pattern": "standart|vip-2|vip-4"
+            },
+            "price": {
+              "$id": "#/items/properties/tickets/items/properties/price",
+              "type": "integer",
+              "title": "The Price Schema",
+              "pattern": "700|820|1200"
+            },
+            "count": {
+              "$id": "#/items/properties/tickets/items/properties/count",
+              "type": "integer",
+              "title": "The Count Schema",
+              "default": 0,
+              "pattern": "0|1"
+            }
+          }
+        }
+      }
+    }
+  }
+}
