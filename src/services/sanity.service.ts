@@ -4,8 +4,8 @@ import {SanityDataSource} from '../datasources/sanity.datasource';
 import {Service} from '../models';
 
 export interface SanityService {
-  getServiceByAlias(alias: string): Promise<Service>;
-  getScheduleByAlias(alias: string): Promise<Event>;
+  getServiceByAlias(alias: string): Promise<Service>[];
+  // getScheduleByAlias(alias: string): Promise<Event>;
 }
 
 export class SanityServiceProvider implements Provider<SanityService> {
