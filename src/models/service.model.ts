@@ -58,7 +58,21 @@ export class Service extends Entity {
     itemType: 'object',
     required: true,
   })
-  directions: object[];
+  directions: {
+    _key: string;
+    _type: 'direction';
+    schedule?: {
+      _key: string;
+      _type: 'event';
+      start: Date;
+      actions: {
+        _key: string;
+        start: Date;
+      }[];
+    }[];
+    dates?: string[];
+    scheduleOnDate?: {}[];
+  }[];
 
   @property({
     type: 'array',

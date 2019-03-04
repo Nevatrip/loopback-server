@@ -1,7 +1,9 @@
 import {Entity, model, property} from '@loopback/repository';
 import {CartItem} from './cart-item.model';
 
-@model()
+@model({
+  excludeBaseProperties: ['created', 'lastUpdated'],
+})
 export class Cart extends Entity {
   @property({
     type: 'string',
@@ -9,6 +11,12 @@ export class Cart extends Entity {
     required: true,
   })
   sessionId: string;
+
+  @property({type: 'date'})
+  created?: Date;
+
+  @property({type: 'date'})
+  lastUpdated?: Date;
 
   @property.array(CartItem)
   items?: CartItem[];

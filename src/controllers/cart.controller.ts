@@ -45,6 +45,10 @@ export class CartController {
         `User id does not match: ${sessionId} !== ${cart.sessionId}`,
       );
     }
+
+    cart.created = cart.created || new Date();
+    cart.lastUpdated = new Date();
+
     await this.cartRepository.set(sessionId, cart);
   }
 

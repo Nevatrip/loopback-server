@@ -7,14 +7,7 @@ export class CartItem extends Entity {
     id: true,
     required: true,
   })
-  productId: string;
-
-  @property({
-    type: 'string',
-    required: true,
-    default: 'service',
-  })
-  type: string;
+  serviceId: string;
 
   @property({
     type: 'object',
