@@ -32,7 +32,7 @@
     "test:dev": "lb-mocha --allow-console-logs dist/test/**/*.js && npm run posttest",
     "migrate": "node ./dist/src/migrate",
     "prestart": "npm run build",
-    "start": "HOST=0.0.0.0 PORT=8080 node .",
+    "start": "HOST=0.0.0.0 PORT=8000 node .",
     "prepublishOnly": "npm run test"
   },
   "repository": {
