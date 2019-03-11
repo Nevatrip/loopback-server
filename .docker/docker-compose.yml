@@ -13,8 +13,6 @@ services:
       - ../:/opt/app
     entrypoint: run-nodock "npm start"
     tty: true
-    ports:
-      - '8000'
 
   mongo:
     build: ./mongo
@@ -30,6 +28,8 @@ services:
       - '6379'
     volumes:
       - ./data/redis:/data
+    sysctls:
+      - net.core.somaxconn=511
 
   nginx:
     build:
