@@ -10,7 +10,19 @@ if (require.main === module) {
       host: process.env.HOST || 'localhost',
       openApiSpec: {
         // useful when used with OASGraph to locate your application
-        setServersFromRequest: true,
+        // setServersFromRequest: true,
+        servers: [
+          {
+            url: 'http://0.0.0.0:' + process.env.PORT,
+          },
+          {
+            url: 'http://api.nevatrip.ru',
+          },
+        ],
+      },
+      expressSettings: {
+        'x-powered-by': false,
+        env: process.env.NODE_ENV || 'production',
       },
     },
   };
