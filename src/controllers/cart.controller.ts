@@ -17,7 +17,7 @@ import {
   requestBody,
   HttpErrors,
 } from '@loopback/rest';
-import {Cart} from '../models';
+import {Cart, CartItem} from '../models';
 import {CartRepository} from '../repositories';
 
 import * as debugFactory from 'debug';
@@ -53,6 +53,19 @@ export class CartController {
   }
 
   /**
+   * Add an item to the shopping cart for a given user
+   * @param sessionId User id
+   * @param cart Shopping cart item to be added
+   */
+  @post('/shoppingCarts/{sessionId}/items')
+  async addItem(
+    @param.path.string('sessionId') sessionId: string,
+    @requestBody({description: 'shopping cart item'}) item: CartItem,
+  ) {
+    await this.cartRepository.addItem(sessionId, item);
+  }
+
+  /**
    * Retrieve the shopping cart by user id
    * @param sessionId User id
    */
@@ -69,6 +82,7 @@ export class CartController {
       return cart;
     }
   }
+
   /*
   @post('/carts', {
     responses: {
