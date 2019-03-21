@@ -10,23 +10,17 @@ export class ServiceController {
     protected sanityService: SanityService,
   ) {}
 
-  @get('/service/{alias}')
+  @get('/service/{alias}/alias')
   async getServiceByAlias(@param.path.string('alias') alias: string) {
-    const services: Promise<
-      Service
-    >[] = await this.sanityService.getServiceByAlias(alias);
-    // services.forEach( service => {
-    //   service;
-    // } )
-    return services;
+    return await this.sanityService.getServiceByAlias(alias);
   }
 
-  @get('/serviceById/{id}')
+  @get('/service/{id}/id')
   async getServiceById(@param.path.string('id') id: string) {
     return await this.sanityService.getServiceById(id);
   }
 
-  @get('/datesById/{id}')
+  @get('/service/{id}/dates')
   async getDatesById(@param.path.string('id') id: string) {
     const services: Promise<
       Service
@@ -50,9 +44,9 @@ export class ServiceController {
     return dir;
   }
 
-  @get('/scheduleById/{serviceId}/{directionId}/{date}')
+  @get('/service/{id}/schedule/{directionId}/{date}')
   async getScheduleById(
-    @param.path.string('serviceId') serviceId: string,
+    @param.path.string('id') id: string,
     @param.path.string('directionId') directionId: string,
     @param.path.string('date') date: string,
   ) {
@@ -64,7 +58,7 @@ export class ServiceController {
     );
     const services: Promise<
       Service
-    >[] = await this.sanityService.getServiceById(serviceId);
+    >[] = await this.sanityService.getServiceById(id);
     const direction = (await services[0]).directions.filter(
       dir => dir._key === directionId,
     )[0];
