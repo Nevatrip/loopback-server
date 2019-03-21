@@ -10,67 +10,17 @@ export class ServiceController {
     protected sanityService: SanityService,
   ) {}
 
-  @get('/service/{alias}')
+  @get('/service/{alias}/alias')
   async getServiceByAlias(@param.path.string('alias') alias: string) {
-    const services: Promise<
-      Service
-    >[] = await this.sanityService.getServiceByAlias(alias);
-    // services.forEach( service => {
-    //   service;
-    // } )
-    return services;
+    return await this.sanityService.getServiceByAlias(alias);
   }
 
-  @get('/service/{alias}/dates')
-  async getDatesByAlias(@param.path.string('alias') alias: string) {
-    const service = await this.sanityService.getServiceByAlias(alias);
-
-    return {
-      ...service[0],
-      periods: [
-        {
-          eventId: 11111111,
-          start: 1548849600,
-          end: 1551528000,
-        },
-        {
-          eventId: 22222222,
-          start: 1549022400,
-          end: 1551528000,
-        },
-        {
-          eventId: 33333333,
-          start: 1546344000,
-          end: 1553947200,
-        },
-      ],
-      dates: [
-        '02.02.2019',
-        '03.02.2019',
-        '05.02.2019',
-        '06.02.2019',
-        '12.02.2019',
-        '14.02.2019',
-        '17.02.2019',
-        '18.02.2019',
-        '19.02.2019',
-        '22.02.2019',
-        '23.02.2019',
-        '24.02.2019',
-        '28.02.2019',
-        '01.03.2019',
-        '02.03.2019',
-        '14.03.2019',
-      ],
-    };
-  }
-
-  @get('/serviceById/{id}')
+  @get('/service/{id}')
   async getServiceById(@param.path.string('id') id: string) {
     return await this.sanityService.getServiceById(id);
   }
 
-  @get('/datesById/{id}')
+  @get('/service/{id}/dates')
   async getDatesById(@param.path.string('id') id: string) {
     const services: Promise<
       Service
@@ -94,9 +44,9 @@ export class ServiceController {
     return dir;
   }
 
-  @get('/scheduleById/{serviceId}/{directionId}/{date}')
+  @get('/service/{id}/schedule/{directionId}/{date}')
   async getScheduleById(
-    @param.path.string('serviceId') serviceId: string,
+    @param.path.string('id') id: string,
     @param.path.string('directionId') directionId: string,
     @param.path.string('date') date: string,
   ) {
@@ -108,7 +58,7 @@ export class ServiceController {
     );
     const services: Promise<
       Service
-    >[] = await this.sanityService.getServiceById(serviceId);
+    >[] = await this.sanityService.getServiceById(id);
     const direction = (await services[0]).directions.filter(
       dir => dir._key === directionId,
     )[0];

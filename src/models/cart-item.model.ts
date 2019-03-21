@@ -9,9 +9,7 @@ export class CartItem extends Entity {
   })
   serviceId: string;
 
-  @property({
-    type: 'object',
-  })
+  @property({type: 'object'})
   options?: object;
 
   constructor(data?: Partial<CartItem>) {

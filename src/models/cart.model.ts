@@ -9,6 +9,7 @@ export class Cart extends Entity {
     type: 'string',
     id: true,
     required: true,
+    example: 'test-test-test',
   })
   sessionId: string;
 
