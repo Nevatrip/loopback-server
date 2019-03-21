@@ -15,7 +15,7 @@ export class ServiceController {
     return await this.sanityService.getServiceByAlias(alias);
   }
 
-  @get('/service/{id}/id')
+  @get('/service/{id}')
   async getServiceById(@param.path.string('id') id: string) {
     return await this.sanityService.getServiceById(id);
   }
