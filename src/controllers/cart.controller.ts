@@ -20,6 +20,7 @@ import {
 import {Cart, CartItem} from '../models';
 import {CartRepository} from '../repositories';
 
+import * as hash from 'object-hash';
 import * as debugFactory from 'debug';
 const debug = debugFactory('loopback:example:shopping');
 
@@ -55,6 +56,10 @@ export class CartController {
 
     cart.created = cart.created || new Date();
     cart.lastUpdated = new Date();
+    (cart.items || []).forEach(item => {
+      delete item.key;
+      item.key = hash(item);
+    });
 
     await this.cartRepository.set(sessionId, cart);
   }
