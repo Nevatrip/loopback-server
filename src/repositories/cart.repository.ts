@@ -31,6 +31,19 @@ export class CartRepository extends DefaultKeyValueRepository<Cart> {
     return this.checkAndSet(sessionId, addItemToCart);
   }
 
+  deleteItem(sessionId: string, key: string) {
+    const deleteItemFromCart = (cart: Cart) => {
+      if (cart.items && cart.items.length) {
+        cart.items = cart.items.filter((item: CartItem) => {
+          return item.key !== key;
+        });
+      }
+
+      return cart;
+    };
+    return this.checkAndSet(sessionId, deleteItemFromCart);
+  }
+
   /**
    * Use Redis WATCH and Transaction to check and set against a key
    * See https://redis.io/topics/transactions#optimistic-locking-using-check-and-set

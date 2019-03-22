@@ -80,6 +80,26 @@ export class CartController {
   }
 
   /**
+   * Add an item to the shopping cart for a given user
+   * @param sessionId User id
+   * @param key Cart item key
+   */
+  @del('/shoppingCarts/{sessionId}/items/{key}', {
+    responses: {
+      '200': {
+        description: "Cart's item to delete",
+      },
+    },
+    summary: "Delete Cart's item by key",
+  })
+  async deleteItem(
+    @param.path.string('sessionId') sessionId: string,
+    @param.path.string('key') key: string,
+  ) {
+    await this.cartRepository.deleteItem(sessionId, key);
+  }
+
+  /**
    * Retrieve the shopping cart by user id
    * @param sessionId User id
    */
