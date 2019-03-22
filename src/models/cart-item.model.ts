@@ -5,6 +5,11 @@ export class CartItem extends Entity {
   @property({
     type: 'string',
     id: true,
+  })
+  key: string;
+
+  @property({
+    type: 'string',
     required: true,
   })
   serviceId: string;
