@@ -34,7 +34,14 @@ export class CartController {
    * @param sessionId User id
    * @param cart Shopping cart
    */
-  @put('/shoppingCarts/{sessionId}')
+  @put('/shoppingCarts/{sessionId}', {
+    responses: {
+      '200': {
+        description: 'Update Cart',
+      },
+    },
+    summary: 'Replace Cart with new data',
+  })
   async set(
     @param.path.string('sessionId') sessionId: string,
     @requestBody({description: 'shopping cart'}) cart: Cart,
@@ -55,21 +62,55 @@ export class CartController {
   /**
    * Add an item to the shopping cart for a given user
    * @param sessionId User id
-   * @param cart Shopping cart item to be added
    */
-  @post('/shoppingCarts/{sessionId}/items')
+  @post('/shoppingCarts/{sessionId}/items', {
+    responses: {
+      '200': {
+        description: 'New item to Cart',
+      },
+    },
+    summary: 'Add new item to Cart',
+  })
   async addItem(
     @param.path.string('sessionId') sessionId: string,
-    @requestBody({description: 'shopping cart item'}) item: CartItem,
+    @requestBody({description: 'shopping cart item'})
+    item: CartItem,
   ) {
     await this.cartRepository.addItem(sessionId, item);
+  }
+
+  /**
+   * Add an item to the shopping cart for a given user
+   * @param sessionId User id
+   * @param key Cart item key
+   */
+  @del('/shoppingCarts/{sessionId}/items/{key}', {
+    responses: {
+      '200': {
+        description: "Cart's item to delete",
+      },
+    },
+    summary: "Delete Cart's item by key",
+  })
+  async deleteItem(
+    @param.path.string('sessionId') sessionId: string,
+    @param.path.string('key') key: string,
+  ) {
+    await this.cartRepository.deleteItem(sessionId, key);
   }
 
   /**
    * Retrieve the shopping cart by user id
    * @param sessionId User id
    */
-  @get('/shoppingCarts/{sessionId}')
+  @get('/shoppingCarts/{sessionId}', {
+    responses: {
+      '200': {
+        description: 'Cart Response',
+      },
+    },
+    summary: 'Get Cart by session Id',
+  })
   async get(@param.path.string('sessionId') sessionId: string) {
     debug('Get shopping cart %s', sessionId);
     const cart = await this.cartRepository.get(sessionId);

@@ -16,7 +16,7 @@ if (require.main === module) {
             url: 'http://api.nevatrip.ru',
           },
           {
-            url: 'http://0.0.0.0:' + process.env.PORT,
+            url: 'http://0.0.0.0',
           },
         ],
       },

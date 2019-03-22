@@ -16,16 +16,16 @@ services:
 
   mongo:
     build: ./mongo
-    expose:
-      - '27017'
+    ports:
+      - '27017:27017'
     volumes:
       - ./data/mongo/:/var/lib/mongodb
 
   redis:
     build:
       context: ./redis
-    expose:
-      - '6379'
+    ports:
+      - '6379:6379'
     volumes:
       - ./data/redis:/data
     sysctls:
