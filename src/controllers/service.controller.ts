@@ -10,17 +10,38 @@ export class ServiceController {
     protected sanityService: SanityService,
   ) {}
 
-  @get('/service/{alias}/alias')
+  @get('/service/{alias}/alias', {
+    responses: {
+      '200': {
+        description: 'Service Response',
+      },
+    },
+    summary: 'Get Service data by alias',
+  })
   async getServiceByAlias(@param.path.string('alias') alias: string) {
     return await this.sanityService.getServiceByAlias(alias);
   }
 
-  @get('/service/{id}')
+  @get('/service/{id}', {
+    responses: {
+      '200': {
+        description: 'Service Response',
+      },
+    },
+    summary: 'Get Service data by Id',
+  })
   async getServiceById(@param.path.string('id') id: string) {
     return await this.sanityService.getServiceById(id);
   }
 
-  @get('/service/{id}/dates')
+  @get('/service/{id}/dates', {
+    responses: {
+      '200': {
+        description: 'Service Response',
+      },
+    },
+    summary: 'Get Service dates by Id',
+  })
   async getDatesById(@param.path.string('id') id: string) {
     const services: Promise<
       Service
@@ -44,7 +65,14 @@ export class ServiceController {
     return dir;
   }
 
-  @get('/service/{id}/schedule/{directionId}/{date}')
+  @get('/service/{id}/schedule/{directionId}/{date}', {
+    responses: {
+      '200': {
+        description: 'Service Response',
+      },
+    },
+    summary: "Get Service schedule by Id, direction's id and date",
+  })
   async getScheduleById(
     @param.path.string('id') id: string,
     @param.path.string('directionId') directionId: string,
