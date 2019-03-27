@@ -39,7 +39,7 @@
     "type": "git"
   },
   "author": "Roman @Realetive Ganin <npm@romanganin.ru> (https://romanganin.ru)",
-  "license": "Creative Common Attribution-NonCommercial-NoDerivatives 4.0 International",
+  "license": "CC-BY-NC-ND-4.0",
   "files": [
     "README.md",
     "index.js",
