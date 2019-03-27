@@ -38,8 +38,8 @@
   "repository": {
     "type": "git"
   },
-  "author": "",
-  "license": "",
+  "author": "Roman @Realetive Ganin <npm@romanganin.ru> (https://romanganin.ru)",
+  "license": "Creative Common Attribution-NonCommercial-NoDerivatives 4.0 International",
   "files": [
     "README.md",
     "index.js",
