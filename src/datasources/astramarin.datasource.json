@@ -1,0 +1,19 @@
+{
+  "name": "astramarin",
+  "connector": "soap",
+  "url": "http://185.68.210.98:8088/InternetTestJson/ws/InternetSaleJSON",
+  "wsdl": "http://185.68.210.98:8088/InternetTestJson/ws/InternetSaleJSON?wsdl",
+  "remotingEnabled": false,
+  "security": {
+    "scheme": "BasicAuth",
+    "username": "test",
+    "password": "test"
+  },
+  "operations": {
+    "getServiceGroups": {
+      "service": "InternetSaleJSON",
+      "port": "InternetSaleJSONSoap",
+      "operation": "GetServiceGroup"
+    }
+  }
+}
