@@ -54,7 +54,7 @@ export class ServiceController {
           event.actions.forEach(action => {
             const date = new Date(action.start);
             if (date > new Date()) {
-              dates.push(format(date, 'DD.MM.YYYY'));
+              dates.push(format(date, 'dd.MM.yyyy'));
             }
           });
         });
