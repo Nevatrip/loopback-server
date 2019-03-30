@@ -3,6 +3,7 @@ import {get, param} from '@loopback/rest';
 import {SanityService} from '../services/sanity.service';
 import {Service} from '../models';
 import * as format from 'date-fns/format';
+import {parse} from 'date-fns';
 
 export class ServiceController {
   constructor(
@@ -78,12 +79,7 @@ export class ServiceController {
     @param.path.string('directionId') directionId: string,
     @param.path.string('date') date: string,
   ) {
-    const parts = date.split('.');
-    const actualDate = new Date(
-      parseInt(parts[2], 10),
-      parseInt(parts[1], 10) - 1,
-      parseInt(parts[0], 10),
-    );
+    const actualDate = parse(date, 'dd.MM.yyyy', new Date());
     const services: Promise<
       Service
     >[] = await this.sanityService.getServiceById(id);
@@ -109,6 +105,106 @@ export class ServiceController {
     }
 
     return schedule;
+  }
+
+  @get('/service/{id}/schedule/{directionId}/{date}/{event}', {
+    responses: {
+      '200': {
+        description: 'Service Response',
+      },
+    },
+    summary: "Get Service schedule by Id, direction's id and date",
+  })
+  async getPlaces(
+    @param.path.string('id') id: string,
+    @param.path.string('directionId') directionId: string,
+    @param.path.string('date') date: string,
+    @param.path.string('event') event: string,
+  ) {
+    const actualDate = parse(date, 'dd.MM.yyyy', new Date());
+
+    return {
+      event,
+      date: actualDate.toDateString(),
+      place: `test-place-id`,
+      places: [
+        'a1',
+        'a2',
+        'a3',
+        'a4',
+        'a5',
+        'a6',
+        'a7',
+        'a8',
+        'a9',
+        'a10',
+        'a11',
+        'a12',
+        'a13',
+        'a14',
+        'a15',
+        'a16',
+        'a17',
+        'a18',
+        'a19',
+        'a20',
+        'a21',
+        'a22',
+        'a23',
+        'a24',
+        'a25',
+        'a26',
+        'a27',
+        'a28',
+        'a29',
+        'a30',
+        'a31',
+        'a32',
+        'a33',
+        'a34',
+        'a35',
+        'a36',
+        'a37',
+        'a38',
+        'a39',
+        'a40',
+        'a41',
+        'a42',
+        'a43',
+        'a44',
+        'a45',
+        'a46',
+        'a47',
+        'a48',
+        'a49',
+        'a50',
+        'a51',
+        'a52',
+        'a53',
+        'a54',
+        'a55',
+        'a56',
+        'a57',
+        'a58',
+        'a59',
+        'a60',
+        'a61',
+        'a62',
+        'a63',
+        'a64',
+        'a65',
+        'a66',
+        'a67',
+        'a68',
+        'a69',
+        'a70',
+      ].map(place => ({
+        id: place,
+        category: Math.random() >= 0.3 ? 'standart' : 'vip',
+        value: Math.random() >= 0.5 ? 2 : 1,
+        available: !!(Math.random() >= 0.5),
+      })),
+    };
   }
 
   // @get('/schedule/:alias')
