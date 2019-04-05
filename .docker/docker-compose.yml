@@ -11,6 +11,11 @@ services:
         - YARN=false
     volumes:
       - ../:/opt/app
+    environment:
+      - NEVATRAVEL=${NEVATRAVEL}
+      - ASTRAMARIN_USERNAME=${ASTRAMARIN_USERNAME}
+      - ASTRAMARIN_PASSWORD=${ASTRAMARIN_PASSWORD}
+      - ASTRAMARIN=${ASTRAMARIN}
     entrypoint: run-nodock "npm start"
     tty: true
 
