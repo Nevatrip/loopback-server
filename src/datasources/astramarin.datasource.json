@@ -14,6 +14,87 @@
       "service": "InternetSaleJSON",
       "port": "InternetSaleJSONSoap",
       "operation": "GetServiceGroup"
+    },
+    "getServicesOnDate": {
+      "service": "InternetSaleJSON",
+      "port": "InternetSaleJSONSoap",
+      "operation": "ServicesOnDate"
+    },
+    "getEventsOnDate": {
+      "service": "InternetSaleJSON",
+      "port": "InternetSaleJSONSoap",
+      "operation": "EventsOnDate"
+    },
+
+    "getSeatСategory": {
+      "service": "InternetSaleJSON",
+      "port": "InternetSaleJSONSoap",
+      "operation": "SeatСategory"
+    },
+    "getSeatsOnEvent": {
+      "service": "InternetSaleJSON",
+      "port": "InternetSaleJSONSoap",
+      "operation": "SeatsOnEvent"
+    },
+    "putBookingSeat": {
+      "service": "InternetSaleJSON",
+      "port": "InternetSaleJSONSoap",
+      "operation": "BookingSeat"
+    },
+    "delBookingSeat": {
+      "service": "InternetSaleJSON",
+      "port": "InternetSaleJSONSoap",
+      "operation": "CancelBookingSeat"
+    },
+    "getPaymentType": {
+      "service": "InternetSaleJSON",
+      "port": "InternetSaleJSONSoap",
+      "operation": "GetPaymentType"
+    },
+    "getSeatPrice": {
+      "service": "InternetSaleJSON",
+      "port": "InternetSaleJSONSoap",
+      "operation": "GetSeatPrice"
+    },
+    "getMenuOnTypePrice": {
+      "service": "InternetSaleJSON",
+      "port": "InternetSaleJSONSoap",
+      "operation": "MenuOnTypePrice"
+    },
+    "getPromoCode": {
+      "service": "InternetSaleJSON",
+      "port": "InternetSaleJSONSoap",
+      "operation": "CheckPromoCode"
+    },
+    "postSaleSeat": {
+      "service": "InternetSaleJSON",
+      "port": "InternetSaleJSONSoap",
+      "operation": "SaleSeat"
+    },
+    "putPayment": {
+      "service": "InternetSaleJSON",
+      "port": "InternetSaleJSONSoap",
+      "operation": "PaymentConfirmation"
+    },
+    "checkDeposit": {
+      "service": "InternetSaleJSON",
+      "port": "InternetSaleJSONSoap",
+      "operation": "ChekDeposit"
+    },
+    "getDepositOnDate": {
+      "service": "InternetSaleJSON",
+      "port": "InternetSaleJSONSoap",
+      "operation": "GetDeposit"
+    },
+    "delOrder": {
+      "service": "InternetSaleJSON",
+      "port": "InternetSaleJSONSoap",
+      "operation": "DelOrder"
+    },
+    "getDiscountCard": {
+      "service": "InternetSaleJSON",
+      "port": "InternetSaleJSONSoap",
+      "operation": "GetDiscountCard"
     }
   }
 }

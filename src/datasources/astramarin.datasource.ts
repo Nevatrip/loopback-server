@@ -9,14 +9,12 @@ const envToken = process.env.ASTRAMARIN;
 const envUser = process.env.ASTRAMARIN_USERNAME;
 const envPass = process.env.ASTRAMARIN_PASSWORD;
 
-if (
-  envUser &&
-  envPass &&
-  secureConfig.security &&
-  secureConfig.security.scheme === 'BasicAuth'
-) {
-  secureConfig.security.username = envUser;
-  secureConfig.security.password = envPass;
+if (envUser && envPass) {
+  secureConfig.security = {
+    scheme: 'BasicAuth',
+    username: envUser,
+    password: envPass,
+  };
 }
 
 if (envToken || (envUser && envPass)) {
@@ -24,8 +22,6 @@ if (envToken || (envUser && envPass)) {
   secureConfig.wsdl_headers = secureConfig.wsdl_headers || {};
   secureConfig.wsdl_headers.Authorization = `Basic ${token}`;
 }
-
-console.log('secureConfig', secureConfig);
 
 export class AstramarinDataSource extends juggler.DataSource {
   static dataSourceName = 'astramarin';
