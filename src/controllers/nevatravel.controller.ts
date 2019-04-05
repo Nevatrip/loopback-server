@@ -44,7 +44,7 @@ export class NevatravelController {
     return await this.nevatravelService.getPiers(apiKey);
   }
 
-  @get('/partner/nevatravel/programs', {
+  @get('/partner/nevatravel/services', {
     responses: {
       '200': {
         description: `Return available programs`,
@@ -56,7 +56,7 @@ export class NevatravelController {
     return await this.nevatravelService.getPrograms(apiKey);
   }
 
-  @get('/partner/nevatravel/services/{service}/{date}', {
+  @get('/partner/nevatravel/services/{service}', {
     responses: {
       '200': {
         description: `Return service's shedule on date`,
@@ -66,7 +66,7 @@ export class NevatravelController {
   })
   async getСruises(
     @param.path.string('service') service: number,
-    @param.path.string('date') date: string,
+    @param.query.string('date') date: string = format(new Date(), 'dd.MM.yyyy'),
     @param.query.string('pier') pier?: number,
   ) {
     const dateInput = parse(date, 'dd.MM.yyyy', new Date());
