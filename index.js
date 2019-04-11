@@ -13,7 +13,7 @@ if (require.main === module) {
         // setServersFromRequest: true,
         servers: [
           {
-            url: 'http://api.nevatrip.ru',
+            url: 'https://api.nevatrip.ru',
           },
           {
             url: 'http://0.0.0.0',
