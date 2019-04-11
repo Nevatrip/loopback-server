@@ -29,7 +29,7 @@ services:
       - .docker/nginx/conf:/etc/nginx/conf.d
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
-      # - dhparam:/etc/ssl/certs
+      - dhparam:/etc/ssl/certs
     depends_on:
       - node
     networks:
@@ -72,12 +72,12 @@ volumes:
       type: none
       device: /home/deploy/api/public/
       o: bind
-  # dhparam:
-  #   driver: local
-  #   driver_opts:
-  #     type: none
-  #     device: /home/deploy/api/dhparam/
-  #     o: bind
+  dhparam:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/deploy/api/dhparam/
+      o: bind
 
 networks:
   app-network:
