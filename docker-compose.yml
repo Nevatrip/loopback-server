@@ -8,6 +8,11 @@ services:
         NODE_VERSION: --lts
       context: .
       dockerfile: Dockerfile
+    environment:
+      - NEVATRAVEL=${NEVATRAVEL}
+      - ASTRAMARIN_USERNAME=${ASTRAMARIN_USERNAME}
+      - ASTRAMARIN_PASSWORD=${ASTRAMARIN_PASSWORD}
+      - ASTRAMARIN=${ASTRAMARIN}
     restart: unless-stopped
     tty: true
     networks:
