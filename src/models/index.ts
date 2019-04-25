@@ -6,3 +6,4 @@ export * from './nevatravel-pier.model';
 export * from './nevatravel-program.model';
 export * from './nevatravel-cruise.model';
 export * from './nevatravel-order.model';
+export * from './order.model';
