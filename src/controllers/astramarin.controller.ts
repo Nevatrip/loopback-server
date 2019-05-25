@@ -1,18 +1,15 @@
 import {inject} from '@loopback/core';
 import {
   get,
-  // post,
-  // put,
-  // del,
+  post,
+  put,
+  del,
   param,
   // requestBody,
-  HttpErrors,
+  // HttpErrors,
 } from '@loopback/rest';
-import {parse} from 'date-fns';
-import {
-  AstramarinService,
-  StringJSONParameter,
-} from '../services/astramarin.service';
+import {parse, format} from 'date-fns';
+import {AstramarinService, StrJSONParam} from '../services/astramarin.service';
 
 interface ServiceGroup {
   ServiceGroupID: string;
@@ -58,13 +55,28 @@ interface Place {
   }[];
 }
 
+interface BookStatus {
+  BookStatus: 'ОК' | string;
+}
+
+interface CancelBookStatus {
+  CancelBookStatus: boolean;
+}
+
+interface PaymentType {
+  PaymentID: string;
+  PaymentName: string;
+  PaymentConfirm: boolean;
+}
+
 export class AstramarinController {
   constructor(
     @inject('services.AstramarinService')
     protected astramarinService: AstramarinService,
   ) {}
 
-  @get('/partner/astramarin/serviceGroups', {
+  /* 1 */
+  @get('/partner/astramarin/category', {
     responses: {
       '200': {
         description: `Return service groups`,
@@ -78,7 +90,8 @@ export class AstramarinController {
     return JSON.parse(response.result.return.ServiceType.StringJSON);
   }
 
-  @get('/partner/astramarin/serviceGroups/{serviceGroup}', {
+  /* 2 */
+  @get('/partner/astramarin/category/{category}/services', {
     responses: {
       '200': {
         description: `Return services on date`,
@@ -87,8 +100,9 @@ export class AstramarinController {
     summary: `Get services on date`,
   })
   async getServicesOnDate(
-    @param.path.string('serviceGroup') serviceGroup: string,
-    @param.query.string('dateFrom') date?: string,
+    @param.path.string('category') category: string,
+    @param.query.string('dateFrom')
+    date: string = format(new Date(), 'dd.MM.yyyy'),
     @param.query.string('dateTo') dateTo?: string,
   ): Promise<ServiceOnDate[]> {
     const dateOutput = date
@@ -96,14 +110,14 @@ export class AstramarinController {
       : new Date();
 
     const StringJSON = JSON.stringify({
-      ServiceGroup_ID: serviceGroup,
+      ServiceGroup_ID: category,
       Date_From: dateOutput,
       Date_To: dateTo && parse(dateTo, 'dd.MM.yyyy', dateOutput),
       Email: 'info@nevatrip.ru',
     });
 
     const response = await this.astramarinService.getServicesOnDate(<
-      StringJSONParameter
+      StrJSONParam
     >{
       StringJSON,
     });
@@ -111,7 +125,8 @@ export class AstramarinController {
     return JSON.parse(response.result.return.Services.StringJSON);
   }
 
-  @get('/partner/astramarin/service/{service}', {
+  /* 3 */
+  @get('/partner/astramarin/events', {
     responses: {
       '200': {
         description: `Return services on date`,
@@ -120,25 +135,22 @@ export class AstramarinController {
     summary: `Get services on date`,
   })
   async getEventsOnDate(
-    @param.path.string('service') service: string,
-    @param.query.string('date') date: string,
-    @param.query.string('serviceGroup') serviceGroup?: string,
+    @param.query.string('service') service: string,
+    @param.query.string('date')
+    date: string = format(new Date(), 'dd.MM.yyyy'),
+    @param.query.string('category') category?: string,
   ): Promise<EventOnDate[]> {
-    if (!date) {
-      throw new HttpErrors.BadRequest(`Date is not defined`);
-    }
-
     const dateOutput = parse(date, 'dd.MM.yyyy', new Date());
 
     const StringJSON = JSON.stringify({
       Service_ID: service,
       Date: dateOutput,
-      ServiceGroup_ID: serviceGroup,
+      ServiceGroup_ID: category,
       Email: 'info@nevatrip.ru',
     });
 
     const response = await this.astramarinService.getEventsOnDate(<
-      StringJSONParameter
+      StrJSONParam
     >{
       StringJSON,
     });
@@ -146,7 +158,8 @@ export class AstramarinController {
     return JSON.parse(response.result.return.Event.StringJSON);
   }
 
-  @get('/partner/astramarin/place/{place}/seatCategory', {
+  /* 4 */
+  @get('/partner/astramarin/places/{place}/category', {
     responses: {
       '200': {
         description: `Return services on date`,
@@ -163,7 +176,7 @@ export class AstramarinController {
     });
 
     const response = await this.astramarinService.getSeatСategory(<
-      StringJSONParameter
+      StrJSONParam
     >{
       StringJSON,
     });
@@ -171,7 +184,8 @@ export class AstramarinController {
     return JSON.parse(response.result.return.SeatСategory.StringJSON);
   }
 
-  @get('/partner/astramarin/event/{event}/places', {
+  /* 5 */
+  @get('/partner/astramarin/events/{event}/places', {
     responses: {
       '200': {
         description: `Return services on date`,
@@ -181,20 +195,170 @@ export class AstramarinController {
   })
   async getSeatsOnEvent(
     @param.path.string('event') event: string,
-    @param.query.string('category') category?: string,
+    @param.query.string('placeCategory') placeCategory?: string,
   ): Promise<Place[]> {
     const StringJSON = JSON.stringify({
       Event_ID: event,
-      Category_ID: category,
+      Category_ID: placeCategory,
       Email: 'info@nevatrip.ru',
     });
 
     const response = await this.astramarinService.getSeatsOnEvent(<
-      StringJSONParameter
+      StrJSONParam
     >{
       StringJSON,
     });
 
     return JSON.parse(response.result.return.Seats.StringJSON);
+  }
+
+  /* 6 */
+  @put('/partner/astramarin/events/{event}/places/{place}/booking', {
+    responses: {
+      '200': {
+        description: `Booking place on event`,
+      },
+    },
+    summary: `Booking place on event`,
+  })
+  async putBookingSeat(
+    @param.path.string('event') event: string,
+    @param.path.string('place') place: string,
+    @param.query.string('session') session: string,
+  ): Promise<BookStatus> {
+    const StringJSON = JSON.stringify({
+      Event_ID: event,
+      Seat_ID: place,
+      Session_ID: session,
+      Email: 'info@nevatrip.ru',
+    });
+
+    const response = await this.astramarinService.putBookingSeat(<StrJSONParam>{
+      StringJSON,
+    });
+
+    return JSON.parse(response.result.return.Book.StringJSON);
+  }
+
+  /* 7 */
+  @del('/partner/astramarin/events/{event}/places/{place}/booking', {
+    responses: {
+      '200': {
+        description: `Cancel booking place on event`,
+      },
+    },
+    summary: `Cancel booking place on event`,
+  })
+  async delBookingSeat(
+    @param.path.string('event') event: string,
+    @param.path.string('place') place: string,
+    @param.query.string('session') session: string,
+  ): Promise<CancelBookStatus> {
+    const StringJSON = JSON.stringify({
+      Event_ID: event,
+      Seat_ID: place,
+      Session_ID: session,
+      Email: 'info@nevatrip.ru',
+    });
+
+    const response = await this.astramarinService.delBookingSeat(<StrJSONParam>{
+      StringJSON,
+    });
+
+    return JSON.parse(response.result.return.CancelBookingSeat.StringJSON);
+  }
+
+  /* 8 Free seating */
+  @get('/partner/astramarin/category/{category}/services/{service}/tickets', {
+    responses: {
+      '200': {
+        description: `Return types of tickets`,
+      },
+    },
+    summary: `Get types of tickets`,
+  })
+  async getTicketType(
+    @param.path.string('category') category: string,
+    @param.path.string('service') service: string,
+  ): Promise<ServiceOnDate[]> {
+    const StringJSON = JSON.stringify({
+      Service_ID: service,
+      Email: 'info@nevatrip.ru',
+    });
+
+    const response = await this.astramarinService.getTicketType(<StrJSONParam>{
+      StringJSON,
+    });
+
+    return JSON.parse(response.result.return.Services.StringJSON);
+  }
+
+  /* 9 */
+  @get('/partner/astramarin/payments', {
+    responses: {
+      '200': {
+        description: `Return payment types`,
+      },
+    },
+    summary: `Get payment types`,
+  })
+  async getPaymentType(): Promise<PaymentType[]> {
+    const StringJSON = JSON.stringify({
+      Email: 'info@nevatrip.ru',
+    });
+
+    const response = await this.astramarinService.getPaymentType(<StrJSONParam>{
+      StringJSON,
+    });
+
+    return JSON.parse(response.result.return.PaymentType.StringJSON);
+  }
+
+  /* 10 Free seating */
+  @get('/partner/astramarin/events/{event}/tickets/{tickets}/price', {
+    responses: {
+      '200': {
+        description: `Cancel booking place on event`,
+      },
+    },
+    summary: `Cancel booking place on event`,
+  })
+  async getSeatPriceOnFreeSeating(
+    @param.path.string('event') event: string,
+    @param.path.string('place') place: string,
+  ): Promise<CancelBookStatus> {
+    const StringJSON = JSON.stringify({
+      Email: 'info@nevatrip.ru',
+    });
+
+    const response = await this.astramarinService.getSeatPrice(<StrJSONParam>{
+      StringJSON,
+    });
+
+    return JSON.parse(response.result.return.CancelBookingSeat.StringJSON);
+  }
+
+  /* 10 Specific seating */
+  @get('/partner/astramarin/events/{event}/tickets/{tickets}/price', {
+    responses: {
+      '200': {
+        description: `Cancel booking place on event`,
+      },
+    },
+    summary: `Cancel booking place on event`,
+  })
+  async getSeatPriceOnSpecificSeating(
+    @param.path.string('event') event: string,
+    @param.path.string('place') place: string,
+  ): Promise<CancelBookStatus> {
+    const StringJSON = JSON.stringify({
+      Email: 'info@nevatrip.ru',
+    });
+
+    const response = await this.astramarinService.getSeatPrice(<StrJSONParam>{
+      StringJSON,
+    });
+
+    return JSON.parse(response.result.return.CancelBookingSeat.StringJSON);
   }
 }

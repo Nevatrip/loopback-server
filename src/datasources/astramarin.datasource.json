@@ -46,6 +46,11 @@
       "port": "InternetSaleJSONSoap",
       "operation": "CancelBookingSeat"
     },
+    "getTicketType": {
+      "service": "InternetSaleJSON",
+      "port": "InternetSaleJSONSoap",
+      "operation": "GetTicketType"
+    },
     "getPaymentType": {
       "service": "InternetSaleJSON",
       "port": "InternetSaleJSONSoap",
