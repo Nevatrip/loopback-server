@@ -13,7 +13,7 @@
         "responsePath": "$.result[0]"
       },
       "functions": {
-        "getServiceByAlias": [
+        "getProductByAlias": [
           "alias"
         ]
       }
@@ -28,7 +28,7 @@
         "responsePath": "$.result[0]"
       },
       "functions": {
-        "getServiceById": [
+        "getProductById": [
           "id"
         ]
       }
@@ -43,7 +43,7 @@
         "responsePath": "$.result[0]"
       },
       "functions": {
-        "getServiceForCartById": [
+        "getProductForCartById": [
           "id"
         ]
       }

@@ -1,5 +1,5 @@
 import {Entity, model, property} from '@loopback/repository';
-import {CartItem} from './cart-item.model';
+import {CartProduct} from './cart-product.model';
 
 @model({
   excludeBaseProperties: ['created', 'lastUpdated'],
@@ -19,8 +19,8 @@ export class Cart extends Entity {
   @property({type: 'date'})
   lastUpdated?: Date;
 
-  @property.array(CartItem)
-  items?: CartItem[];
+  @property.array(CartProduct)
+  products?: CartProduct[];
 
   constructor(data?: Partial<Cart>) {
     super(data);

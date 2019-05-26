@@ -1,7 +1,7 @@
 import {Entity, model, property} from '@loopback/repository';
 
 @model()
-export class CartItem extends Entity {
+export class CartProduct extends Entity {
   @property({
     type: 'string',
     id: true,
@@ -12,12 +12,12 @@ export class CartItem extends Entity {
     type: 'string',
     required: true,
   })
-  serviceId: string;
+  productId: string;
 
   @property({type: 'object'})
   options?: object;
 
-  constructor(data?: Partial<CartItem>) {
+  constructor(data?: Partial<CartProduct>) {
     super(data);
   }
 }

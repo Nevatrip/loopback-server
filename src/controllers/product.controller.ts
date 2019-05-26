@@ -4,52 +4,52 @@ import {SanityService} from '../services/sanity.service';
 import * as format from 'date-fns/format';
 import {parse} from 'date-fns';
 
-export class ServiceController {
+export class ProductController {
   constructor(
     @inject('services.SanityService')
     protected sanityService: SanityService,
   ) {}
 
-  @get('/service/{id}', {
+  @get('/product/{id}', {
     responses: {
       '200': {
-        description: 'Service Response',
+        description: 'Product Response',
       },
     },
-    summary: 'Get Service data by Id',
+    summary: 'Get Product data by Id',
   })
-  async getServiceById(@param.path.string('id') id: string) {
-    const service = (await this.sanityService.getServiceById(id))[0];
+  async getProductById(@param.path.string('id') id: string) {
+    const product = (await this.sanityService.getProductById(id))[0];
 
-    return service;
+    return product;
   }
 
-  @get('/service/{id}/cart', {
+  @get('/product/{id}/cart', {
     responses: {
       '200': {
-        description: 'Service Response',
+        description: 'Product Response',
       },
     },
-    summary: 'Get Service data for cart by Id',
+    summary: 'Get Product data for cart by Id',
   })
-  async getServiceForCartById(@param.path.string('id') id: string) {
-    const service = (await this.sanityService.getServiceForCartById(id))[0];
+  async getProductForCartById(@param.path.string('id') id: string) {
+    const product = (await this.sanityService.getProductForCartById(id))[0];
 
-    return service;
+    return product;
   }
 
-  @get('/service/{id}/dates', {
+  @get('/product/{id}/dates', {
     responses: {
       '200': {
-        description: 'Service Response',
+        description: 'Product Response',
       },
     },
-    summary: 'Get Service dates by Id',
+    summary: 'Get Product dates by Id',
   })
   async getDatesById(@param.path.string('id') id: string) {
-    const services = await this.sanityService.getServiceById(id);
+    const product = await this.sanityService.getProductById(id);
     let dir: {[key: string]: string[]} = {};
-    (await services[0]).directions.forEach(direction => {
+    (await product[0]).directions.forEach(direction => {
       let dates: string[] = [];
       if (direction.schedule) {
         direction.schedule.forEach(event => {
@@ -69,13 +69,13 @@ export class ServiceController {
     return dir;
   }
 
-  @get('/service/{id}/schedule/{directionId}/{date}', {
+  @get('/product/{id}/schedule/{directionId}/{date}', {
     responses: {
       '200': {
-        description: 'Service Response',
+        description: 'Product Response',
       },
     },
-    summary: "Get Service schedule by Id, direction's id and date",
+    summary: "Get Product schedule by Id, direction's id and date",
   })
   async getScheduleById(
     @param.path.string('id') id: string,
@@ -83,8 +83,8 @@ export class ServiceController {
     @param.path.string('date') date: string,
   ) {
     const actualDate = parse(date, 'dd.MM.yyyy', new Date());
-    const services = await this.sanityService.getServiceById(id);
-    const direction = (await services[0]).directions.filter(
+    const product = await this.sanityService.getProductById(id);
+    const direction = (await product[0]).directions.filter(
       dir => dir._key === directionId,
     )[0];
 
