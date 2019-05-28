@@ -157,10 +157,9 @@ export class Product extends Entity {
 
   @property({
     type: 'string',
-    required: true,
     default: 'test',
   })
-  test: string;
+  test?: string;
 
   constructor(data?: Partial<Product>) {
     super(data);

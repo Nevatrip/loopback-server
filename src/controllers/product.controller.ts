@@ -35,23 +35,13 @@ export class ProductController {
   async getProductForCartById(@param.path.string('id') id: string) {
     const product = (await this.sanityService.getProductForCartById(id))[0];
 
-    return product;
-  }
+    (await product).test = 'world';
+    product.test = 'world2';
 
-  @get('/product/{id}/dates', {
-    responses: {
-      '200': {
-        description: 'Product Response',
-      },
-    },
-    summary: 'Get Product dates by Id',
-  })
-  async getDatesById(@param.path.string('id') id: string) {
-    const product = await this.sanityService.getProductById(id);
-    let dir: {[key: string]: string[]} = {};
-    (await product[0]).directions.forEach(direction => {
+    product.directions.forEach(direction => {
       let dates: string[] = [];
       if (direction.schedule) {
+        console.log('direction.schedule');
         direction.schedule.forEach(event => {
           event.actions.forEach(action => {
             const date = new Date(action.start);
@@ -62,11 +52,12 @@ export class ProductController {
             }
           });
         });
+        delete direction.schedule;
+        direction.dates = [...new Set(dates)];
       }
-      dir[direction._key] = [...new Set(dates)];
     });
 
-    return dir;
+    return product;
   }
 
   @get('/product/{id}/schedule/{directionId}/{date}', {
