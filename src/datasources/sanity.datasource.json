@@ -13,7 +13,7 @@
         "responsePath": "$.result[0]"
       },
       "functions": {
-        "getServiceByAlias": [
+        "getProductByAlias": [
           "alias"
         ]
       }
@@ -28,7 +28,22 @@
         "responsePath": "$.result[0]"
       },
       "functions": {
-        "getServiceById": [
+        "getProductById": [
+          "id"
+        ]
+      }
+    },
+    {
+      "template": {
+        "method": "GET",
+        "url": "https://39dycnz5.api.sanity.io/v1/data/query/develop",
+        "query": {
+          "query": "*[_id=='{id}']\u007Btitle,'directions':directions[]\u007B_key,title,'schedule':schedule[],'tickets':tickets[]\u007B...,'category':category->,'ticket':ticket[]->\u007D\u007D\u007D"
+        },
+        "responsePath": "$.result[0]"
+      },
+      "functions": {
+        "getProductForCartById": [
           "id"
         ]
       }

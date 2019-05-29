@@ -1,7 +1,7 @@
 import {Entity, model, property} from '@loopback/repository';
 
 @model()
-export class Service extends Entity {
+export class Product extends Entity {
   @property({
     type: 'string',
     id: true,
@@ -157,12 +157,11 @@ export class Service extends Entity {
 
   @property({
     type: 'string',
-    required: true,
     default: 'test',
   })
-  test: string;
+  test?: string;
 
-  constructor(data?: Partial<Service>) {
+  constructor(data?: Partial<Product>) {
     super(data);
   }
 }

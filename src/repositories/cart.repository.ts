@@ -1,5 +1,5 @@
 import {DefaultKeyValueRepository} from '@loopback/repository';
-import {Cart, CartItem} from '../models';
+import {Cart, CartProduct} from '../models';
 import {RedisDataSource} from '../datasources';
 import {inject} from '@loopback/core';
 import {promisify} from 'util';
@@ -11,37 +11,37 @@ export class CartRepository extends DefaultKeyValueRepository<Cart> {
   }
 
   /**
-   * Add an item to the shopping cart with optimistic lock to allow concurrent
+   * Add an product to the shopping cart with optimistic lock to allow concurrent
    * `adding to cart` from multiple devices
    *
    * @param sessionId User's session id
-   * @param item Item to be added
+   * @param product product to be added
    */
-  addItem(sessionId: string, item: CartItem) {
-    const addItemToCart = (cart: Cart | null) => {
+  addProduct(sessionId: string, product: CartProduct) {
+    const addProductToCart = (cart: Cart | null) => {
       cart = cart || new Cart({sessionId});
-      cart.items = cart.items || [];
+      cart.products = cart.products || [];
 
-      delete item.key;
-      item.key = hash(item);
+      delete product.key;
+      product.key = hash(product);
 
-      cart.items.push(item);
+      cart.products.push(product);
       return cart;
     };
-    return this.checkAndSet(sessionId, addItemToCart);
+    return this.checkAndSet(sessionId, addProductToCart);
   }
 
-  deleteItem(sessionId: string, key: string) {
-    const deleteItemFromCart = (cart: Cart) => {
-      if (cart.items && cart.items.length) {
-        cart.items = cart.items.filter((item: CartItem) => {
-          return item.key !== key;
+  deleteProduct(sessionId: string, key: string) {
+    const deleteProductFromCart = (cart: Cart) => {
+      if (cart.products && cart.products.length) {
+        cart.products = cart.products.filter((product: CartProduct) => {
+          return product.key !== key;
         });
       }
 
       return cart;
     };
-    return this.checkAndSet(sessionId, deleteItemFromCart);
+    return this.checkAndSet(sessionId, deleteProductFromCart);
   }
 
   /**

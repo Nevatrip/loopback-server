@@ -1,11 +1,12 @@
 import {getService, juggler} from '@loopback/service-proxy';
 import {inject, Provider} from '@loopback/core';
 import {SanityDataSource} from '../datasources/sanity.datasource';
-import {Service} from '../models';
+import {Product} from '../models';
 
 export interface SanityService {
-  getServiceByAlias(alias: string): Promise<Service>[];
-  getServiceById(id: string): Promise<Service>[];
+  getProductByAlias(alias: string): Promise<Product[]>;
+  getProductById(id: string): Promise<Product[]>;
+  getProductForCartById(id: string): Promise<Product[]>;
   // getScheduleByAlias(alias: string): Promise<Event>;
 }
 

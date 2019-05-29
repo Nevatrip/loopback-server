@@ -11,6 +11,11 @@ services:
         - YARN=false
     volumes:
       - ../:/opt/app
+    environment:
+      - NEVATRAVEL=${NEVATRAVEL}
+      - ASTRAMARIN_USERNAME=${ASTRAMARIN_USERNAME}
+      - ASTRAMARIN_PASSWORD=${ASTRAMARIN_PASSWORD}
+      - ASTRAMARIN=${ASTRAMARIN}
     entrypoint: run-nodock "npm start"
     tty: true
 
@@ -46,26 +51,3 @@ services:
       - '80:80'
       - '443:443'
     tty: true
-
-  certbot:
-    build:
-      context: ./certbot
-    links:
-      - nginx
-    volumes:
-      - ./certbot/letsencrypt/:/var/www/letsencrypt
-      - ./certbot/certs/:/var/certs
-    environment:
-      - CN=api.nevatrip.ru
-      - EMAIL=info@nevatrip.ru
-
-  workspace:
-    build:
-      context: ./workspace
-      args:
-        - NODE_VERSION=latest
-        - TZ=UTC
-    links:
-      - nginx
-    volumes:
-      - ../:/opt/app

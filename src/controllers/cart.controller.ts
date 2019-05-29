@@ -8,7 +8,7 @@ import {
   requestBody,
   HttpErrors,
 } from '@loopback/rest';
-import {Cart, CartItem} from '../models';
+import {Cart, CartProduct} from '../models';
 import {CartRepository} from '../repositories';
 
 import * as hash from 'object-hash';
@@ -47,52 +47,52 @@ export class CartController {
 
     cart.created = cart.created || new Date();
     cart.lastUpdated = new Date();
-    (cart.items || []).forEach(item => {
-      delete item.key;
-      item.key = hash(item);
+    (cart.products || []).forEach(product => {
+      delete product.key;
+      product.key = hash(product);
     });
 
     await this.cartRepository.set(sessionId, cart);
   }
 
   /**
-   * Add an item to the shopping cart for a given user
+   * Add an product to the shopping cart for a given user
    * @param sessionId User id
    */
-  @post('/shoppingCarts/{sessionId}/items', {
+  @post('/shoppingCarts/{sessionId}/products', {
     responses: {
       '200': {
-        description: 'New item to Cart',
+        description: 'New product to Cart',
       },
     },
-    summary: 'Add new item to Cart',
+    summary: 'Add new product to Cart',
   })
-  async addItem(
+  async addProduct(
     @param.path.string('sessionId') sessionId: string,
-    @requestBody({description: 'shopping cart item'})
-    item: CartItem,
+    @requestBody({description: 'shopping cart product'})
+    product: CartProduct,
   ) {
-    await this.cartRepository.addItem(sessionId, item);
+    await this.cartRepository.addProduct(sessionId, product);
   }
 
   /**
-   * Add an item to the shopping cart for a given user
+   * Add an product to the shopping cart for a given user
    * @param sessionId User id
-   * @param key Cart item key
+   * @param key Cart product key
    */
-  @del('/shoppingCarts/{sessionId}/items/{key}', {
+  @del('/shoppingCarts/{sessionId}/products/{key}', {
     responses: {
       '200': {
-        description: "Cart's item to delete",
+        description: "Cart's product to delete",
       },
     },
-    summary: "Delete Cart's item by key",
+    summary: "Delete Cart's product by key",
   })
-  async deleteItem(
+  async deleteProduct(
     @param.path.string('sessionId') sessionId: string,
     @param.path.string('key') key: string,
   ) {
-    await this.cartRepository.deleteItem(sessionId, key);
+    await this.cartRepository.deleteProduct(sessionId, key);
   }
 
   /**
