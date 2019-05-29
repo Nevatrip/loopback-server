@@ -38,7 +38,7 @@
         "method": "GET",
         "url": "https://39dycnz5.api.sanity.io/v1/data/query/develop",
         "query": {
-          "query": "*[_id=='{id}']\u007Btitle,'directions':directions[]\u007B_key,title,'tickets':tickets[]\u007B...,'category':category->,'ticket':ticket[]->\u007D\u007D\u007D"
+          "query": "*[_id=='{id}']\u007Btitle,'directions':directions[]\u007B_key,title,'schedule':schedule[],'tickets':tickets[]\u007B...,'category':category->,'ticket':ticket[]->\u007D\u007D\u007D"
         },
         "responsePath": "$.result[0]"
       },
