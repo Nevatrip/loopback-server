@@ -35,13 +35,9 @@ export class ProductController {
   async getProductForCartById(@param.path.string('id') id: string) {
     const product = (await this.sanityService.getProductForCartById(id))[0];
 
-    (await product).test = 'world';
-    product.test = 'world2';
-
     product.directions.forEach(direction => {
       let dates: string[] = [];
       if (direction.schedule) {
-        console.log('direction.schedule');
         direction.schedule.forEach(event => {
           event.actions.forEach(action => {
             const date = new Date(action.start);
