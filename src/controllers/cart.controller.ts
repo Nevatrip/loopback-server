@@ -1,4 +1,4 @@
-import {repository} from '@loopback/repository';
+import { repository } from '@loopback/repository';
 import {
   post,
   param,
@@ -8,8 +8,8 @@ import {
   requestBody,
   HttpErrors,
 } from '@loopback/rest';
-import {Cart, CartProduct} from '../models';
-import {CartRepository} from '../repositories';
+import { Cart, CartProduct } from '../models';
+import { CartRepository } from '../repositories';
 
 import * as hash from 'object-hash';
 import * as debugFactory from 'debug';
@@ -19,7 +19,7 @@ export class CartController {
   constructor(
     @repository(CartRepository)
     public cartRepository: CartRepository,
-  ) {}
+  ) { }
 
   /**
    * Create or update the shopping cart for a given user
@@ -36,7 +36,7 @@ export class CartController {
   })
   async set(
     @param.path.string('sessionId') sessionId: string,
-    @requestBody({description: 'shopping cart'}) cart: Cart,
+    @requestBody({ description: 'shopping cart' }) cart: Cart,
   ) {
     debug('Create shopping cart %s: %j', sessionId, cart);
     if (sessionId !== cart.sessionId) {
@@ -69,7 +69,7 @@ export class CartController {
   })
   async addProduct(
     @param.path.string('sessionId') sessionId: string,
-    @requestBody({description: 'shopping cart product'})
+    @requestBody({ description: 'shopping cart product' })
     product: CartProduct,
   ) {
     await this.cartRepository.addProduct(sessionId, product);

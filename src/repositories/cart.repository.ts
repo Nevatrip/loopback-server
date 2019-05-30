@@ -1,8 +1,8 @@
-import {DefaultKeyValueRepository} from '@loopback/repository';
-import {Cart, CartProduct} from '../models';
-import {RedisDataSource} from '../datasources';
-import {inject} from '@loopback/core';
-import {promisify} from 'util';
+import { DefaultKeyValueRepository } from '@loopback/repository';
+import { Cart, CartProduct } from '../models';
+import { RedisDataSource } from '../datasources';
+import { inject } from '@loopback/core';
+import { promisify } from 'util';
 import * as hash from 'object-hash';
 
 export class CartRepository extends DefaultKeyValueRepository<Cart> {
@@ -19,7 +19,7 @@ export class CartRepository extends DefaultKeyValueRepository<Cart> {
    */
   addProduct(sessionId: string, product: CartProduct) {
     const addProductToCart = (cart: Cart | null) => {
-      cart = cart || new Cart({sessionId});
+      cart = cart || new Cart({ sessionId });
       cart.products = cart.products || [];
 
       delete product.key;
@@ -32,8 +32,8 @@ export class CartRepository extends DefaultKeyValueRepository<Cart> {
   }
 
   deleteProduct(sessionId: string, key: string) {
-    const deleteProductFromCart = (cart: Cart) => {
-      if (cart.products && cart.products.length) {
+    const deleteProductFromCart = (cart: Cart | null) => {
+      if (cart && cart.products && cart.products.length) {
         cart.products = cart.products.filter((product: CartProduct) => {
           return product.key !== key;
         });
