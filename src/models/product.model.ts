@@ -1,4 +1,4 @@
-import {Entity, model, property} from '@loopback/repository';
+import { Entity, model, property } from '@loopback/repository';
 
 @model()
 export class Product extends Entity {
@@ -64,13 +64,17 @@ export class Product extends Entity {
     schedule?: {
       _key: string;
       _type: 'event';
-      start: Date;
+      start: number;
+      startLabel: Date;
+      end: number;
+      endLabel: Date;
       actions: {
         _key: string;
         start: Date;
+        end: Date;
       }[];
     }[];
-    dates?: string[];
+    dates?: number[];
     scheduleOnDate?: {}[];
   }[];
 

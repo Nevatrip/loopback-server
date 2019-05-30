@@ -1,14 +1,14 @@
-import {inject} from '@loopback/core';
-import {get, param} from '@loopback/rest';
-import {SanityService} from '../services/sanity.service';
+import { inject } from '@loopback/core';
+import { get, param } from '@loopback/rest';
+import { SanityService } from '../services/sanity.service';
 import * as format from 'date-fns/format';
-import {parse} from 'date-fns';
+import { parse } from 'date-fns';
 
 export class ProductController {
   constructor(
     @inject('services.SanityService')
     protected sanityService: SanityService,
-  ) {}
+  ) { }
 
   @get('/product/{id}', {
     responses: {
@@ -36,7 +36,7 @@ export class ProductController {
     const product = (await this.sanityService.getProductForCartById(id))[0];
 
     product.directions.forEach(direction => {
-      let dates: string[] = [];
+      let dates: number[] = [];
       if (direction.schedule) {
         direction.schedule.forEach(event => {
           event.actions.forEach(action => {
@@ -44,7 +44,7 @@ export class ProductController {
 
             // return only feature dates
             if (date > new Date()) {
-              dates.push(format(date, 'dd.MM.yyyy'));
+              dates.push(date.getTime() / 1000);
             }
           });
         });
@@ -69,7 +69,7 @@ export class ProductController {
     @param.path.string('directionId') directionId: string,
     @param.path.string('date') date: string,
   ) {
-    const actualDate = parse(date, 'dd.MM.yyyy', new Date());
+    const actualDate = parse(date, 'yyyy-MM-dd', new Date());
     const product = await this.sanityService.getProductById(id);
     const direction = (await product[0]).directions.filter(
       dir => dir._key === directionId,
@@ -84,7 +84,10 @@ export class ProductController {
             actionDate > new Date() &&
             actionDate.toDateString() === actualDate.toDateString()
           ) {
-            event.start = action.start;
+            event.startLabel = action.start;
+            event.endLabel = action.end;
+            event.start = new Date(action.start).getTime() / 1000;
+            event.end = new Date(action.end).getTime() / 1000;
             delete event.actions;
             schedule.push(event);
           }
