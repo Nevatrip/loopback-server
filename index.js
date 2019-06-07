@@ -11,6 +11,10 @@ if (require.main === module) {
       openApiSpec: {
         // useful when used with OASGraph to locate your application
         // setServersFromRequest: true,
+        info: {
+          title: 'NevaTrip API',
+          version: '0.1.0',
+        },
         servers: [
           {
             url: 'http://api.nevatrip.ru',

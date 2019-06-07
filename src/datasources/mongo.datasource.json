@@ -4,7 +4,7 @@
   "url": "",
   "host": "mongo",
   "port": 27017,
-  "user": "",
-  "password": "",
-  "database": ""
+  "user": "root",
+  "password": "example",
+  "database": "mongo"
 }
