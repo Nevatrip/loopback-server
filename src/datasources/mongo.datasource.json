@@ -6,5 +6,5 @@
   "port": 27017,
   "user": "root",
   "password": "example",
-  "database": "mongo"
+  "database": "test"
 }

@@ -19,15 +19,25 @@ services:
     entrypoint: run-nodock "npm start"
     tty: true
 
+  # mongo:
+  #   build: ./mongo
+  #   ports:
+  #     - '27017:27017'
+  #   volumes:
+  #     - ./data/mongo/:/var/lib/mongodb
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: root
+  #     MONGO_INITDB_ROOT_PASSWORD: example
+
   mongo:
-    build: ./mongo
+    image: mongo
+    restart: always
     ports:
-      - '27017:27017'
-    volumes:
-      - ./data/mongo/:/var/lib/mongodb
+      - 27017:27017
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: test
 
   redis:
     build:

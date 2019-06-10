@@ -9,8 +9,8 @@ export class OrderRepository extends DefaultCrudRepository<
 > {
   constructor(
     // @inject('datasources.mongo') dataSource: MongoDataSource,
-    @inject('datasources.mongo') protected dataSource: juggler.DataSource,
+    @inject('datasources.mongo') protected datasource: juggler.DataSource,
   ) {
-    super(Order, dataSource);
+    super(Order, datasource);
   }
 }
