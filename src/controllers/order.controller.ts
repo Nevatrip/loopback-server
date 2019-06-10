@@ -18,23 +18,101 @@ import {
 } from '@loopback/rest';
 import {Order} from '../models';
 import {OrderRepository} from '../repositories';
+import {
+  ClientService,
+  TaxationSystem,
+  VAT,
+  ResponseCodes,
+  ReceiptTypes,
+  PayNotification,
+} from 'cloudpayments';
 
 export class OrderController {
   constructor(
     @repository(OrderRepository)
-    public orderRepository : OrderRepository,
+    public orderRepository: OrderRepository,
   ) {}
 
   @post('/orders', {
     responses: {
       '200': {
         description: 'Order model instance',
-        content: {'application/json': {schema: {'x-ts-type': Order}}},
+        content: {
+          'application/json': {schema: {'x-ts-type': Order}},
+        },
       },
     },
   })
-  async create(@requestBody() order: Order): Promise<Order> {
-    return await this.orderRepository.create(order);
+  async create(
+    @requestBody() order: Order,
+  ): Promise<
+    | {
+        request: PayNotification;
+        response: {
+          code: ResponseCodes;
+        };
+      }
+    | {
+        request: PayNotification;
+        response: {
+          code?: undefined;
+        };
+      }
+  > {
+    const client = new ClientService({
+      privateKey: 'pk_9571506275254507c34463787fa0b',
+      publicId: 'bcf206edd471f415bf49881b3ad167fb',
+      org: {
+        taxationSystem: TaxationSystem.SIMPLIFIED_INCOME,
+        inn: 7802873242,
+      },
+    });
+
+    const handlers = client.getNotificationHandlers();
+    const receiptApi = client.getReceiptApi();
+
+    const response = await handlers.handlePayRequest(
+      {payload: 'new'},
+      async request => {
+        console.log('request', request);
+
+        // Проверям запрос, например на совпадение цены заказа
+        if (request.Amount > 0) {
+          return ResponseCodes.INVALID_AMOUNT;
+        }
+
+        // Отправляем запрос на создание чека
+        const responseReceipt = await receiptApi.createReceipt(
+          {
+            Type: ReceiptTypes.Income,
+          },
+          {
+            Items: [
+              {
+                label: 'Наименование товара или сервиса',
+                quantity: 2,
+                price: 1200,
+                amount: 2400,
+                vat: VAT.VAT18,
+                ean13: '1234456363',
+              },
+            ],
+          },
+        );
+
+        console.log('responseReceipt', responseReceipt);
+
+        // Проверяем, что запрос встал в очередь,
+        // иначе обрабатываем исключение
+
+        // Если все прошло успешно, возвращаем 0
+        return ResponseCodes.SUCCESS;
+      },
+    );
+
+    await this.orderRepository.create(order);
+
+    return response;
   }
 
   @get('/orders/count', {
@@ -46,7 +124,8 @@ export class OrderController {
     },
   })
   async count(
-    @param.query.object('where', getWhereSchemaFor(Order)) where?: Where<Order>,
+    @param.query.object('where', getWhereSchemaFor(Order))
+    where?: Where<Order>,
   ): Promise<Count> {
     return await this.orderRepository.count(where);
   }
@@ -64,7 +143,8 @@ export class OrderController {
     },
   })
   async find(
-    @param.query.object('filter', getFilterSchemaFor(Order)) filter?: Filter<Order>,
+    @param.query.object('filter', getFilterSchemaFor(Order))
+    filter?: Filter<Order>,
   ): Promise<Order[]> {
     return await this.orderRepository.find(filter);
   }
@@ -79,7 +159,8 @@ export class OrderController {
   })
   async updateAll(
     @requestBody() order: Order,
-    @param.query.object('where', getWhereSchemaFor(Order)) where?: Where<Order>,
+    @param.query.object('where', getWhereSchemaFor(Order))
+    where?: Where<Order>,
   ): Promise<Count> {
     return await this.orderRepository.updateAll(order, where);
   }
@@ -88,7 +169,9 @@ export class OrderController {
     responses: {
       '200': {
         description: 'Order model instance',
-        content: {'application/json': {schema: {'x-ts-type': Order}}},
+        content: {
+          'application/json': {schema: {'x-ts-type': Order}},
+        },
       },
     },
   })
