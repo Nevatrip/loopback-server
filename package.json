@@ -58,6 +58,7 @@
     "@loopback/rest": "^1.9.1",
     "@loopback/rest-explorer": "^1.1.13",
     "@loopback/service-proxy": "^1.1.1",
+    "@types/nodemailer": "^6.2.0",
     "@types/object-hash": "^1.2.0",
     "basic-auth-token": "^0.4.2",
     "cloudpayments": "^2.1.3",

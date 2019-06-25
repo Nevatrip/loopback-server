@@ -18,6 +18,7 @@ import {
   HttpErrors,
 } from '@loopback/rest';
 import {Order} from '../models';
+import {sendEmail} from '../utils';
 import {OrderRepository, CartRepository} from '../repositories';
 import {
   ClientService,
@@ -47,7 +48,7 @@ export class OrderController {
   async create(@requestBody() order: Order): Promise<Order> {
     if (!privateKey || !publicId) {
       throw new HttpErrors.Unauthorized(`Payment gateway is not defined`);
-      }
+    }
 
     const {sessionId} = order;
     const cart = await this.cartRepository.get(sessionId);
@@ -56,7 +57,7 @@ export class OrderController {
       throw new HttpErrors.NotFound(
         `Shopping cart not found for user: ${sessionId}`,
       );
-      }
+    }
 
     const client = new ClientService({
       privateKey: privateKey,
@@ -94,9 +95,10 @@ export class OrderController {
 
     const newOrder = await this.orderRepository.create(order);
 
+    sendEmail(newOrder);
 
     return newOrder;
-        }
+  }
 
   @post('/orders/check', {
     responses: {'200': {description: 'Check CloudPayment'}},
@@ -127,7 +129,7 @@ export class OrderController {
       '200': {
         description: 'pay CloudPayment',
       },
-      },
+    },
   })
   // tslint:disable-next-line: no-any
   async pay(@requestBody() body: {}) {
