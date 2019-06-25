@@ -5,7 +5,7 @@ import {
   RestExplorerComponent,
 } from '@loopback/rest-explorer';
 import {RepositoryMixin} from '@loopback/repository';
-import {RestApplication} from '@loopback/rest';
+import {RestApplication, RestBindings} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import * as path from 'path';
 import {MySequence} from './sequence';
@@ -21,6 +21,11 @@ export class NevatripRestApplication extends BootMixin(
 
     // Set up default home page
     this.static('/', path.join(__dirname, '../../public'));
+
+    this.bind(RestBindings.REQUEST_BODY_PARSER_OPTIONS).to({
+      limit: '1MB',
+      parameterLimit: 1000000,
+    });
 
     // Customize @loopback/rest-explorer configuration here
     this.bind(RestExplorerBindings.CONFIG).to({
