@@ -4,7 +4,8 @@
   "url": "",
   "host": "mongo",
   "port": 27017,
-  "user": "root",
-  "password": "example",
-  "database": "test"
+  "user": "",
+  "password": "",
+  "database": "test",
+  "useNewUrlParser": true
 }
