@@ -18,7 +18,7 @@ import {
   HttpErrors,
 } from '@loopback/rest';
 import {Order} from '../models';
-import {sendEmail} from '../utils';
+import {sendEmail, getPaymentDescription} from '../utils';
 import {OrderRepository, CartRepository} from '../repositories';
 import {
   ClientService,
@@ -74,11 +74,7 @@ export class OrderController {
       Amount: cart.products.length,
       Currency: 'RUB',
       // JsonData?: string;
-      Description: `Покупка ${
-        cart.products.length < 2
-          ? 'экскурсии'
-          : cart.products.length + ' экскурсий'
-      } на сайте NevaTrip`,
+      Description: getPaymentDescription(cart.products.length),
       email: order.user.email,
       phone: order.user.phone,
     });
@@ -181,6 +177,7 @@ export class OrderController {
     @param.query.object('filter', getFilterSchemaFor(Order))
     filter?: Filter<Order>,
   ): Promise<Order[]> {
+    console.log(filter);
     return await this.orderRepository.find(filter);
   }
 
