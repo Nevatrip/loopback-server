@@ -20,7 +20,7 @@ export class Cart extends Entity {
   lastUpdated?: Date;
 
   @property.array(CartProduct)
-  products?: CartProduct[];
+  products: CartProduct[];
 
   constructor(data?: Partial<Cart>) {
     super(data);

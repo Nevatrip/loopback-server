@@ -1,8 +1,8 @@
-import { DefaultKeyValueRepository } from '@loopback/repository';
-import { Cart, CartProduct } from '../models';
-import { RedisDataSource } from '../datasources';
-import { inject } from '@loopback/core';
-import { promisify } from 'util';
+import {DefaultKeyValueRepository} from '@loopback/repository';
+import {Cart, CartProduct} from '../models';
+import {RedisDataSource} from '../datasources';
+import {inject} from '@loopback/core';
+import {promisify} from 'util';
 import * as hash from 'object-hash';
 
 export class CartRepository extends DefaultKeyValueRepository<Cart> {
@@ -19,11 +19,13 @@ export class CartRepository extends DefaultKeyValueRepository<Cart> {
    */
   addProduct(sessionId: string, product: CartProduct) {
     const addProductToCart = (cart: Cart | null) => {
-      cart = cart || new Cart({ sessionId });
+      cart = cart || new Cart({sessionId});
       cart.products = cart.products || [];
+      cart.created = cart.created || new Date();
+      cart.lastUpdated = new Date();
 
       delete product.key;
-      product.key = hash(product);
+      product.key = hash({product, date: new Date()});
 
       cart.products.push(product);
       return cart;
