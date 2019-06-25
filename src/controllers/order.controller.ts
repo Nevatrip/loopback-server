@@ -15,22 +15,23 @@ import {
   put,
   del,
   requestBody,
+  HttpErrors,
 } from '@loopback/rest';
 import {Order} from '../models';
-import {OrderRepository} from '../repositories';
+import {OrderRepository, CartRepository} from '../repositories';
 import {
   ClientService,
   TaxationSystem,
-  VAT,
-  ResponseCodes,
-  ReceiptTypes,
-  PayNotification,
+  PaymentSuccessModel,
 } from 'cloudpayments';
+
+const privateKey = process.env.CLOUDPAYMENTS_PRIVATEKEY;
+const publicId = process.env.CLOUDPAYMENTS_PUBLICID;
 
 export class OrderController {
   constructor(
-    @repository(OrderRepository)
-    public orderRepository: OrderRepository,
+    @repository(OrderRepository) public orderRepository: OrderRepository,
+    @repository(CartRepository) public cartRepository: CartRepository,
   ) {}
 
   @post('/orders', {
@@ -43,76 +44,108 @@ export class OrderController {
       },
     },
   })
-  async create(
-    @requestBody() order: Order,
-  ): Promise<
-    | {
-        request: PayNotification;
-        response: {
-          code: ResponseCodes;
-        };
+  async create(@requestBody() order: Order): Promise<Order> {
+    if (!privateKey || !publicId) {
+      throw new HttpErrors.Unauthorized(`Payment gateway is not defined`);
       }
-    | {
-        request: PayNotification;
-        response: {
-          code?: undefined;
-        };
+
+    const {sessionId} = order;
+    const cart = await this.cartRepository.get(sessionId);
+
+    if (cart == null || !cart.products.length) {
+      throw new HttpErrors.NotFound(
+        `Shopping cart not found for user: ${sessionId}`,
+      );
       }
-  > {
+
     const client = new ClientService({
-      privateKey: 'pk_9571506275254507c34463787fa0b',
-      publicId: 'bcf206edd471f415bf49881b3ad167fb',
+      privateKey: privateKey,
+      publicId: publicId,
       org: {
         taxationSystem: TaxationSystem.SIMPLIFIED_INCOME,
         inn: 7802873242,
       },
     });
 
-    const handlers = client.getNotificationHandlers();
-    const receiptApi = client.getReceiptApi();
+    const clientApi = client.getClientApi();
 
-    const response = await handlers.handlePayRequest(
-      {payload: 'new'},
-      async request => {
-        console.log('request', request);
+    const orderPayment = await clientApi.createOrder({
+      Amount: cart.products.length,
+      Currency: 'RUB',
+      // JsonData?: string;
+      Description: `Покупка ${
+        cart.products.length < 2
+          ? 'экскурсии'
+          : cart.products.length + ' экскурсий'
+      } на сайте NevaTrip`,
+      email: order.user.email,
+      phone: order.user.phone,
+    });
 
-        // Проверям запрос, например на совпадение цены заказа
-        if (request.Amount > 0) {
-          return ResponseCodes.INVALID_AMOUNT;
+    if (!orderPayment.isSuccess()) {
+      throw new HttpErrors.NotFound(`Платёж не прошёл…`);
+    }
+
+    order.payment = orderPayment.getResponse();
+    order.status = 'new';
+    order.created = new Date();
+    order.source = 'default';
+    order.products = cart.products;
+
+    const newOrder = await this.orderRepository.create(order);
+
+
+    return newOrder;
         }
 
-        // Отправляем запрос на создание чека
-        const responseReceipt = await receiptApi.createReceipt(
-          {
-            Type: ReceiptTypes.Income,
-          },
-          {
-            Items: [
-              {
-                label: 'Наименование товара или сервиса',
-                quantity: 2,
-                price: 1200,
-                amount: 2400,
-                vat: VAT.VAT18,
-                ean13: '1234456363',
-              },
-            ],
-          },
-        );
+  @post('/orders/check', {
+    responses: {'200': {description: 'Check CloudPayment'}},
+  })
+  async check(
+    @requestBody({
+      content: {'application/x-www-form-urlencoded': {}},
+    })
+    body: PaymentSuccessModel,
+  ) {
+    console.log('CCCCHCKCKKCKCKC', body.TransactionId);
+    const filter: Filter<Order> = {
+      where: {
+        'payment.Model.Number': body.TransactionId,
+        // tslint:disable-next-line: no-any
+      } as any,
+    };
+    const order: Order | null = await this.orderRepository.findOne(filter);
+    console.log('@@@##@@!!!@@');
 
-        console.log('responseReceipt', responseReceipt);
+    if (!order) return {code: 0};
 
-        // Проверяем, что запрос встал в очередь,
-        // иначе обрабатываем исключение
+    return {code: 0};
+  }
 
-        // Если все прошло успешно, возвращаем 0
-        return ResponseCodes.SUCCESS;
+  @post('/orders/pay', {
+    responses: {
+      '200': {
+        description: 'pay CloudPayment',
       },
-    );
+      },
+  })
+  // tslint:disable-next-line: no-any
+  async pay(@requestBody() body: {}) {
+    console.log('pay CloudPayment', body);
+    return body;
+  }
 
-    await this.orderRepository.create(order);
-
-    return response;
+  @post('/orders/fail', {
+    responses: {
+      '200': {
+        description: 'fail CloudPayment',
+      },
+    },
+  })
+  // tslint:disable-next-line: no-any
+  async fail(@requestBody() body: {}) {
+    console.log('fail CloudPayment', body);
+    return body;
   }
 
   @get('/orders/count', {
