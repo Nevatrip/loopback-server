@@ -46,7 +46,7 @@ export class CartController {
     }
 
     cart.created = cart.created || new Date();
-    cart.lastUpdated = new Date();
+    cart.updated = new Date();
     (cart.products || []).forEach(product => {
       delete product.key;
       product.key = hash(product);

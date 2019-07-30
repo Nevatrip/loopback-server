@@ -22,7 +22,7 @@ export class CartRepository extends DefaultKeyValueRepository<Cart> {
       cart = cart || new Cart({sessionId});
       cart.products = cart.products || [];
       cart.created = cart.created || new Date();
-      cart.lastUpdated = new Date();
+      cart.updated = new Date();
 
       delete product.key;
       product.key = hash({product, date: new Date()});

@@ -17,8 +17,10 @@ import {
   requestBody,
   HttpErrors,
 } from '@loopback/rest';
-import {Order} from '../models';
-import {sendEmail, getPaymentDescription} from '../utils';
+import {inject} from '@loopback/core';
+import {SanityService} from '../services/sanity.service';
+import {Order, Cart, Product} from '../models';
+import {/* sendEmail, */ getPaymentDescription} from '../utils';
 import {OrderRepository, CartRepository} from '../repositories';
 import {
   ClientService,
@@ -31,32 +33,36 @@ const publicId = process.env.CLOUDPAYMENTS_PUBLICID;
 
 export class OrderController {
   constructor(
-    @repository(OrderRepository) public orderRepository: OrderRepository,
-    @repository(CartRepository) public cartRepository: CartRepository,
+    @repository(OrderRepository)
+    public orderRepository: OrderRepository,
+    @repository(CartRepository)
+    public cartRepository: CartRepository,
+    @inject('services.SanityService')
+    protected sanityService: SanityService,
   ) {}
 
-  @post('/orders', {
-    responses: {
-      '200': {
-        description: 'Order model instance',
-        content: {
-          'application/json': {schema: {'x-ts-type': Order}},
-        },
-      },
-    },
-  })
-  async create(@requestBody() order: Order): Promise<Order> {
+  async getCart(cart: Cart) {
+    const {sessionId} = cart;
+    const order = await this.cartRepository.get(sessionId);
+
+    if (order == null || !order.products.length) {
+      throw new HttpErrors.NotFound(
+        `Shopping cart not found for user: ${sessionId}`,
+      );
+    }
+
+    order.user = cart.user;
+
+    return order;
+  }
+
+  async getPayment(order: Order) {
     if (!privateKey || !publicId) {
       throw new HttpErrors.Unauthorized(`Payment gateway is not defined`);
     }
 
-    const {sessionId} = order;
-    const cart = await this.cartRepository.get(sessionId);
-
-    if (cart == null || !cart.products.length) {
-      throw new HttpErrors.NotFound(
-        `Shopping cart not found for user: ${sessionId}`,
-      );
+    if (!order.sum && !order.isFullDiscount) {
+      throw new HttpErrors.PaymentRequired(`Ошибка суммы`);
     }
 
     const client = new ClientService({
@@ -70,28 +76,70 @@ export class OrderController {
 
     const clientApi = client.getClientApi();
 
-    const orderPayment = await clientApi.createOrder({
-      Amount: cart.products.length,
+    const payment = await clientApi.createOrder({
+      Amount: order.sum || 0,
       Currency: 'RUB',
       // JsonData?: string;
-      Description: getPaymentDescription(cart.products.length),
+      Description: getPaymentDescription(order.products.length),
       email: order.user.email,
       phone: order.user.phone,
     });
 
-    if (!orderPayment.isSuccess()) {
+    if (!payment.isSuccess()) {
       throw new HttpErrors.NotFound(`Платёж не прошёл…`);
     }
 
-    order.payment = orderPayment.getResponse();
-    order.status = 'new';
-    order.created = new Date();
-    order.source = 'default';
-    order.products = cart.products;
+    return payment.getResponse();
+  }
+
+  async getSum(order: Order) {
+    let sum = 0;
+    const products: {[key: string]: Product} = {};
+
+    for (const productItem of order.products) {
+      const {productId, tickets, direction} = productItem;
+
+      const product =
+        products[productId] ||
+        (await this.sanityService.getProductForCartById(productId))[0];
+      productItem.product = product;
+      const directionData = product.directions.find(
+        dir =>
+          dir._type === 'direction' &&
+          direction &&
+          direction.some(item => item._key === dir._key),
+      );
+
+      if (!directionData) return;
+
+      for (const ticket of directionData.tickets) {
+        if (tickets && tickets.hasOwnProperty(ticket._key)) {
+          sum += ticket.price * tickets[ticket._key];
+        }
+      }
+    }
+
+    return sum;
+  }
+
+  @post('/orders', {
+    responses: {
+      '200': {
+        description: 'Order model instance',
+        content: {
+          'application/json': {schema: {'x-ts-type': Order}},
+        },
+      },
+    },
+  })
+  async create(@requestBody() cart: Cart): Promise<Order> {
+    const order = (await this.getCart(cart)) as Order;
+    order.sum = await this.getSum(order);
+    order.payment = await this.getPayment(order);
 
     const newOrder = await this.orderRepository.create(order);
 
-    sendEmail(newOrder);
+    // sendEmail(newOrder, 'new');
 
     return newOrder;
   }
@@ -101,21 +149,27 @@ export class OrderController {
   })
   async check(
     @requestBody({
-      content: {'application/x-www-form-urlencoded': {}},
+      content: {
+        'application/x-www-form-urlencoded': {
+          schema: {
+            type: 'object',
+            properties: {
+              InvoiceId: {type: 'number'},
+            },
+          },
+        },
+      },
     })
     body: PaymentSuccessModel,
   ) {
-    console.log('CCCCHCKCKKCKCKC', body.TransactionId);
     const filter: Filter<Order> = {
       where: {
-        'payment.Model.Number': body.TransactionId,
-        // tslint:disable-next-line: no-any
-      } as any,
+        'payment.Model.Number': body.InvoiceId,
+      } as Where<Order>,
     };
-    const order: Order | null = await this.orderRepository.findOne(filter);
-    console.log('@@@##@@!!!@@');
+    const order = await this.orderRepository.findOne(filter);
 
-    if (!order) return {code: 0};
+    if (!order) return {code: 10};
 
     return {code: 0};
   }
@@ -127,10 +181,39 @@ export class OrderController {
       },
     },
   })
-  // tslint:disable-next-line: no-any
-  async pay(@requestBody() body: {}) {
-    console.log('pay CloudPayment', body);
-    return body;
+  async pay(
+    @requestBody({
+      content: {
+        'application/x-www-form-urlencoded': {
+          schema: {
+            type: 'object',
+            properties: {
+              InvoiceId: {type: 'number'},
+            },
+          },
+        },
+      },
+    })
+    body: PaymentSuccessModel,
+  ) {
+    const filter: Filter<Order> = {
+      where: {
+        'payment.Model.Number': body.InvoiceId,
+      } as Where<Order>,
+    };
+    const order = await this.orderRepository.findOne(filter);
+
+    if (!order) return {code: 10};
+
+    order.status = 'paid';
+    order.updated = new Date();
+
+    await this.orderRepository.updateById(order.id, order);
+
+    // sendEmail(order, 'paid');
+    // sendEmail(order, 'manager');
+
+    return {code: 0};
   }
 
   @post('/orders/fail', {
@@ -140,7 +223,6 @@ export class OrderController {
       },
     },
   })
-  // tslint:disable-next-line: no-any
   async fail(@requestBody() body: {}) {
     console.log('fail CloudPayment', body);
     return body;
@@ -177,7 +259,6 @@ export class OrderController {
     @param.query.object('filter', getFilterSchemaFor(Order))
     filter?: Filter<Order>,
   ): Promise<Order[]> {
-    console.log(filter);
     return await this.orderRepository.find(filter);
   }
 

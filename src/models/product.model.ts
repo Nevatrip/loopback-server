@@ -1,4 +1,48 @@
-import { Entity, model, property } from '@loopback/repository';
+import {Entity, model, property} from '@loopback/repository';
+
+export interface Ticket {
+  _key: string;
+  price: number;
+  name: string;
+}
+
+export interface Direction {
+  _key: string;
+  tickets: Ticket[];
+}
+
+export interface DirectionComplex extends Direction {
+  _type: 'complex';
+  nested: Direction['_key'][];
+  isEveryOwnDate?: boolean; // У каждого направления своя дата
+}
+
+export interface DirectionProduct extends Direction {
+  _type: 'direction';
+  schedule: IEvent[];
+  dates?: number[];
+}
+
+export interface IAction {
+  _key: string;
+  start: Date;
+}
+
+export interface IEvent {
+  _key: string;
+  _type: 'event';
+  title: string;
+  start: Date;
+  end: Date;
+  startTimezone?: string;
+  endTimezone?: string;
+  recurrenceRule?: string;
+  recurrenceException?: string;
+  recurrenceID?: string;
+  isAllDay?: boolean;
+  description?: string;
+  actions: IAction[];
+}
 
 @model()
 export class Product extends Entity {
@@ -9,10 +53,14 @@ export class Product extends Entity {
   _id: string;
 
   @property({
-    type: 'string',
+    type: 'object',
     required: true,
   })
-  title: string;
+  title: {
+    [key: string]: {
+      name: string;
+    };
+  };
 
   @property({
     type: 'string',
@@ -20,9 +68,7 @@ export class Product extends Entity {
   })
   titleLong: string;
 
-  @property({
-    type: 'string',
-  })
+  @property({type: 'string'})
   description?: string;
 
   @property({
@@ -31,14 +77,10 @@ export class Product extends Entity {
   })
   status?: string[];
 
-  @property({
-    type: 'object',
-  })
+  @property({type: 'object'})
   image?: object;
 
-  @property({
-    type: 'object',
-  })
+  @property({type: 'object'})
   category?: object;
 
   @property({
@@ -58,25 +100,7 @@ export class Product extends Entity {
     itemType: 'object',
     required: true,
   })
-  directions: {
-    _key: string;
-    _type: 'direction';
-    schedule?: {
-      _key: string;
-      _type: 'event';
-      start: number;
-      startLabel: Date;
-      end: number;
-      endLabel: Date;
-      actions: {
-        _key: string;
-        start: Date;
-        end: Date;
-      }[];
-    }[];
-    dates?: number[];
-    scheduleOnDate?: {}[];
-  }[];
+  directions: (DirectionProduct | DirectionComplex)[];
 
   @property({
     type: 'array',
@@ -84,19 +108,13 @@ export class Product extends Entity {
   })
   features?: string[];
 
-  @property({
-    type: 'string',
-  })
+  @property({type: 'string'})
   descriptionPrepend?: string;
 
-  @property({
-    type: 'string',
-  })
+  @property({type: 'string'})
   descriptionAppend?: string;
 
-  @property({
-    type: 'string',
-  })
+  @property({type: 'string'})
   advice?: string;
 
   @property({
@@ -105,9 +123,7 @@ export class Product extends Entity {
   })
   point: object;
 
-  @property({
-    type: 'string',
-  })
+  @property({type: 'string'})
   priceDescription?: string;
 
   @property({
@@ -116,29 +132,19 @@ export class Product extends Entity {
   })
   price: string;
 
-  @property({
-    type: 'string',
-  })
+  @property({type: 'string'})
   priceWidget?: string;
 
-  @property({
-    type: 'string',
-  })
+  @property({type: 'string'})
   priceAlt?: string;
 
-  @property({
-    type: 'string',
-  })
+  @property({type: 'string'})
   sale?: string;
 
-  @property({
-    type: 'string',
-  })
+  @property({type: 'string'})
   routeMap?: string;
 
-  @property({
-    type: 'date',
-  })
+  @property({type: 'date'})
   end?: string;
 
   @property({
@@ -157,13 +163,7 @@ export class Product extends Entity {
     type: 'array',
     itemType: 'object',
   })
-  schedule?: object[];
-
-  @property({
-    type: 'string',
-    default: 'test',
-  })
-  test?: string;
+  schedule?: IEvent[];
 
   constructor(data?: Partial<Product>) {
     super(data);

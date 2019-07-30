@@ -1,7 +1,7 @@
 import {inject} from '@loopback/core';
 import {
   get,
-  post,
+  // post,
   put,
   del,
   param,

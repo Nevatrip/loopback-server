@@ -1,39 +1,32 @@
-import {Entity, model, property} from '@loopback/repository';
-import {CartProduct} from './cart-product.model';
+import {model, property} from '@loopback/repository';
 import {BaseResponse, PaymentResponse} from 'cloudpayments';
+import {Cart} from './cart.model';
 
 @model({settings: {strict: false}})
-export class Order extends Entity {
-  @property({type: 'string'})
-  sessionId: string;
-
-  @property({type: 'object', required: true})
-  user: {
-    email: string;
-    phone: string;
-    fullname: string;
-  };
-
+export class Order extends Cart {
   @property({type: 'string', id: true})
   id?: string;
 
-  @property({type: 'string', default: 'new'})
-  status?: string;
+  @property({
+    type: 'string',
+    default: 'new',
+  })
+  status: 'new' | 'paid' | 'rejected';
 
-  @property({type: 'date'})
-  created?: Date;
-
-  @property({type: 'date'})
-  updated?: Date;
-
-  @property({type: 'string', default: 'default'})
+  @property({
+    type: 'string',
+    default: 'default',
+  })
   source?: string;
 
   @property({type: 'object'})
   payment?: PaymentResponse | BaseResponse;
 
-  @property.array(CartProduct)
-  products?: CartProduct[];
+  @property({type: 'number'})
+  sum?: number;
+
+  @property({type: 'string'})
+  isFullDiscount?: string;
 
   constructor(data?: Partial<Order>) {
     super(data);

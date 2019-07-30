@@ -1,4 +1,5 @@
 import {Entity, model, property} from '@loopback/repository';
+import {Product, CartDirection} from './index';
 
 @model()
 export class CartProduct extends Entity {
@@ -14,8 +15,16 @@ export class CartProduct extends Entity {
   })
   productId: string;
 
+  @property(Product)
+  product?: Product;
+
   @property({type: 'object'})
-  options?: object;
+  tickets?: {
+    [key: string]: number;
+  };
+
+  @property.array(CartDirection)
+  direction?: CartDirection[];
 
   constructor(data?: Partial<CartProduct>) {
     super(data);

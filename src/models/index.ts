@@ -1,6 +1,7 @@
 export * from './product.model';
 export * from './cart.model';
 export * from './cart-product.model';
+export * from './cart-direction.model';
 export * from './nevatravel-status.model';
 export * from './nevatravel-pier.model';
 export * from './nevatravel-program.model';

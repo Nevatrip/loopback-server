@@ -13,14 +13,21 @@ export class Cart extends Entity {
   })
   sessionId: string;
 
-  @property({type: 'date'})
-  created?: Date;
+  @property({type: 'date', default: () => new Date()})
+  created: Date;
 
   @property({type: 'date'})
-  lastUpdated?: Date;
+  updated?: Date;
 
   @property.array(CartProduct)
   products: CartProduct[];
+
+  @property({type: 'object'})
+  user: {
+    email: string;
+    phone: string;
+    fullName: string;
+  };
 
   constructor(data?: Partial<Cart>) {
     super(data);
