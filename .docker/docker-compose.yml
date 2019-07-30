@@ -21,16 +21,9 @@ services:
       - SMTP_PASS=${SMTP_PASS}
     entrypoint: run-nodock "npm start"
     tty: true
-
-  # mongo:
-  #   build: ./mongo
-  #   ports:
-  #     - '27017:27017'
-  #   volumes:
-  #     - ./data/mongo/:/var/lib/mongodb
-  #   environment:
-  #     MONGO_INITDB_ROOT_USERNAME: root
-  #     MONGO_INITDB_ROOT_PASSWORD: example
+    restart: unless-stopped
+    networks:
+      - app-network
 
   mongo:
     image: mongo
@@ -39,8 +32,11 @@ services:
       - 27017:27017
     environment:
       MONGO_INITDB_DATABASE: test
-    #   MONGO_INITDB_ROOT_USERNAME: root
-    #   MONGO_INITDB_ROOT_PASSWORD: example
+      # MONGO_INITDB_ROOT_USERNAME: root
+      # MONGO_INITDB_ROOT_PASSWORD: example
+    restart: unless-stopped
+    networks:
+      - app-network
 
   redis:
     build:
@@ -51,19 +47,54 @@ services:
       - ./data/redis:/data
     sysctls:
       - net.core.somaxconn=511
+    restart: unless-stopped
+    networks:
+      - app-network
 
   nginx:
-    build:
-      context: ./nginx
-      args:
-        - WEB_REVERSE_PROXY_PORT=8000
-        - WEB_SSL=false
-        - SELF_SIGNED=false
-        - NO_DEFAULT=false
-    volumes:
-      - ./data/logs/nginx/:/var/log/nginx
-      - ./certbot/certs/:/var/certs
+    image: nginx:mainline-alpine
+    restart: unless-stopped
     ports:
-      - '80:80'
-      - '443:443'
-    tty: true
+      - "80:80"
+      - "443:443"
+    volumes:
+      - web-root:/var/www/html
+      - ./nginx/conf:/etc/nginx/conf.d
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - dhparam:/etc/ssl/certs
+    depends_on:
+      - node
+    networks:
+      - app-network
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+    depends_on:
+      - nginx
+    # command: certonly --webroot --webroot-path=/var/www/html --email tech-support@nevatrip.ru --agree-tos --no-eff-email --staging -d api.nevatrip.ru
+    command: certonly --webroot --webroot-path=/var/www/html --email tech-support@nevatrip.ru --agree-tos --no-eff-email --force-renewal -d api.nevatrip.ru
+
+volumes:
+  certbot-etc:
+  certbot-var:
+  web-root:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/deploy/api/public/
+      o: bind
+  dhparam:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/deploy/api/.docker/nginx/dhparam/
+      o: bind
+
+networks:
+  app-network:
+    driver: bridge
