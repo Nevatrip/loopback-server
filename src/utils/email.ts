@@ -29,20 +29,20 @@ const getMailContent = (order: Order, status: Status) => {
   let number = '¯\\_(ツ)_/¯';
 
   const productList = products.map(({product, direction, tickets}) => {
-    if (!product) return;
+    if (!product || !direction || !tickets) return;
 
-    const direction = product.directions.find(
+    const productDirection = product.directions.find(
       dir => direction && direction.find(item => item._key === dir._key),
     );
-    if (!direction) return;
+    if (!productDirection || productDirection._type !== 'direction') return;
 
-    const tickets = direction.tickets.reduce(
+    productDirection.tickets.reduce(
       (render, {_key, name /* , price */}) => {
-        if (options.tickets.hasOwnProperty(_key) && options.tickets[_key]) {
+        if (tickets.hasOwnProperty(_key) && tickets[_key]) {
           switch (status) {
             case 'manager':
-              render += `<b>${name}</b>: ${options.tickets[_key]}<br/>`;
-              passengerCount += options.tickets[_key];
+              render += `<b>${name}</b>: ${tickets[_key]}<br/>`;
+              passengerCount += tickets[_key];
               break;
             default:
               render += `
@@ -50,7 +50,7 @@ const getMailContent = (order: Order, status: Status) => {
               <font style="color:#486482;font-size:19.2px">
                 ${name === 'Взрослый' ? 'Adult' : 'Pre-school'}
               </font>
-              — ${options.tickets[_key]} шт.
+              — ${tickets[_key]} шт.
               <br>
             `;
               break;
@@ -62,9 +62,9 @@ const getMailContent = (order: Order, status: Status) => {
       '',
     );
 
-    (direction.schedule || []).some(eventItem => {
-      const action = eventItem.actions.find(
-        actionItem => actionItem._key === options.event,
+    (productDirection.schedule || []).some(eventItem => {
+      const action = eventItem.actions.find(actionItem =>
+        direction.some(dir => dir.action === actionItem),
       );
       if (action) {
         event = action;
