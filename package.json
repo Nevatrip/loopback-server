@@ -22,6 +22,7 @@
     "prettier:cli": "lb-prettier \"**/*.ts\" \"**/*.js\"",
     "prettier:check": "npm run prettier:cli -- -l",
     "prettier:fix": "npm run prettier:cli -- --write",
+    "tslint": "tslint -c tslint.json 'src/**/*.ts'",
     "tslint:fix": "npm run tslint -- --fix",
     "pretest": "npm run clean && npm run build",
     "pretest:ci": "npm run build",
