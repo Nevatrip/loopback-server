@@ -1,9 +1,0 @@
-{
-  "name": "redis",
-  "connector": "kv-redis",
-  "url": "",
-  "host": "redis",
-  "port": 6379,
-  "password": "secret",
-  "db": null
-}
