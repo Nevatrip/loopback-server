@@ -107,7 +107,7 @@ const getMailContent = (order: Order, status: Status) => {
       <p>Товары:</p>
       <ul>${productList}</ul>
       <p>Сумма: ${(payment as PaymentSuccessResponse).Model.Amount} ₽</p>
-      <p>Ссылка на оплату: ${(payment as PaymentSuccessResponse).Model.Url}</p>
+      <p>Ссылка на оплату: ${(payment as PaymentSuccessResponse).Model.Status}</p>
       <p>Ваш email: ${email}</p>`,
     paid: `
       <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
