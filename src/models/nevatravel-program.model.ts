@@ -100,17 +100,10 @@ export class NevatravelProgram extends Entity {
   })
   is_active: boolean;
 
-  @property({
-    type: 'array',
-    itemType: 'string',
-    default: [''],
-  })
+  @property.array(String)
   reverse_program_ids?: string[];
 
-  @property({
-    type: 'array',
-    itemType: 'number',
-  })
+  @property.array(Number)
   tabs?: number[];
 
   @property({

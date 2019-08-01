@@ -19,7 +19,7 @@ export interface DirectionComplex extends Direction {
 
 export interface DirectionProduct extends Direction {
   _type: 'direction';
-  schedule: IEvent[];
+  schedule: ProductEvent[];
   dates?: number[];
 }
 
@@ -28,7 +28,8 @@ export interface IAction {
   start: Date;
 }
 
-export interface IEvent {
+@model()
+class ProductEvent extends Entity {
   _key: string;
   _type: 'event';
   title: string;
@@ -42,6 +43,10 @@ export interface IEvent {
   isAllDay?: boolean;
   description?: string;
   actions: IAction[];
+
+  constructor(data?: Partial<ProductEvent>) {
+    super(data);
+  }
 }
 
 @model()
@@ -71,10 +76,7 @@ export class Product extends Entity {
   @property({type: 'string'})
   description?: string;
 
-  @property({
-    type: 'array',
-    itemType: 'string',
-  })
+  @property.array(String)
   status?: string[];
 
   @property({type: 'object'})
@@ -84,28 +86,17 @@ export class Product extends Entity {
   category?: object;
 
   @property({
-    type: 'array',
-    itemType: 'object',
-  })
-  tags?: object[];
-
-  @property({
     type: 'string',
     required: true,
   })
   key: string;
 
-  @property({
-    type: 'array',
-    itemType: 'object',
+  @property.array(Object, {
     required: true,
   })
   directions: (DirectionProduct | DirectionComplex)[];
 
-  @property({
-    type: 'array',
-    itemType: 'string',
-  })
+  @property.array(String)
   features?: string[];
 
   @property({type: 'string'})
@@ -159,11 +150,8 @@ export class Product extends Entity {
   })
   partner: object;
 
-  @property({
-    type: 'array',
-    itemType: 'object',
-  })
-  schedule?: IEvent[];
+  @property.array(ProductEvent)
+  schedule?: ProductEvent[];
 
   constructor(data?: Partial<Product>) {
     super(data);
