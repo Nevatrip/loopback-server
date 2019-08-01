@@ -1,0 +1,52 @@
+{
+  "name": "sanity",
+  "connector": "rest",
+  "baseURL": "https://39dycnz5.api.sanity.io/v1/data/query/develop",
+  "operations": [
+    {
+      "template": {
+        "method": "GET",
+        "url": "https://39dycnz5.api.sanity.io/v1/data/query/develop",
+        "query": {
+          "query": "*[_type=='tour' && key.current=='{alias}']\u007B...,'point':point->,'place':place->,'category':category->,'attractions':attractions[]->,'tourLanguage':tourLanguage[]->\u007Btitle,'icon':icon.asset->\u007D,'placeFeatures':placeFeatures[]->\u007Btitle,'icon':icon.asset->\u007D,'titleImage':titleImage.asset->\u007Burl\u007D.url\u007D"
+        },
+        "responsePath": "$.result[0]"
+      },
+      "functions": {
+        "getProductByAlias": [
+          "alias"
+        ]
+      }
+    },
+    {
+      "template": {
+        "method": "GET",
+        "url": "https://39dycnz5.api.sanity.io/v1/data/query/develop",
+        "query": {
+          "query": "*[_type=='tour' && _id=='{id}']\u007B...,'point':point->,'place':place->,'category':category->,'attractions':attractions[]->,'tourLanguage':tourLanguage[]->\u007Btitle,'icon':icon.asset->\u007D,'placeFeatures':placeFeatures[]->\u007Btitle,'icon':icon.asset->\u007D,'titleImage':titleImage.asset->\u007Burl\u007D.url\u007D"
+        },
+        "responsePath": "$.result[0]"
+      },
+      "functions": {
+        "getProductById": [
+          "id"
+        ]
+      }
+    },
+    {
+      "template": {
+        "method": "GET",
+        "url": "https://39dycnz5.api.sanity.io/v1/data/query/develop",
+        "query": {
+          "query": "*[_id=='{id}']\u007B_id,title,'directions':directions[]\u007B_key,title,'schedule':schedule[],'tickets':tickets[]\u007B...,'category':category->,'ticket':ticket[]->\u007D\u007D\u007D"
+        },
+        "responsePath": "$.result[0]"
+      },
+      "functions": {
+        "getProductForCartById": [
+          "id"
+        ]
+      }
+    }
+  ]
+}
