@@ -1,5 +1,10 @@
 {
-  "compilerOptions": { "baseUrl": ".", "paths": { "*": ["types/*"] } },
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": { "*": ["types/*"] } ,
+    "outDir": "dist",
+    "target": "es2018"
+  },
   "$schema": "http://json.schemastore.org/tsconfig",
   "extends": "@loopback/build/config/tsconfig.common.json",
   "include": [
