@@ -15,12 +15,7 @@ export class SanityServiceProvider implements Provider<SanityService> {
     protected dataSource: juggler.DataSource = new SanityDataSource(),
   ) {}
 
-  async value(): Promise<SanityService> {
-    console.log(
-      'getService(this.dataSource)',
-      ( await getService(this.dataSource) )
-        .getProductById
-    );
+  value(): Promise<SanityService> {
     return getService(this.dataSource);
   }
 }
