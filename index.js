@@ -17,10 +17,7 @@ if (require.main === module) {
         },
         servers: [
           {
-            url: 'https://api.nevatrip.ru',
-          },
-          {
-            url: 'http://0.0.0.0',
+            url: process.env.SERVER_URL,
           },
         ],
       },
