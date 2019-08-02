@@ -33,7 +33,7 @@
     "migrate": "node ./dist/src/migrate",
     "prestart": "npm run build",
     "start": "HOST=0.0.0.0 PORT=8000 node .",
-    "start:watch": "HOST=0.0.0.0 PORT=8000 tsc-watch --onSuccess \"node .\"",
+    "start:watch": "DEBUG=nevatrip HOST=0.0.0.0 PORT=8000 tsc-watch --onSuccess \"node .\"",
     "prepublishOnly": "npm run test"
   },
   "repository": {
