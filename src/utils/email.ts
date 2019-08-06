@@ -9,6 +9,9 @@ const SMTPPass = process.env.SMTP_PASS;
 
 type Status = 'new' | 'paid' | 'rejected' | 'manager';
 
+let number = '¯\\_(ツ)_/¯';
+let title = 'Название экскурсии';
+
 const getMailContent = (order: Order, status: Status) => {
   const {
     user: {
@@ -26,71 +29,54 @@ const getMailContent = (order: Order, status: Status) => {
   };
 
   let passengerCount = 0;
-  let number = '¯\\_(ツ)_/¯';
 
   const productList = products.map(({product, options}) => {
     if (!product || !options) return;
 
-    let tickets = '¯\\_(ツ)_/¯';
+    let [
+      {direction, tickets, event: optionsEvent, number: optionsNumber},
+    ] = options;
 
-    // const productDirection = product.directions.find(
-    //   dir => direction && direction.find(item => item._key === dir._key),
-    // );
-    // if (!productDirection || productDirection._type !== 'direction') return;
+    event = optionsEvent;
+    title = product.title.ru.name;
+    if (optionsNumber) number = optionsNumber;
 
-    // productDirection.tickets.reduce(
-    //   (render, {_key, name /* , price */}) => {
-    //     if (tickets.hasOwnProperty(_key) && tickets[_key]) {
-    //       switch (status) {
-    //         case 'manager':
-    //           render += `<b>${name}</b>: ${tickets[_key]}<br/>`;
-    //           passengerCount += tickets[_key];
-    //           break;
-    //         default:
-    //           render += `
-    //           ${name} /
-    //           <font style="color:#486482;font-size:19.2px">
-    //             ${name === 'Взрослый' ? 'Adult' : 'Pre-school'}
-    //           </font>
-    //           — ${tickets[_key]} шт.
-    //           <br>
-    //         `;
-    //           break;
-    //       }
-    //     }
+    const productDirection = product.directions.find(
+      dir => direction === dir._key,
+    );
 
-    //     return render;
-    //   },
-    //   '',
-    // );
+    if (!productDirection || productDirection._type !== 'direction') return;
 
-    // (productDirection.schedule || []).some(eventItem => {
-    //   const action = eventItem.actions.find(actionItem =>
-    //     direction.some(dir => dir.action === actionItem),
-    //   );
-    //   if (action) {
-    //     event = action;
+    return productDirection.tickets.reduce(
+      (render, {_key, name /* , price */}) => {
+        if (tickets.hasOwnProperty(_key) && tickets[_key]) {
+          switch (status) {
+            case 'manager':
+              render += `<b>${name}</b>: ${tickets[_key]}<br/>`;
+              passengerCount += tickets[_key];
+              break;
+            default:
+              render += `
+              ${name} /
+              <font style="color:#486482;font-size:19.2px">
+                ${name === 'Взрослый' ? 'Adult' : 'Pre-school'}
+              </font>
+              — ${tickets[_key]} шт.
+              <br>
+            `;
+              break;
+          }
+        }
 
-    //     return !0;
-    //   }
-    // });
-
-    return tickets;
-
-    // return `
-    //   <li>
-    //     <h3>${product.title.ru.name}</h3>
-    //     <dl>
-    //       <dt>Направление</dt><dd>${options.direction}</dd>
-    //       <dt>Причал</dt><dd> WIP </dd>
-    //       <dt>Отправление</dt><dd>${options.event}</dd>
-    //       <dt>Билеты></dt><dd><ul>${tickets}</ul></dd>
-    //     </dl>
-    //   </li>
-    // `;
+        return render;
+      },
+      '',
+    );
   });
 
   const date: Date = new Date(event.start);
+  // TODO timezone offset
+  date.setMinutes(date.getMinutes() + 180);
   const prevDate: Date = new Date(date);
   prevDate.setHours(prevDate.getHours() - 24);
 
@@ -807,12 +793,17 @@ export const sendEmail = (order: Order, status: Status) => {
     },
   });
 
+  const mailContent = getMailContent(order, status);
+
   const mailOptions = {
     from: '"NevaTrip" <order@nevatrip.ru>', // sender address
-    to: status === 'manager' ? 'info@nevatrip.ru' : email, // list of receivers
-    subject: 'Заказ', // Subject line
+    html: mailContent,
+    to:
+      status === 'manager'
+        ? ['info@nevatrip.ru', 'order@nevatrip.ru', 'driver-spb@yandex.ru']
+        : email, // list of receivers
+    subject: `Заказ билетов на «${title}» НТ${number}`,
     text: JSON.stringify(order), // plain text body
-    html: getMailContent(order, status),
   };
 
   transporter.sendMail(

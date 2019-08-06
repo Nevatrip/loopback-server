@@ -20,7 +20,7 @@ import {
 import {inject} from '@loopback/core';
 import {SanityService} from '../services/sanity.service';
 import {Order, Cart, Product} from '../models';
-import {/* sendEmail, */ getPaymentDescription} from '../utils';
+import {sendEmail, getPaymentDescription} from '../utils';
 import {OrderRepository, CartRepository} from '../repositories';
 import {
   ClientService,
@@ -82,7 +82,7 @@ export class OrderController {
       // JsonData?: string;
       Description: getPaymentDescription(order.products.length),
       email: order.user.email,
-      phone: order.user.phone,
+      phone: (order.user.phone.match(/\d+/g) || []).join(''),
     });
 
     if (!payment.isSuccess()) {
@@ -96,19 +96,25 @@ export class OrderController {
     let sum = 0;
     const products: {[key: string]: Product} = {};
 
-    /*
     for (const productItem of order.products) {
-      const { productId, options } = productItem;
+      const {productId, options} = productItem;
+
+      if (
+        !options ||
+        !options[0] ||
+        !options[0].direction ||
+        !options[0].tickets
+      )
+        return;
+
+      const [{direction, tickets}] = options;
 
       const product =
         products[productId] ||
         (await this.sanityService.getProductForCartById(productId))[0];
       productItem.product = product;
       const directionData = product.directions.find(
-        dir =>
-          dir._type === 'direction' &&
-          direction &&
-          direction.some(item => item._key === dir._key),
+        dir => dir._type === 'direction' && dir._key === direction,
       );
 
       if (!directionData) return;
@@ -119,7 +125,6 @@ export class OrderController {
         }
       }
     }
-    */
 
     return sum;
   }
@@ -155,6 +160,7 @@ export class OrderController {
             type: 'object',
             properties: {
               InvoiceId: {type: 'number'},
+              Amount: {type: 'number'},
             },
           },
         },
@@ -167,7 +173,7 @@ export class OrderController {
     };
     const order = await this.orderRepository.findOne(filter);
 
-    if (!order || await this.getSum(order) !== body.Amount) return {code: 10};
+    if (!order || (await this.getSum(order)) !== body.Amount) return {code: 10};
 
     return {code: 0};
   }
@@ -183,6 +189,7 @@ export class OrderController {
             type: 'object',
             properties: {
               InvoiceId: {type: 'number'},
+              Amount: {type: 'number'},
             },
           },
         },
@@ -195,15 +202,15 @@ export class OrderController {
     };
     const order = await this.orderRepository.findOne(filter);
 
-    if (!order || await this.getSum(order) !== body.Amount) return {code: 10};
+    if (!order || (await this.getSum(order)) !== body.Amount) return {code: 10};
 
     order.status = 'paid';
     order.updated = new Date();
 
     await this.orderRepository.updateById(order.id, order);
 
-    // sendEmail(order, 'paid');
-    // sendEmail(order, 'manager');
+    sendEmail(order, 'paid');
+    sendEmail(order, 'manager');
 
     return {code: 0};
   }
