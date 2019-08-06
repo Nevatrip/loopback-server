@@ -128,7 +128,7 @@ export class OrderController {
     responses: {
       '200': {
         description: 'Order model instance',
-        content: { 'application/json': { schema: { 'x-ts-type': Order } } },
+        content: {'application/json': {schema: {'x-ts-type': Order}}},
       },
     },
   })
@@ -145,7 +145,7 @@ export class OrderController {
   }
 
   @post('/orders/check', {
-    responses: { '200': { description: 'Check CloudPayment' } },
+    responses: {'200': {description: 'Check CloudPayment'}},
   })
   async check(
     @requestBody({
@@ -153,7 +153,9 @@ export class OrderController {
         'application/x-www-form-urlencoded': {
           schema: {
             type: 'object',
-            properties: { InvoiceId: {type: 'number'} },
+            properties: {
+              InvoiceId: {type: 'number'},
+            },
           },
         },
       },
@@ -161,7 +163,7 @@ export class OrderController {
     body: PaymentSuccessModel,
   ) {
     const filter: Filter<Order> = {
-      where: { 'payment.Model.Number': body.InvoiceId } as Where<Order>,
+      where: {'payment.Model.Number': body.InvoiceId} as Where<Order>,
     };
     const order = await this.orderRepository.findOne(filter);
 
@@ -171,11 +173,7 @@ export class OrderController {
   }
 
   @post('/orders/pay', {
-    responses: {
-      '200': {
-        description: 'pay CloudPayment',
-      },
-    },
+    responses: {'200': {description: 'pay CloudPayment'}},
   })
   async pay(
     @requestBody({
@@ -183,7 +181,9 @@ export class OrderController {
         'application/x-www-form-urlencoded': {
           schema: {
             type: 'object',
-            properties: { InvoiceId: {type: 'number'} },
+            properties: {
+              InvoiceId: {type: 'number'},
+            },
           },
         },
       },
@@ -191,7 +191,7 @@ export class OrderController {
     body: PaymentSuccessModel,
   ) {
     const filter: Filter<Order> = {
-      where: { 'payment.Model.Number': body.InvoiceId } as Where<Order>,
+      where: {'payment.Model.Number': body.InvoiceId} as Where<Order>,
     };
     const order = await this.orderRepository.findOne(filter);
 
@@ -209,7 +209,7 @@ export class OrderController {
   }
 
   @post('/orders/fail', {
-    responses: { '200': { description: 'fail CloudPayment' } },
+    responses: {'200': {description: 'fail CloudPayment'}},
   })
   async fail(@requestBody() body: {}) {
     console.log('fail CloudPayment', body);
@@ -235,7 +235,11 @@ export class OrderController {
     responses: {
       '200': {
         description: 'Array of Order model instances',
-        content: { 'application/json': { schema: { type: 'array', items: { 'x-ts-type': Order } } } },
+        content: {
+          'application/json': {
+            schema: {type: 'array', items: {'x-ts-type': Order}},
+          },
+        },
       },
     },
   })
@@ -266,7 +270,7 @@ export class OrderController {
     responses: {
       '200': {
         description: 'Order model instance',
-        content: { 'application/json': { schema: { 'x-ts-type': Order } } },
+        content: {'application/json': {schema: {'x-ts-type': Order}}},
       },
     },
   })
@@ -274,7 +278,9 @@ export class OrderController {
     return await this.orderRepository.findById(id);
   }
 
-  @patch('/orders/{id}', { responses: { '204': { description: 'Order PATCH success' } } })
+  @patch('/orders/{id}', {
+    responses: {'204': {description: 'Order PATCH success'}},
+  })
   async updateById(
     @param.path.string('id') id: string,
     @requestBody() order: Order,
@@ -282,7 +288,7 @@ export class OrderController {
     await this.orderRepository.updateById(id, order);
   }
 
-  @put('/orders/{id}', { responses: { '204': { description: 'Order PUT success' } } })
+  @put('/orders/{id}', {responses: {'204': {description: 'Order PUT success'}}})
   async replaceById(
     @param.path.string('id') id: string,
     @requestBody() order: Order,
@@ -290,7 +296,9 @@ export class OrderController {
     await this.orderRepository.replaceById(id, order);
   }
 
-  @del('/orders/{id}', { responses: { '204': { description: 'Order DELETE success' } } })
+  @del('/orders/{id}', {
+    responses: {'204': {description: 'Order DELETE success'}},
+  })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.orderRepository.deleteById(id);
   }

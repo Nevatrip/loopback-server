@@ -11,7 +11,7 @@ export class ProductController {
   ) {}
 
   @get('/product/{id}', {
-    responses: { '200': { description: 'Product Response'} },
+    responses: {'200': {description: 'Product Response'}},
     summary: 'Get Product data by Id',
   })
   async getProductById(@param.path.string('id') id: string): Promise<Product> {
@@ -21,7 +21,7 @@ export class ProductController {
   }
 
   @get('/product/{id}/cart', {
-    responses: { '200': { description: 'Product Response' } },
+    responses: {'200': {description: 'Product Response'}},
     summary: 'Get Product data for cart by Id',
   })
   async getProductForCartById(@param.path.string('id') id: string) {
@@ -49,7 +49,7 @@ export class ProductController {
   }
 
   @get('/product/{id}/schedule/{directionId}/{date}', {
-    responses: { '200': { description: 'Product Response' } },
+    responses: {'200': {description: 'Product Response'}},
     summary: "Get Product schedule by Id, direction's id and date",
   })
   async getScheduleById(

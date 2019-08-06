@@ -1,4 +1,4 @@
-import { repository } from '@loopback/repository';
+import {repository} from '@loopback/repository';
 import {
   post,
   param,
@@ -8,8 +8,8 @@ import {
   requestBody,
   HttpErrors,
 } from '@loopback/rest';
-import { Cart, CartProduct } from '../models';
-import { CartRepository } from '../repositories';
+import {Cart, CartProduct} from '../models';
+import {CartRepository} from '../repositories';
 
 import * as hash from 'object-hash';
 import * as debugFactory from 'debug';
@@ -19,7 +19,7 @@ export class CartController {
   constructor(
     @repository(CartRepository)
     public cartRepository: CartRepository,
-  ) { }
+  ) {}
 
   /**
    * Create or update the shopping cart for a given user
@@ -36,7 +36,7 @@ export class CartController {
   })
   async set(
     @param.path.string('sessionId') sessionId: string,
-    @requestBody({ description: 'shopping cart' }) cart: Cart,
+    @requestBody({description: 'shopping cart'}) cart: Cart,
   ) {
     debug('Create shopping cart %s: %j', sessionId, cart);
     if (sessionId !== cart.sessionId) {
@@ -60,12 +60,12 @@ export class CartController {
    * @param sessionId User id
    */
   @post('/shoppingCarts/{sessionId}/products', {
-    responses: { '200': { description: 'New product to Cart' } },
+    responses: {'200': {description: 'New product to Cart'}},
     summary: 'Add new product to Cart',
   })
   async addProduct(
     @param.path.string('sessionId') sessionId: string,
-    @requestBody({ description: 'shopping cart product' })
+    @requestBody({description: 'shopping cart product'})
     product: CartProduct,
   ) {
     await this.cartRepository.addProduct(sessionId, product);
@@ -77,11 +77,7 @@ export class CartController {
    * @param key Cart product key
    */
   @del('/shoppingCarts/{sessionId}/products/{key}', {
-    responses: {
-      '200': {
-        description: "Cart's product to delete",
-      },
-    },
+    responses: {'200': {description: "Cart's product to delete"}},
     summary: "Delete Cart's product by key",
   })
   async deleteProduct(
@@ -96,11 +92,7 @@ export class CartController {
    * @param sessionId User id
    */
   @get('/shoppingCarts/{sessionId}', {
-    responses: {
-      '200': {
-        description: 'Cart Response',
-      },
-    },
+    responses: {'200': {description: 'Cart Response'}},
     summary: 'Get Cart by session Id',
   })
   async get(@param.path.string('sessionId') sessionId: string) {

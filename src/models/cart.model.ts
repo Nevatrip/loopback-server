@@ -1,5 +1,5 @@
-import { Entity, model, property } from '@loopback/repository';
-import { Product, IAction } from "./index";
+import {Entity, model, property} from '@loopback/repository';
+import {Product, IAction} from './index';
 const generate = require('nanoid/generate');
 
 @model()
@@ -10,7 +10,7 @@ export class CartProductOptions extends Entity {
   })
   number?: string;
 
-  @property({ description: 'Direction\'s ID' })
+  @property({description: "Direction's ID"})
   direction: string;
 
   @property({type: 'object'})
@@ -31,11 +31,10 @@ export class CartProduct extends Entity {
   @property({
     id: true,
     description: 'Unique key of product',
-    default: (...args: any) => console.log( 'args', args ),
   })
   key: string;
 
-  @property({ required: true })
+  @property({required: true})
   productId: string;
 
   @property(Product)

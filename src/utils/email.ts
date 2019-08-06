@@ -109,7 +109,9 @@ const getMailContent = (order: Order, status: Status) => {
       <p>Товары:</p>
       <ul>${productList}</ul>
       <p>Сумма: ${(payment as PaymentSuccessResponse).Model.Amount} ₽</p>
-      <p>Ссылка на оплату: ${(payment as PaymentSuccessResponse).Model.Status}</p>
+      <p>Ссылка на оплату: ${
+        (payment as PaymentSuccessResponse).Model.Status
+      }</p>
       <p>Ваш email: ${email}</p>`,
     paid: `
       <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -767,8 +769,8 @@ const getMailContent = (order: Order, status: Status) => {
     rejected: `Заказ отменён`,
     manager: `<table width="100%" cellpadding="0" cellspacing="0" style="font-family:Arial,sans-serif"><tbody><tr><td align="center" valign="top">
       <h3>Заявка на бронирование билетов</h3><table width="622" cellpadding="5" cellspacing="5" style="border:1px solid #dadada;"><tbody>
-      <tr><th width="200" style="text-align: right;">№ Договора:</th><td>Дука Мария "Про Событие"</td></tr>
-      <tr><th style="text-align: right;">Название компании:</th><td>Про Событие-Неватрип</td></tr>
+      <tr><th width="200" style="text-align: right;">№ Договора:</th><td>ООО "Про Событие"</td></tr>
+      <tr><th style="text-align: right;">Название компании:</th><td>«Неватрип»</td></tr>
       <tr><th style="text-align: right;">Контактное лицо:</th><td>Команда Неватрип</td></tr>
       <tr><th style="text-align: right;">Контактный телефон:</th><td>89219653404</td></tr>
       <tr><th style="text-align: right;">Контактный E-mail:</th><td>order@nevatrip.ru</td></tr></tbody></table>
