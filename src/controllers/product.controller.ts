@@ -59,6 +59,8 @@ export class ProductController {
   ) {
     const now = new Date();
     const actualDate = parse(date, 'yyyy-MM-dd', now);
+    // TODO: перенести расчёт часового пояса в direction.schedule[].startTimeZone
+    actualDate.setMinutes(actualDate.getMinutes() - 180);
     const product = (await this.sanityService.getProductById(id))[0];
 
     const directions: {[key: string]: DirectionProduct} = {};
