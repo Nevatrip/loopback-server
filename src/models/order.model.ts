@@ -1,5 +1,9 @@
 import {model, property} from '@loopback/repository';
-import {BaseResponse, PaymentResponse} from 'cloudpayments';
+import {
+  BaseResponse,
+  PaymentResponse,
+  PaymentSuccessModel,
+} from 'cloudpayments';
 import {Cart} from './cart.model';
 
 @model({settings: {strict: false}})
@@ -20,7 +24,7 @@ export class Order extends Cart {
   source?: string;
 
   @property({type: 'object'})
-  payment?: PaymentResponse | BaseResponse;
+  payment?: PaymentResponse | BaseResponse | {Model: PaymentSuccessModel};
 
   @property({type: 'number'})
   sum?: number;

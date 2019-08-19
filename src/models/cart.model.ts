@@ -67,6 +67,9 @@ export class Cart extends Entity {
   products: CartProduct[];
 
   @property()
+  promocode?: string;
+
+  @property()
   user: {
     email: string;
     phone: string;

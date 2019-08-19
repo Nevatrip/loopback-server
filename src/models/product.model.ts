@@ -33,7 +33,7 @@ interface i18nString {
   [key: string]: {
     name: string;
   };
-  }
+}
 
 @model()
 class ProductEvent extends Entity {
@@ -58,13 +58,16 @@ class ProductEvent extends Entity {
 
 @model()
 export class Product extends Entity {
-  @property({ type: 'string', id: true })
+  @property({type: 'string', id: true})
   _id: string;
 
-  @property({ type: 'object', required: true })
+  @property({description: "Tour's ID from old admin"})
+  oldId?: number;
+
+  @property({type: 'object', required: true})
   title: i18nString;
 
-  @property({ type: 'string', required: true })
+  @property({type: 'string', required: true})
   titleLong: string;
 
   @property({type: 'string'})
@@ -79,10 +82,10 @@ export class Product extends Entity {
   @property({type: 'object'})
   category?: object;
 
-  @property({ type: 'string', required: true })
+  @property({type: 'string', required: true})
   key: string;
 
-  @property.array(Object, { required: true })
+  @property.array(Object, {required: true})
   directions: (DirectionProduct | DirectionComplex)[];
 
   @property.array(String)
@@ -97,13 +100,13 @@ export class Product extends Entity {
   @property({type: 'string'})
   advice?: string;
 
-  @property({ type: 'object', required: true })
+  @property({type: 'object', required: true})
   point: object;
 
   @property({type: 'string'})
   priceDescription?: string;
 
-  @property({ type: 'string', required: true })
+  @property({type: 'string', required: true})
   price: string;
 
   @property({type: 'string'})
@@ -121,10 +124,10 @@ export class Product extends Entity {
   @property({type: 'date'})
   end?: string;
 
-  @property({ type: 'object', required: true })
+  @property({type: 'object', required: true})
   place: object;
 
-  @property({ type: 'object', required: true })
+  @property({type: 'object', required: true})
   partner: object;
 
   @property.array(ProductEvent)

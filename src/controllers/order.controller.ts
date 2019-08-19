@@ -18,7 +18,7 @@ import {
   HttpErrors,
 } from '@loopback/rest';
 import {inject} from '@loopback/core';
-import {SanityService} from '../services/sanity.service';
+import {SanityService, NevatripService} from '../services';
 import {Order, Cart, Product} from '../models';
 import {sendEmail, getPaymentDescription} from '../utils';
 import {OrderRepository, CartRepository} from '../repositories';
@@ -39,6 +39,8 @@ export class OrderController {
     public cartRepository: CartRepository,
     @inject('services.SanityService')
     protected sanityService: SanityService,
+    @inject('services.NevatripService')
+    protected nevatripService: NevatripService,
   ) {}
 
   async getCart(cart: Cart) {
@@ -54,6 +56,54 @@ export class OrderController {
     order.user = cart.user;
 
     return order;
+  }
+
+  async getSum(order: Order) {
+    let sum = 0;
+    let sale = 0;
+    const products: {[key: string]: Product} = {};
+
+    for (const productItem of order.products) {
+      const {productId, options} = productItem;
+
+      if (
+        !options ||
+        !options[0] ||
+        !options[0].direction ||
+        !options[0].tickets
+      )
+        return;
+
+      const [{direction, tickets}] = options;
+
+      const product =
+        products[productId] ||
+        (await this.sanityService.getProductForCartById(productId))[0];
+      productItem.product = product;
+      const directionData = product.directions.find(
+        dir => dir._type === 'direction' && dir._key === direction,
+      );
+
+      if (!directionData) return;
+
+      for (const ticket of directionData.tickets) {
+        if (tickets && tickets.hasOwnProperty(ticket._key)) {
+          sum += ticket.price * tickets[ticket._key];
+        }
+      }
+
+      if (product.oldId && order.promocode) {
+        const getSale = (await this.nevatripService.getSale(
+          product.oldId,
+          order.promocode,
+        ))[0];
+        sale = getSale || 0;
+      }
+    }
+
+    sum = Math.ceil(sum - sum * (sale / 100));
+
+    return sum;
   }
 
   async getPayment(order: Order) {
@@ -92,43 +142,6 @@ export class OrderController {
     return payment.getResponse();
   }
 
-  async getSum(order: Order) {
-    let sum = 0;
-    const products: {[key: string]: Product} = {};
-
-    for (const productItem of order.products) {
-      const {productId, options} = productItem;
-
-      if (
-        !options ||
-        !options[0] ||
-        !options[0].direction ||
-        !options[0].tickets
-      )
-        return;
-
-      const [{direction, tickets}] = options;
-
-      const product =
-        products[productId] ||
-        (await this.sanityService.getProductForCartById(productId))[0];
-      productItem.product = product;
-      const directionData = product.directions.find(
-        dir => dir._type === 'direction' && dir._key === direction,
-      );
-
-      if (!directionData) return;
-
-      for (const ticket of directionData.tickets) {
-        if (tickets && tickets.hasOwnProperty(ticket._key)) {
-          sum += ticket.price * tickets[ticket._key];
-        }
-      }
-    }
-
-    return sum;
-  }
-
   @post('/orders', {
     responses: {
       '200': {
@@ -140,7 +153,16 @@ export class OrderController {
   async create(@requestBody() cart: Cart): Promise<Order> {
     const order = (await this.getCart(cart)) as Order;
     order.sum = await this.getSum(order);
-    order.payment = await this.getPayment(order);
+
+    if (order.sum) {
+      order.payment = await this.getPayment(order);
+    } else {
+      order.status = 'paid';
+      order.updated = new Date();
+
+      sendEmail(order, 'paid');
+      // sendEmail(order, 'manager');
+    }
 
     const newOrder = await this.orderRepository.create(order);
 
@@ -188,8 +210,11 @@ export class OrderController {
           schema: {
             type: 'object',
             properties: {
-              InvoiceId: {type: 'number'},
+              TransactionId: {type: 'number'},
               Amount: {type: 'number'},
+              InvoiceId: {type: 'number'},
+              AuthCode: {type: 'string'},
+              Token: {type: 'number'},
             },
           },
         },
@@ -206,6 +231,9 @@ export class OrderController {
 
     order.status = 'paid';
     order.updated = new Date();
+    order.payment = {
+      Model: body,
+    };
 
     await this.orderRepository.updateById(order.id, order);
 
