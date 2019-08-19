@@ -1,0 +1,24 @@
+{
+  "name": "sanity",
+  "connector": "rest",
+  "baseURL": "https://nevatrip.ru/api",
+  "operations": [
+    {
+      "template": {
+        "method": "GET",
+        "url": "https://nevatrip.ru/api/promo",
+        "query": {
+          "id": "{id}",
+          "code": "{code}"
+        },
+        "responsePath": "$"
+      },
+      "functions": {
+        "getSale": [
+          "id",
+          "code"
+        ]
+      }
+    }
+  ]
+}
