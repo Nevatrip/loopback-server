@@ -1,5 +1,5 @@
 {
-  "name": "sanity",
+  "name": "nevatrip",
   "connector": "rest",
   "baseURL": "https://nevatrip.ru/api",
   "operations": [
