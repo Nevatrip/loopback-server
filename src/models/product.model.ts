@@ -21,6 +21,7 @@ export interface DirectionProduct extends Direction {
   _type: 'direction';
   schedule: ProductEvent[];
   dates?: number[];
+  buyTimeOffset?: number;
 }
 
 export interface IAction {
@@ -31,8 +32,8 @@ export interface IAction {
 interface i18nString {
   [key: string]: {
     name: string;
+  };
   }
-}
 
 @model()
 class ProductEvent extends Entity {

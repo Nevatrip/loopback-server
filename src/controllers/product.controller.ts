@@ -2,6 +2,7 @@ import {inject} from '@loopback/core';
 import {get, param} from '@loopback/rest';
 import {SanityService} from '../services/sanity.service';
 import {parse} from 'date-fns';
+import {convertToTimeZone} from 'date-fns-timezone';
 import {Product, DirectionProduct, IAction} from '../models';
 
 export class ProductController {
@@ -31,17 +32,21 @@ export class ProductController {
       if (direction._type === 'direction') {
         let dates: number[] = [];
         direction.schedule.forEach(event => {
-          event.actions.forEach(action => {
-            const date = new Date(action.start);
+          const timeZone = event.startTimezone || 'Europe/Moscow';
+          const offsetDate: Date = convertToTimeZone(new Date(), {timeZone});
+          offsetDate.setMinutes(
+            offsetDate.getMinutes() + (direction.buyTimeOffset || 0),
+          );
 
-            // return only feature dates
-            if (date > new Date()) {
-              dates.push(date.getTime() / 1000);
+          event.actions.forEach(action => {
+            const actionDate = convertToTimeZone(action.start, {timeZone});
+            if (actionDate > offsetDate) {
+              dates.push(actionDate.getTime() / 1000);
             }
           });
         });
         delete direction.schedule;
-        direction.dates = [...new Set(dates)];
+        direction.dates = [...new Set(dates)].sort();
       }
     });
 
@@ -57,10 +62,6 @@ export class ProductController {
     @param.path.string('directionId') directionId: string,
     @param.path.string('date') date: string,
   ) {
-    const now = new Date();
-    const actualDate = parse(date, 'yyyy-MM-dd', now);
-    // TODO: перенести расчёт часового пояса в direction.schedule[].startTimeZone
-    actualDate.setMinutes(actualDate.getMinutes() - 180);
     const product = (await this.sanityService.getProductById(id))[0];
 
     const directions: {[key: string]: DirectionProduct} = {};
@@ -74,10 +75,20 @@ export class ProductController {
 
     let schedule: IAction[] = [];
     direction.schedule.forEach(event => {
+      const timeZone = event.startTimezone || 'Europe/Moscow';
+      const offsetDate: Date = convertToTimeZone(new Date(), {timeZone});
+      offsetDate.setMinutes(
+        offsetDate.getMinutes() + (direction.buyTimeOffset || 0),
+      );
+      const actualDate = convertToTimeZone(
+        parse(date, 'yyyy-MM-dd', offsetDate),
+        {timeZone},
+      );
+
       event.actions.forEach(action => {
-        const actionDate = new Date(action.start);
+        const actionDate = convertToTimeZone(action.start, {timeZone});
         if (
-          actionDate > now &&
+          actionDate > offsetDate &&
           actionDate.toDateString() === actualDate.toDateString()
         ) {
           schedule.push(action);
