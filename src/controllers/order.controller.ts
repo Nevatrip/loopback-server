@@ -18,7 +18,7 @@ import {
   HttpErrors,
 } from '@loopback/rest';
 import {inject} from '@loopback/core';
-import {SanityService, NevatripService} from '../services';
+import {SanityService, NevatripService, AtolService} from '../services';
 import {Order, Cart, Product} from '../models';
 import {sendEmail, getPaymentDescription} from '../utils';
 import {OrderRepository, CartRepository} from '../repositories';
@@ -27,6 +27,8 @@ import {
   TaxationSystem,
   PaymentSuccessModel,
 } from 'cloudpayments';
+import {format} from 'date-fns';
+import {ru} from 'date-fns/locale';
 
 const privateKey = process.env.CLOUDPAYMENTS_PRIVATEKEY;
 const publicId = process.env.CLOUDPAYMENTS_PUBLICID;
@@ -41,6 +43,8 @@ export class OrderController {
     protected sanityService: SanityService,
     @inject('services.NevatripService')
     protected nevatripService: NevatripService,
+    @inject('services.AtolService')
+    protected atolService: AtolService,
   ) {}
 
   async getCart(cart: Cart) {
@@ -58,9 +62,10 @@ export class OrderController {
     return order;
   }
 
-  async getSum(order: Order) {
+  async getSum(order: Order, sendToAtol?: boolean) {
     let sum = 0;
     let sale = 0;
+    let atolItems = [];
     const products: {[key: string]: Product} = {};
 
     for (const productItem of order.products) {
@@ -86,12 +91,6 @@ export class OrderController {
 
       if (!directionData) return;
 
-      for (const ticket of directionData.tickets) {
-        if (tickets && tickets.hasOwnProperty(ticket._key)) {
-          sum += ticket.price * tickets[ticket._key];
-        }
-      }
-
       if (product.oldId && order.promocode) {
         const getSale = (await this.nevatripService.getSale(
           product.oldId,
@@ -99,9 +98,76 @@ export class OrderController {
         ))[0];
         sale = getSale || 0;
       }
+
+      for (const ticket of directionData.tickets) {
+        if (tickets && tickets.hasOwnProperty(ticket._key)) {
+          const price = Math.ceil(ticket.price - ticket.price * (sale / 100));
+          sum += price * tickets[ticket._key];
+          if (tickets[ticket._key]) {
+            atolItems.push({
+              name: `${ticket.name} билет на «${product.title.ru.name}»`,
+              price: price,
+              quantity: tickets[ticket._key],
+              sum: price * tickets[ticket._key],
+              payment_method: 'full_prepayment',
+              payment_object: 'service',
+              vat: {
+                type: 'none',
+              },
+            });
+          }
+        }
+      }
     }
 
     sum = Math.ceil(sum - sum * (sale / 100));
+
+    if (sendToAtol) {
+      const atolToken = await this.atolService.getToken(
+        'nevatrip-ru',
+        'IjNWCSDHp',
+      );
+      const token = atolToken[0].token;
+      const timestamp = format(new Date(), 'dd.MM.yyyy HH:mm:ss', {locale: ru});
+      const atolReceipt = {
+        client: {
+          //email: order.user.email,
+          phone: '+' + (order.user.phone.match(/\d+/g) || []).join(''),
+        },
+        company: {
+          email: 'info@nevatrip.ru',
+          sno: 'usn_income',
+          inn: '7802873242',
+          payment_address: 'nevatrip.ru',
+        },
+        items: atolItems,
+        payments: [
+          {
+            type: 1,
+            sum: sum,
+          },
+        ],
+        vats: [
+          {
+            type: 'none',
+            sum: 0,
+          },
+        ],
+        total: sum,
+      };
+      const atolResponse = await this.atolService.postSell(
+        token,
+        'nevatrip-ru_11018',
+        timestamp,
+        order.id || 'test_' + order.sessionId,
+        {
+          callback_url: `https://api.nevatrip.ru/orders/${order.id}/ofd`,
+        },
+        atolReceipt,
+      );
+
+      order.ofd = atolResponse;
+    }
 
     return sum;
   }
@@ -227,7 +293,11 @@ export class OrderController {
     };
     const order = await this.orderRepository.findOne(filter);
 
-    if (!order || (await this.getSum(order)) !== body.Amount) return {code: 10};
+    if (!order || !order.id) return {code: 10};
+
+    const sum = await this.getSum(order, true);
+
+    if (sum !== body.Amount) return {code: 10};
 
     order.status = 'paid';
     order.updated = new Date();

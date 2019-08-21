@@ -8,29 +8,26 @@ import {Cart} from './cart.model';
 
 @model({settings: {strict: false}})
 export class Order extends Cart {
-  @property({type: 'string', id: true})
+  @property({id: true})
   id?: string;
 
-  @property({
-    type: 'string',
-    default: 'new',
-  })
+  @property({default: 'new'})
   status: 'new' | 'paid' | 'rejected';
 
-  @property({
-    type: 'string',
-    default: 'default',
-  })
+  @property({default: 'default'})
   source?: string;
 
   @property({type: 'object'})
   payment?: PaymentResponse | BaseResponse | {Model: PaymentSuccessModel};
 
-  @property({type: 'number'})
+  @property()
   sum?: number;
 
-  @property({type: 'string'})
+  @property()
   isFullDiscount?: string;
+
+  @property({type: 'object'})
+  ofd?: object;
 
   constructor(data?: Partial<Order>) {
     super(data);

@@ -4,3 +4,4 @@ export * from './redis.datasource';
 // export * from './astramarin.datasource';
 export * from './mongo.datasource';
 export * from './nevatrip.datasource';
+export * from './atol.datasource';
