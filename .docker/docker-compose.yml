@@ -24,6 +24,10 @@ services:
       - CLOUDPAYMENTS_PUBLICID=${CLOUDPAYMENTS_PUBLICID}
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASS=${SMTP_PASS}
+      - ATOL_LOGIN=${ATOL_LOGIN}
+      - ATOL_TOKEN=${ATOL_TOKEN}
+      - ATOL_GROUP=${ATOL_GROUP}
+      - SECRET=${SECRET}
     entrypoint: run-nodock "npm start"
     tty: true
     restart: unless-stopped
