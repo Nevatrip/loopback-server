@@ -32,6 +32,10 @@ import {ru} from 'date-fns/locale';
 
 const privateKey = process.env.CLOUDPAYMENTS_PRIVATEKEY;
 const publicId = process.env.CLOUDPAYMENTS_PUBLICID;
+const secret = process.env.SECRET;
+const ATOLLOGIN = process.env.ATOL_LOGIN;
+const ATOLTOKEN = process.env.ATOL_TOKEN;
+const ATOLGROUP = process.env.ATOL_GROUP;
 
 export class OrderController {
   constructor(
@@ -123,10 +127,11 @@ export class OrderController {
     sum = Math.ceil(sum - sum * (sale / 100));
 
     if (sendToAtol) {
-      const atolToken = await this.atolService.getToken(
-        'nevatrip-ru',
-        'IjNWCSDHp',
-      );
+      if (!ATOLLOGIN || !ATOLTOKEN || !ATOLGROUP) {
+        throw new HttpErrors.Unauthorized(`ATOL credentials is not defined`);
+      }
+
+      const atolToken = await this.atolService.getToken(ATOLLOGIN, ATOLTOKEN);
       const token = atolToken[0].token;
       const timestamp = format(new Date(), 'dd.MM.yyyy HH:mm:ss', {locale: ru});
       const atolReceipt = {
@@ -157,7 +162,7 @@ export class OrderController {
       };
       const atolResponse = await this.atolService.postSell(
         token,
-        'nevatrip-ru_11018',
+        ATOLGROUP,
         timestamp,
         order.id || 'test_' + order.sessionId,
         {
@@ -349,10 +354,15 @@ export class OrderController {
     },
   })
   async find(
+    @param.query.string('token')
+    token: string,
     @param.query.object('filter', getFilterSchemaFor(Order))
     filter?: Filter<Order>,
-  ): Promise<Order[]> {
-    return await this.orderRepository.find(filter);
+  ): Promise<Order[] | Response | void> {
+    if (token !== secret) {
+      throw new HttpErrors.Unauthorized(`Token is incorrect`);
+    }
+
   }
 
   @patch('/orders', {
