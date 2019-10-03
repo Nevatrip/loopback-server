@@ -4,6 +4,9 @@ export interface Ticket {
   _key: string;
   price: number;
   name: string;
+  category: {
+    title: string;
+  };
 }
 
 export interface Direction {

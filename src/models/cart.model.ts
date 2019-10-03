@@ -38,10 +38,10 @@ export class CartProduct extends Entity {
   productId: string;
 
   @property(Product)
-  product?: Product;
+  product: Product;
 
   @property.array(CartProductOptions)
-  options?: CartProductOptions[];
+  options: CartProductOptions[];
 
   constructor(data?: Partial<CartProduct>) {
     super(data);
