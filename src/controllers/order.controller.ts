@@ -32,6 +32,7 @@ import {
 import {format as _format} from 'date-fns';
 import {ru} from 'date-fns/locale';
 import * as Excel from 'exceljs';
+import * as renderEmail from '../utils/renderEmail';
 
 const privateKey = process.env.CLOUDPAYMENTS_PRIVATEKEY;
 const publicId = process.env.CLOUDPAYMENTS_PUBLICID;
@@ -479,7 +480,7 @@ export class OrderController {
         return _this.res.end(buffer, 'binnary');
         // done
       });
-  }
+    }
 
     return orders;
   }
@@ -510,6 +511,28 @@ export class OrderController {
   })
   async findById(@param.path.string('id') id: string): Promise<Order> {
     return await this.orderRepository.findById(id);
+  }
+
+  @get('/orders/{id}/email', {
+    responses: {
+      '200': {
+        description: 'Order model instance',
+        content: {'text/html': {schema: {}}},
+        examples: {'text/html': '<html><body>Your HTML text</body></html>'},
+      },
+    },
+  })
+  async emailById(@param.path.string('id') id: string): Promise<Response> {
+    const order = await this.orderRepository.findById(id);
+    const root = {
+      page: 'email',
+      params: {},
+      api: order,
+    };
+
+    this.res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+
+    return this.res.send(renderEmail.renderEmail(root));
   }
 
   @patch('/orders/{id}', {
