@@ -7,6 +7,7 @@ export interface SanityService {
   getProductByAlias(alias: string): Promise<Product[]>;
   getProductById(id: string): Promise<Product[]>;
   getProductForCartById(id: string): Promise<Product[]>;
+  getProductForOrderById(id: string): Promise<Product[]>;
 }
 
 export class SanityServiceProvider implements Provider<SanityService> {

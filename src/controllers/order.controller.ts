@@ -83,7 +83,7 @@ export class OrderController {
 
       const product =
         products[productId] ||
-        (await this.sanityService.getProductForCartById(productId))[0];
+        (await this.sanityService.getProductForOrderById(productId))[0];
       productItem.product = product;
       const directionData = product.directions.find(
         dir => dir._type === 'direction' && dir._key === direction,
