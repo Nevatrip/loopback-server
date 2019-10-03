@@ -16,6 +16,8 @@ import {
   del,
   requestBody,
   HttpErrors,
+  RestBindings,
+  Response,
 } from '@loopback/rest';
 import {inject} from '@loopback/core';
 import {SanityService, NevatripService, AtolService} from '../services';
@@ -27,8 +29,9 @@ import {
   TaxationSystem,
   PaymentSuccessModel,
 } from 'cloudpayments';
-import {format} from 'date-fns';
+import {format as _format} from 'date-fns';
 import {ru} from 'date-fns/locale';
+import * as Excel from 'exceljs';
 
 const privateKey = process.env.CLOUDPAYMENTS_PRIVATEKEY;
 const publicId = process.env.CLOUDPAYMENTS_PUBLICID;
@@ -49,6 +52,8 @@ export class OrderController {
     protected nevatripService: NevatripService,
     @inject('services.AtolService')
     protected atolService: AtolService,
+    @inject(RestBindings.Http.RESPONSE)
+    public res: Response,
   ) {}
 
   async getCart(cart: Cart) {
@@ -124,7 +129,7 @@ export class OrderController {
       }
     }
 
-    sum = Math.ceil(sum - sum * (sale / 100));
+    // sum = Math.ceil(sum - sum * (sale / 100));
 
     if (sendToAtol) {
       if (!ATOLLOGIN || !ATOLTOKEN || !ATOLGROUP) {
@@ -133,7 +138,9 @@ export class OrderController {
 
       const atolToken = await this.atolService.getToken(ATOLLOGIN, ATOLTOKEN);
       const token = atolToken[0].token;
-      const timestamp = format(new Date(), 'dd.MM.yyyy HH:mm:ss', {locale: ru});
+      const timestamp = _format(new Date(), 'dd.MM.yyyy HH:mm:ss', {
+        locale: ru,
+      });
       const atolReceipt = {
         client: {
           //email: order.user.email,
@@ -356,6 +363,8 @@ export class OrderController {
   async find(
     @param.query.string('token')
     token: string,
+    @param.query.string('format')
+    format?: string,
     @param.query.object('filter', getFilterSchemaFor(Order))
     filter?: Filter<Order>,
   ): Promise<Order[] | Response | void> {
@@ -363,6 +372,116 @@ export class OrderController {
       throw new HttpErrors.Unauthorized(`Token is incorrect`);
     }
 
+    // if (!this.orderRepository.dataSource.connected) {
+    //   await this.orderRepository.dataSource.connect();
+    // }
+
+    // const orderCollection = (this.orderRepository.dataSource // tslint:disable-next-line: no-any
+    //   .connector as any).collection('Order');
+
+    // console.log(`filter`, filter);
+
+    // const request = await orderCollection.aggregate([{$match: filter}]).get();
+
+    // console.log(`request`, request);
+
+    const orders = await this.orderRepository.find(filter);
+
+    if (format === 'csv') {
+      const workbook = new Excel.Workbook();
+      const sheet = workbook.addWorksheet('Orders');
+      sheet.state = 'visible';
+      const table = sheet.addTable({
+        name: 'MyTable',
+        ref: 'A1',
+        headerRow: true,
+        style: {
+          theme: 'TableStyleMedium2',
+          showRowStripes: true,
+        },
+        columns: [
+          {name: 'Имя'},
+          {name: 'Почта'},
+          {name: 'Телефон'},
+          {name: 'Экскурсия'},
+          {name: 'Билет'},
+          {name: 'Количество'},
+          {name: 'Стоимость'},
+          {name: 'Посадочный номер'},
+          {name: 'Создан'},
+          {name: 'Обновлён'},
+          {name: 'Сумма'},
+          {name: 'Транзакция'},
+          {name: 'Статус'},
+          {name: 'Промокод'},
+        ],
+        rows: [],
+      });
+
+      orders.forEach(order => {
+        const {
+          TransactionId,
+          InternalId,
+          // @ts-ignore
+        } = order.payment.Model;
+        order.products.forEach(({product, options}) => {
+          options.forEach(({number, direction, tickets}) => {
+            const productDirection = product.directions.find(
+              ({_key}) => _key === direction,
+            );
+            if (productDirection) {
+              productDirection.tickets.forEach(
+                ({category, name, price, _key}) => {
+                  if (tickets[_key]) {
+                    // @ts-ignore
+                    table.addRow([
+                      order.user.fullName,
+                      order.user.email,
+                      order.user.phone,
+                      product.title.ru.name,
+                      category.title + ' ' + name,
+                      tickets[_key],
+                      price,
+                      order.status === 'paid' && number ? `НТ${number}` : '',
+                      new Date(order.created),
+                      order.updated ? new Date(order.updated) : '',
+                      order.sum,
+                      order.status === 'paid' ? TransactionId : InternalId,
+                      order.status,
+                      order.promocode,
+                    ]);
+                  }
+                },
+              );
+            }
+          });
+        });
+      });
+
+      table.commit();
+
+      this.res.setHeader(
+        'Content-Disposition',
+        'attachment; filename="orders.xls"',
+      );
+
+      this.res.setHeader(
+        'Content-Type',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8',
+      );
+
+      const file = await workbook.xlsx.writeBuffer();
+      return this.res.end(file, 'binnary');
+      // return this.res.send(Buffer.from(file));
+
+      const _this = this;
+      workbook.xlsx.writeBuffer().then(function(buffer) {
+        return _this.res.end(buffer, 'binnary');
+        // done
+      });
+  }
+
+    return orders;
   }
 
   @patch('/orders', {
