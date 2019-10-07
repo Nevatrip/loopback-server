@@ -321,7 +321,10 @@ export class OrderController {
     await this.orderRepository.updateById(order.id, order);
 
     sendEmail(order, 'paid');
-    sendEmail(order, 'manager');
+
+    if (order.user.fullName.toLowerCase() !== 'test') {
+      sendEmail(order, 'manager');
+    }
 
     return {code: 0};
   }
@@ -518,21 +521,75 @@ export class OrderController {
       '200': {
         description: 'Order model instance',
         content: {'text/html': {schema: {}}},
-        examples: {'text/html': '<html><body>Your HTML text</body></html>'},
+        examples: {
+          'text/html': '<html><body>Your HTML text</body></html>',
+        },
       },
     },
   })
   async emailById(@param.path.string('id') id: string): Promise<Response> {
-    const order = await this.orderRepository.findById(id);
-    const root = {
-      page: 'email',
-      params: {},
-      api: order,
-    };
+    const api = await this.orderRepository.findById(id);
 
     this.res.setHeader('Content-Type', 'text/html; charset=UTF-8');
 
-    return this.res.send(renderEmail.renderEmail(root));
+    return this.res.send(renderEmail.renderEmail({page: 'email', api}));
+  }
+
+  @get('/orders/{id}/operator', {
+    responses: {
+      '200': {
+        description: 'Order model instance',
+        content: {'text/html': {schema: {}}},
+        examples: {
+          'text/html': '<html><body>Your HTML text</body></html>',
+        },
+      },
+    },
+  })
+  async operatorById(@param.path.string('id') id: string): Promise<Response> {
+    const api = await this.orderRepository.findById(id);
+
+    this.res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+
+    return this.res.send(renderEmail.renderEmail({page: 'operator', api}));
+  }
+
+  @get('/orders/{id}/print', {
+    responses: {
+      '200': {
+        description: 'Order model instance',
+        content: {'text/html': {schema: {}}},
+        examples: {
+          'text/html': '<html><body>Your HTML text</body></html>',
+        },
+      },
+    },
+  })
+  async printById(@param.path.string('id') id: string): Promise<Response> {
+    const api = await this.orderRepository.findById(id);
+
+    this.res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+
+    return this.res.send(renderEmail.renderEmail({page: 'print', api}));
+  }
+
+  @get('/orders/{id}/preview', {
+    responses: {
+      '200': {
+        description: 'Order model instance',
+        content: {'text/html': {schema: {}}},
+        examples: {
+          'text/html': '<html><body>Your HTML text</body></html>',
+        },
+      },
+    },
+  })
+  async previewById(@param.path.string('id') id: string): Promise<Response> {
+    const api = await this.orderRepository.findById(id);
+
+    this.res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+
+    return this.res.send(renderEmail.renderEmail({page: 'web', api}));
   }
 
   @patch('/orders/{id}', {
@@ -545,7 +602,9 @@ export class OrderController {
     await this.orderRepository.updateById(id, order);
   }
 
-  @put('/orders/{id}', {responses: {'204': {description: 'Order PUT success'}}})
+  @put('/orders/{id}', {
+    responses: {'204': {description: 'Order PUT success'}},
+  })
   async replaceById(
     @param.path.string('id') id: string,
     @requestBody() order: Order,
