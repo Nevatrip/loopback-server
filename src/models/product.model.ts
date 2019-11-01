@@ -12,6 +12,10 @@ export interface Ticket {
 export interface Direction {
   _key: string;
   tickets: Ticket[];
+  partner?: {
+    email?: string;
+  };
+  partnerName?: string;
 }
 
 export interface DirectionComplex extends Direction {
@@ -21,9 +25,11 @@ export interface DirectionComplex extends Direction {
 }
 
 export interface DirectionProduct extends Direction {
+  start: string | number | Date;
   _type: 'direction';
   schedule: ProductEvent[];
-  dates?: number[];
+  timeOffset: number;
+  dates?: Date[];
   buyTimeOffset?: number;
 }
 

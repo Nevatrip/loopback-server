@@ -7,9 +7,6 @@ const SMTPPass = process.env.SMTP_PASS;
 
 type Status = 'new' | 'paid' | 'rejected' | 'manager';
 
-let number = '¯\\_(ツ)_/¯';
-let title = 'Название экскурсии';
-
 const getMailContent = (order: Order, status: Status) => {
   const content = {
     new: JSON.stringify(order),
@@ -24,7 +21,29 @@ const getMailContent = (order: Order, status: Status) => {
 export const sendEmail = (order: Order, status: Status) => {
   const {
     user: {email},
+    products: [
+      {
+        product: {
+          title: {
+            ru: {name: title},
+          },
+          directions,
+        },
+        options: [{number, direction}],
+      },
+    ],
   } = order;
+
+  const selectedDirection = directions.find(dir => dir._key === direction);
+
+  if (!selectedDirection) return;
+
+  const {
+    partnerName: partnerSubject,
+    partner: {email: partnerEmail = 'tech-support@nevatrip.ru'} = {
+      email: 'tech-support@nevatrip.ru',
+    },
+  } = selectedDirection;
 
   const transporter = createTransport({
     host: 'smtp.yandex.ru',
@@ -43,9 +62,12 @@ export const sendEmail = (order: Order, status: Status) => {
     html: mailContent,
     to:
       status === 'manager'
-        ? ['info@nevatrip.ru', 'order@nevatrip.ru', 'driver-spb@yandex.ru']
+        ? ['info@nevatrip.ru', 'order@nevatrip.ru', partnerEmail]
         : email, // list of receivers
-    subject: `Заказ билетов на «${title}» НТ${number}`,
+    subject:
+      status === 'manager'
+        ? partnerSubject
+        : `Заказ билетов на «${title}» НТ${number}`,
     text: JSON.stringify(order), // plain text body
   };
 
