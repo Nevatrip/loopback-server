@@ -588,6 +588,8 @@ export class OrderController {
     const api = await this.orderRepository.findById(id);
 
     this.res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+    this.res.setHeader('Access-Control-Allow-Origin', '*');
+    this.res.setHeader('X-FRAME-OPTIONS', 'ALLOWALL');
 
     return this.res.send(renderEmail.renderEmail({page: 'web', api}));
   }
