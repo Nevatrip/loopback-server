@@ -2309,7 +2309,7 @@ if (typeof Object.create === 'function') {
 });;
 return module.exports || exports.BEMHTML;
 }({}, {});
-var api = new BEMHTML({"elemJsInstances":true,"runtimeLint":true,"requires":{"dateFns":{"commonJS":"date-fns"}},"exportName":"BEMHTML","to":"/Users/realetive/_dev/monorepo/apps/emails"});
+var api = new BEMHTML({"elemJsInstances":true,"runtimeLint":true,"production":true,"requires":{"dateFns":{"commonJS":"date-fns"}},"exportName":"BEMHTML","to":"/Users/realetive/_dev/monorepo/apps/emails"});
 api.compile(function(match, block, elem, mod, elemMod, oninit, xjstOptions, wrap, replace, extend, mode, def, content, appendContent, prependContent, attrs, addAttrs, js, addJs, mix, addMix, mods, addMods, addElemMods, elemMods, tag, cls, bem, local, applyCtx, applyNext, apply) {
 /* BEM-XJST User code here: */
 /* begin: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-core/common.blocks/page/page.bemhtml.js */
@@ -2391,9 +2391,7 @@ block('page')(
 /* end: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-core/common.blocks/page/page.bemhtml.js */
 /* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/page/page.bemhtml.js */
 block( 'page' )(
-  mode( 'doctype' )( function () {
-    return { html: this.ctx.doctype || '<!DOCTYPE html>' };
-  } ),
+  def()( ( node, ctx ) => applyCtx( ctx.content ) ),
 
   wrap()( function () {
     const ctx = this.ctx;
@@ -2431,43 +2429,13 @@ block( 'page' )(
             ],
           },
           ctx,
+          ctx.scripts,
         ],
       },
     ];
   } ),
+)
 
-  tag()( 'body' ),
-
-  content()( function () {
-    return [
-      applyNext(),
-      this.ctx.scripts,
-    ];
-  } ),
-
-  elem( 'head' )(
-    bem()( false ),
-    tag()( 'head' ),
-  ),
-
-  elem( 'meta' )(
-    bem()( false ),
-    tag()( 'meta' ),
-  ),
-
-  elem( 'link' )(
-    bem()( false ),
-    tag()( 'link' ),
-  ),
-
-  elem( 'favicon' )(
-    bem()( false ),
-    tag()( 'link' ),
-    attrs()( function () {
-      return this.extend( applyNext() || {}, { rel: 'shortcut icon', href: this.ctx.url } );
-    } ),
-  ),
-);
 
 /* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/page/page.bemhtml.js */
 /* begin: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-core/common.blocks/ua/ua.bemhtml.js */
@@ -2512,16 +2480,32 @@ block('page').elem('js')(
 );
 
 /* end: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-core/common.blocks/page/__js/page__js.bemhtml.js */
-/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/development.blocks/livereload/livereload.bemhtml.js */
-block( 'page' ).content()( () => [
-  applyNext(),
-  {
-    elem: 'js',
-    url: '/livereload.js?snipver=1',
-  },
-] );
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-core/desktop.blocks/page/__conditional-comment/page__conditional-comment.bemhtml.js */
+block('page').elem('conditional-comment')(
+    tag()(false),
 
-/* end: /Users/realetive/_dev/monorepo/apps/emails/components/development.blocks/livereload/livereload.bemhtml.js */
+    content()(function() {
+        var ctx = this.ctx,
+            cond = ctx.condition
+                .replace('<', 'lt')
+                .replace('>', 'gt')
+                .replace('=', 'e'),
+            hasNegation = cond.indexOf('!') > -1,
+            includeOthers = ctx.msieOnly === false,
+            hasNegationOrIncludeOthers = hasNegation || includeOthers;
+
+        return [
+            { html : '<!--[if ' + cond + ']>' },
+            includeOthers? { html : '<!' } : '',
+            hasNegationOrIncludeOthers? { html : '-->' } : '',
+            applyNext(),
+            hasNegationOrIncludeOthers? { html : '<!--' } : '',
+            { html : '<![endif]-->' }
+        ];
+    })
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-core/desktop.blocks/page/__conditional-comment/page__conditional-comment.bemhtml.js */
 /* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/thanks/thanks.bemhtml.js */
 block( 'thanks' )(
   content()( ( node, ctx ) => [
@@ -2825,7 +2809,7 @@ block( 'email-map' )(
         attrs: {
           width: '540',
           style: '-ms-interpolation-mode:bicubic;display:inline-block;height:auto;max-width:100%;outline:0;'
-            + 'text-decoration:none;width:540px !important;background-color:#aacbda;text-align:center;padding:10px;',
+            + 'text-decoration:none;width:540px !important;background-color:#aacbda;text-align:center;padding:0;',
         },
       },
     },
