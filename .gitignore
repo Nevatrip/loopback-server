@@ -64,3 +64,4 @@ api-docs/
 /dist
 
 .docker/data
+.config/ca-certificates/Yandex/YandexInternalRootCA.crt
