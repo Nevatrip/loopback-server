@@ -258,6 +258,8 @@ export class OrderController {
       order.updated = new Date();
     }
 
+    order.hash = getHash(order.user.email);
+
     const newOrder = await this.orderRepository.create(order);
 
     if (order.sum) {
