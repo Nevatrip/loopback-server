@@ -2322,7 +2322,7 @@ block( 'email' ).elem( 'content' ).elemMod( 'view', 'web' )( {
                   {
                     block: 'link',
                     mix: { block: 'email-web', elem: 'print' },
-                    url: `https://api.nevatrip.ru/orders/${ order.id }/print`,
+                    url: `https://api.nevatrip.ru/orders/${ order.id }/print?hash=${ order.hash }`,
                     content: [
                       {
                         tag: 'b',

@@ -29,6 +29,9 @@ export class Order extends Cart {
   @property({type: 'object'})
   ofd?: object;
 
+  @property()
+  hash?: string; // email's hash
+
   constructor(data?: Partial<Order>) {
     super(data);
   }

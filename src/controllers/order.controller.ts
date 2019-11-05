@@ -33,6 +33,7 @@ import {format as _format} from 'date-fns';
 import {ru} from 'date-fns/locale';
 import * as Excel from 'exceljs';
 import * as renderEmail from '../utils/renderEmail';
+import {createHmac} from 'crypto';
 
 const privateKey = process.env.CLOUDPAYMENTS_PRIVATEKEY;
 const publicId = process.env.CLOUDPAYMENTS_PUBLICID;
@@ -40,6 +41,23 @@ const secret = process.env.SECRET;
 const ATOLLOGIN = process.env.ATOL_LOGIN;
 const ATOLTOKEN = process.env.ATOL_TOKEN;
 const ATOLGROUP = process.env.ATOL_GROUP;
+
+if (!secret) {
+  throw new Error('SECRET (env) is not defined');
+}
+
+const getHash = (string: string) => {
+  const sha1 = createHmac('sha1', secret);
+  return sha1.update(string).digest('base64');
+};
+
+const checkHash = (string: string, hash: string): void => {
+  const emailHash = getHash(string);
+
+  if (emailHash !== hash) {
+    throw new HttpErrors.Unauthorized(`Hash is invalid`);
+  }
+};
 
 export class OrderController {
   constructor(
@@ -238,14 +256,16 @@ export class OrderController {
     } else {
       order.status = 'paid';
       order.updated = new Date();
-
-      sendEmail(order, 'paid');
-      // sendEmail(order, 'manager');
     }
 
     const newOrder = await this.orderRepository.create(order);
 
-    // sendEmail(newOrder, 'new');
+    if (order.sum) {
+      // sendEmail(newOrder, 'new');
+    } else {
+      sendEmail(newOrder, 'paid');
+      // sendEmail(newOrder, 'manager');
+    }
 
     return newOrder;
   }
@@ -318,14 +338,13 @@ export class OrderController {
       Model: body,
     };
 
-    await this.orderRepository.updateById(order.id, order);
-
     sendEmail(order, 'paid');
 
     if (order.user.fullName.toLowerCase() !== 'test') {
       sendEmail(order, 'manager');
     }
 
+    this.orderRepository.updateById(order.id, order);
     return {code: 0};
   }
 
@@ -527,12 +546,45 @@ export class OrderController {
       },
     },
   })
-  async emailById(@param.path.string('id') id: string): Promise<Response> {
+  async emailById(
+    @param.path.string('id') id: string,
+    @param.query.string('hash') hash: string,
+  ): Promise<Response> {
     const api = await this.orderRepository.findById(id);
+
+    checkHash(api.user.email, hash);
+
+    api.hash = getHash(api.user.email);
 
     this.res.setHeader('Content-Type', 'text/html; charset=UTF-8');
 
     return this.res.send(renderEmail.renderEmail({page: 'email', api}));
+  }
+
+  @get('/orders/{id}/email/send', {
+    responses: {
+      '200': {
+        description: 'Order model instance',
+        content: {'text/html': {schema: {}}},
+        examples: {
+          'text/html': '<html><body>Your HTML text</body></html>',
+        },
+      },
+    },
+  })
+  async sendEmailById(
+    @param.path.string('id') id: string,
+    @param.query.string('hash') hash: string,
+  ): Promise<Order> {
+    const order = await this.orderRepository.findById(id);
+
+    checkHash(order.user.email, hash);
+
+    order.hash = getHash(order.user.email);
+
+    sendEmail(order, 'paid');
+
+    return order;
   }
 
   @get('/orders/{id}/operator', {
@@ -546,8 +598,15 @@ export class OrderController {
       },
     },
   })
-  async operatorById(@param.path.string('id') id: string): Promise<Response> {
+  async operatorById(
+    @param.path.string('id') id: string,
+    @param.query.string('hash') hash: string,
+  ): Promise<Response> {
     const api = await this.orderRepository.findById(id);
+
+    checkHash(api.user.email, hash);
+
+    api.hash = getHash(api.user.email);
 
     this.res.setHeader('Content-Type', 'text/html; charset=UTF-8');
 
@@ -565,8 +624,15 @@ export class OrderController {
       },
     },
   })
-  async printById(@param.path.string('id') id: string): Promise<Response> {
+  async printById(
+    @param.path.string('id') id: string,
+    @param.query.string('hash') hash: string,
+  ): Promise<Response> {
     const api = await this.orderRepository.findById(id);
+
+    checkHash(api.user.email, hash);
+
+    api.hash = getHash(api.user.email);
 
     this.res.setHeader('Content-Type', 'text/html; charset=UTF-8');
 
@@ -584,8 +650,15 @@ export class OrderController {
       },
     },
   })
-  async previewById(@param.path.string('id') id: string): Promise<Response> {
+  async previewById(
+    @param.path.string('id') id: string,
+    @param.query.string('hash') hash: string,
+  ): Promise<Response> {
     const api = await this.orderRepository.findById(id);
+
+    checkHash(api.user.email, hash);
+
+    api.hash = getHash(api.user.email);
 
     this.res.setHeader('Content-Type', 'text/html; charset=UTF-8');
     this.res.setHeader('Access-Control-Allow-Origin', '*');

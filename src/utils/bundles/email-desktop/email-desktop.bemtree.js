@@ -2387,7 +2387,7 @@ block( 'email' ).elem( 'content' ).elemMod( 'view', 'email' )( {
                   content: {
                     block: 'email-unit',
                     mods: { type: 'button' },
-                    url: `https://api.nevatrip.ru/orders/${ order.id }/print`,
+                    url: `https://api.nevatrip.ru/orders/${ order.id }/print?hash=${ order.hash }`,
                     color: '#ffffff',
                     border: '3px solid #fff',
                     fontWeight: '15px',
@@ -3095,7 +3095,7 @@ block( 'email' ).elem( 'content' ).elemMod( 'view', 'email' )( {
               },
               {
                 block: 'link',
-                url: `https://api.nevatrip.ru/orders/${ order.id }/preview`,
+                url: `https://api.nevatrip.ru/orders/${ order.id }/preview?hash=${ order.hash }`,
                 attrs: {
                   style: 'Margin: 0; color: #FFFFFF; font-family: Arial,sans-serif; font-weight: 400; '
                     + 'line-height: 20px; margin: 0; padding: 0; text-align: left; text-decoration: none;',
@@ -3124,7 +3124,7 @@ block( 'email' ).elem( 'content' ).elemMod( 'view', 'email' )( {
                   'If the message is not displayed correctly, click ',
                   {
                     block: 'link',
-                    url: `https://api.nevatrip.ru/orders/${ order.id }/preview`,
+                    url: `https://api.nevatrip.ru/orders/${ order.id }/preview?hash=${ order.hash }`,
                     attrs: {
                       style: 'Margin: 0; color: #FFFFFF; font-family: Arial,sans-serif; font-weight: 400; '
                         + 'line-height: 20px; margin: 0; padding: 0; text-align: left; text-decoration: none;',

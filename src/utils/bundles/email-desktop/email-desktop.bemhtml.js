@@ -2506,6 +2506,308 @@ block('page').elem('conditional-comment')(
 );
 
 /* end: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-core/desktop.blocks/page/__conditional-comment/page__conditional-comment.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/email-text.bemhtml.js */
+block( 'email-text' )(
+  attrs()( ( node, ctx ) => ( {
+    style: 'Margin:0;Margin-bottom:0;font-family:Arial,sans-serif;margin:0 !important;margin-bottom:0;padding: 0;'
+      + `${ ctx.align ? `text-align:${ ctx.align };` : '' }`
+      + `${ ctx.color ? `color:${ ctx.color };` : '' }`
+      + `${ ctx.fontSize ? `font-size:${ ctx.fontSize };` : '' }`
+      + `${ ctx.fontWeight ? `font-weight:${ ctx.fontWeight };` : '' }`
+      + `${ ctx.letterSpacing ? `letter-spacing:${ ctx.letterSpacing };` : '' }`
+      + `${ ctx.lineHeight ? `line-height:${ ctx.lineHeight };` : '' }`
+      + `${ ctx.padding ? `padding:${ ctx.padding };` : '' }`
+      + `${ ctx.textTransform ? `text-transform:${ ctx.textTransform };` : '' }`
+      + `${ ctx.textDecoration ? `text-decoration:${ ctx.textDecoration };` : '' }`,
+    align: ctx.align ? ctx.align : '',
+  } ) ),
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/email-text.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email/__ban-adaptability/email__ban-adaptability.bemhtml.js */
+block( 'email' ).elem( 'ban-adaptability' )(
+  replace()( () => ( {
+    mix: {
+      block: 'email',
+      elem: 'ban-adaptability',
+    },
+    attrs: {
+      style: 'white-space:nowrap!important;line-height:0;color:#ffffff;'
+        + 'font-family:Arial,sans-serif;font-size:16px;text-align:center;',
+    },
+    content: '____________________________________________________________________',
+  } ) )
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email/__ban-adaptability/email__ban-adaptability.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email/__common-styles/email__common-styles.bemhtml.js */
+block( 'email' ).elem( 'common-styles' )(
+  replace()( () => ( {
+    tag: 'style',
+    content: {
+      html: '.MsoNormal_mailru_css_attribute_postfix{margin:0}'
+        + 'a{text-decoration: none;color:inherit;color:inherit!important;}'
+        + '@media print{body,html{-webkit-print-color-adjust:exact;}}',
+    },
+  } ) )
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email/__common-styles/email__common-styles.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_tag/email-text_tag_p.bemhtml.js */
+block( 'email-text' ).mod( 'tag', 'p' )(
+  tag()( 'p' ),
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_tag/email-text_tag_p.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_tag/email-text_tag_b.bemhtml.js */
+block( 'email-text' ).mod( 'tag', 'b' )(
+  tag()( 'b' ),
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_tag/email-text_tag_b.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_tag/email-text_tag_h1.bemhtml.js */
+block( 'email-text' ).mod( 'tag', 'h1' )(
+  tag()( 'h1' ),
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_tag/email-text_tag_h1.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_tag/email-text_tag_font.bemhtml.js */
+block( 'email-text' ).mod( 'tag', 'font' )(
+  tag()( 'font' ),
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_tag/email-text_tag_font.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_tag/email-text_tag_h2.bemhtml.js */
+block( 'email-text' ).mod( 'tag', 'h2' )(
+  tag()( 'h2' ),
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_tag/email-text_tag_h2.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_style/email-text_style_translation.bemhtml.js */
+block( 'email-text' ).mod( 'style', 'translation' )(
+  addAttrs()(
+    {
+      style: 'color:#486482;'
+        + 'display:inline-block;'
+        + 'font-size:.8em;',
+    },
+  ),
+  content()( ( node, ctx ) => ctx.content ),
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_style/email-text_style_translation.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_style/email-text_style_inherit.bemhtml.js */
+block( 'email-text' ).mod( 'style', 'translation' )(
+
+  // content()( ( node, ctx ) => {
+  // todo: должен наследовать attrs родителя
+  // } ),
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_style/email-text_style_inherit.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_style/email-text_style_translation-param.bemhtml.js */
+block( 'email-text' ).mod( 'style', 'translation-param' )(
+  addAttrs()(
+    {
+      style: 'color:#486482;'
+        + 'font-size:21.6px;'
+        + 'font-weight:400',
+    },
+  ),
+  content()( ( node, ctx ) => ctx.content ),
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_style/email-text_style_translation-param.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/email-unit.bemhtml.js */
+block( 'email-unit' )(
+  tag()( 'table' ),
+  attrs()( ( node, ctx ) => ( {
+    style: `;Margin:0${ ctx.horizonMargin ? ` ${ ctx.horizonMargin }` : '' };`
+        + `margin:0${ ctx.horizonMargin ? ` ${ ctx.horizonMargin }` : '' };`
+        + 'padding:0;'
+        + 'font-family:Arial,sans-serif;'
+        + 'padding:0;'
+        + 'max-width:100%;'
+        + `width:${ ctx.width ? `${ ctx.width }px` : '100%;' };`
+        + `${ ctx.bgcolor ? `background:${ ctx.bgcolor };` : '' }`
+        + `${ ctx.border ? `border:${ ctx.border };` : '' }`,
+    bgcolor: ctx.bgcolor ? ctx.bgcolor : '',
+    width: ctx.width ? ctx.width : '',
+    cellpadding: ctx.cellpadding ? ctx.cellpadding : 0,
+    cellspacing: ctx.cellspacing ? ctx.cellspacing : 0,
+    border: 0,
+  } ) ),
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/email-unit.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/__tbody/email-unit__tbody.bemhtml.js */
+block( 'email-unit' ).elem( 'tbody' )(
+  tag()( 'tbody' ),
+  addAttrs()( ( node, ctx ) => {
+    const bgcolorStyle = ctx.bgcolor ? `background:${ ctx.bgcolor };` : '';
+
+    return {
+      style: ( ctx.styleTbody || '' ) + bgcolorStyle,
+      bgcolor: ctx.bgcolor ? ctx.bgcolor : '',
+    }
+  } ),
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/__tbody/email-unit__tbody.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/__td/email-unit__td.bemhtml.js */
+block( 'email-unit' ).elem( 'td' )(
+  tag()( 'td' ),
+  addAttrs()( ( node, ctx ) => {
+    const widthStyle = ctx.width ? `width:${ ctx.width }px;` : '';
+    const bgcolorStyle = ctx.bgcolor ? `background:${ ctx.bgcolor };` : '';
+    const verticalAlignStyle = ctx.verticalAlign ? `vertical-align:${ ctx.verticalAlign };` : '';
+
+    return {
+      style: ( ctx.styleTd || '' ) + widthStyle + bgcolorStyle + verticalAlignStyle,
+      bgcolor: ctx.bgcolor ? ctx.bgcolor : '',
+      width: ctx.width ? ctx.width : '',
+      valign: ctx.verticalAlign ? ctx.verticalAlign : '',
+    }
+  } ),
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/__td/email-unit__td.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/__tr/email-unit__tr.bemhtml.js */
+block( 'email-unit' ).elem( 'tr' )(
+  tag()( 'tr' ),
+  addAttrs()( ( node, ctx ) => {
+    const bgcolorStyle = ctx.bgcolor ? `background:${ ctx.bgcolor };` : '';
+
+    return {
+      style: ( ctx.styleTr || '' ) + bgcolorStyle,
+      bgcolor: ctx.bgcolor ? ctx.bgcolor : '',
+    }
+  } ),
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/__tr/email-unit__tr.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/__center/email-unit__center.bemhtml.js */
+block( 'email-unit' )
+  .elem( 'center' )(
+    tag()( 'center' ),
+    addAttrs()( ( node, ctx ) => {
+      const bgcolorStyle = ctx.bgcolor ? `background:${ ctx.bgcolor };` : '';
+
+      return {
+        style: ( ctx.styleCenter || '' ) + bgcolorStyle,
+        bgcolor: ctx.bgcolor ? ctx.bgcolor : '',
+      }
+    } ),
+  );
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/__center/email-unit__center.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/_type/email-unit_type_spacer.bemhtml.js */
+block( 'email-unit' ).mod( 'type', 'spacer' )(
+  def()( ( node, ctx ) => {
+    ctx.styleTd = ctx.height
+      ? `height:${ ctx.height }px;line-height:${ ctx.height }px;`
+      : ';';
+    return applyNext()
+  } ),
+  content()( ( node, ctx ) => [ {
+    elem: 'tbody',
+    content: {
+      elem: 'tr',
+      content: {
+        elem: 'td',
+        styleTd: ctx.styleTd,
+        content: {
+          html: '&nbsp;',
+        },
+        attrs: {
+          height: ctx.height,
+        },
+      },
+    },
+  } ] ) );
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/_type/email-unit_type_spacer.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/_type/email-unit_type_row.bemhtml.js */
+block( 'email-unit' ).mod( 'type', 'row' )(
+  content()( ( node, ctx ) => [
+    {
+      elem: 'tbody',
+      content: {
+        elem: 'tr',
+        content: ctx.content,
+      },
+    },
+  ] ) );
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/_type/email-unit_type_row.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/_type/email-unit_type_button.bemhtml.js */
+block( 'email-unit' ).mod( 'type', 'button' )(
+  def()( ( node, ctx ) => {
+    ctx.styleTbody = 'padding:0;text-align:left;vertical-align:top;';
+    ctx.styleTr = 'padding:0;text-align:left;vertical-align:top;';
+    ctx.styleTd = 'Margin:0;background: 0 0;margin:0;padding:0;text-align:left;vertical-align:top;word-wrap:break-word;border-collapse:collapse !important;font-family:Arial,sans-serif;'
+      + `border:${ ctx.border ? ` ${ ctx.border }` : 'none' };`
+      + `color:${ ctx.color ? ` ${ ctx.color }` : 'inherit' };`
+      + `font-size:${ ctx.fontSize ? ` ${ ctx.fontSize }` : 'inherit' };`
+      + `font-weight:${ ctx.fontWeight ? ` ${ ctx.fontWeight }` : 'inherit' };`
+      + `line-height:${ ctx.lineHeight ? ` ${ ctx.lineHeight }` : 'inherit' };`
+    ctx.styleCenter = 'min-width:0;width: 100%;';
+    ctx.styleLink = 'Margin:0;margin:0;border:0 solid transparent;border-radius:0;color:#fff;display:inline-block;font-family:Arial,sans-serif;text-align:center;text-decoration:none;'
+      + `font-size:${ ctx.fontSize ? ` ${ ctx.fontSize }` : 'inherit' };`
+      + `font-weight:${ ctx.fontWeight ? ` ${ ctx.fontWeight }` : 'inherit' };`
+      + `line-height:${ ctx.lineHeight ? ` ${ ctx.lineHeight }` : 'inherit' };`
+      + `padding:${ ctx.padding ? ` ${ ctx.padding }` : '0' };`
+
+    return applyNext()
+  } ),
+  attrs()( ( node, ctx ) => ( {
+    style: `;Margin:0${ ctx.horizonMargin ? ` ${ ctx.horizonMargin }` : '' };`
+      + `margin:0${ ctx.horizonMargin ? ` ${ ctx.horizonMargin }` : '' };`
+      + 'border-collapse:collapse;'
+      + 'border-spacing:0;'
+      + 'text-align:left;'
+      + 'vertical-align:top;'
+      + 'padding:0;'
+      + 'font-family:Arial,sans-serif;'
+      + 'padding:0;'
+      + 'max-width:100%;'
+      + `width:${ ctx.width ? `${ ctx.width }px` : '100%;' };`
+      + `${ ctx.bgcolor ? `background:${ ctx.bgcolor };` : '' }`,
+    bgcolor: ctx.bgcolor ? ctx.bgcolor : '',
+    width: ctx.width ? ctx.width : '',
+    cellpadding: 0,
+    cellspacing: 0,
+    valign: 'top',
+    border: 0,
+  } ) ),
+  content()( ( node, ctx ) => [
+    {
+      elem: 'tbody',
+      styleTbody: ctx.styleTbody,
+      content: {
+        elem: 'tr',
+        styleTr: ctx.styleTr,
+        content: {
+          elem: 'td',
+          styleTd: ctx.styleTd,
+          content: {
+            elem: 'center',
+            styleCenter: ctx.styleCenter,
+            content: {
+              block: 'link',
+              content: ctx.content,
+              url: ctx.url,
+              attrs: {
+                style: ctx.styleLink,
+              },
+            },
+          },
+        },
+      },
+    },
+  ] ) );
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/_type/email-unit_type_button.bemhtml.js */
 /* begin: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-components/common.blocks/link/link.bemhtml.js */
 block('link')(
     def()(function() {
@@ -2553,6 +2855,349 @@ block('link')(
 );
 
 /* end: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-components/common.blocks/link/link.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/_type/email-unit_type_dotted-line.bemhtml.js */
+block( 'email-unit' ).mod( 'type', 'dotted-line' )(
+  content()( ( node, ctx ) => [ {
+    elem: 'tbody',
+    content: {
+      elem: 'tr',
+      content: {
+        elem: 'td',
+        styleTd: ctx.styleTd,
+        content: {
+          block: 'image',
+          alt: '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ',
+          url: 'https://nevatrip.ru/assets/img/email/separator_lg.png',
+          attrs: {
+            style: '-ms-interpolation-mode:bicubic;'
+              + 'clear:both;'
+              + 'display:block;'
+              + 'height:auto;'
+              + 'max-width:100%;'
+              + 'outline:0;'
+              + 'text-align:center;'
+              + 'text-decoration:none;'
+              + 'width:100%;',
+          },
+        },
+        attrs: {
+          height: ctx.height,
+        },
+      },
+    },
+  } ] ) );
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/_type/email-unit_type_dotted-line.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-components/common.blocks/image/image.bemhtml.js */
+block('image')(
+    addAttrs()({ role : 'img' }),
+
+    tag()('span'),
+
+    match(function() { return typeof this.ctx.content === 'undefined'; })(
+        tag()('img'),
+        addAttrs()(function() {
+            var ctx = this.ctx;
+            return this.extend(applyNext(),
+                {
+                    role : undefined,
+                    src : ctx.url,
+                    width : ctx.width,
+                    height : ctx.height,
+                    alt : ctx.alt,
+                    title : ctx.title
+                });
+        })
+    )
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-components/common.blocks/image/image.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/_type/email-unit_type_param.bemhtml.js */
+block( 'email-unit' ).mod( 'type', 'param' )(
+  attrs()( () => ( {
+    style: 'border-collapse: collapse; border-spacing: 0; display: inline-block; padding: 0; text-align: left; vertical-align: top; width: auto;',
+    cellpadding: 0,
+    cellspacing: 0,
+    border: 0,
+  } ) ),
+  content()( ( node, ctx ) => [ {
+    elem: 'tbody',
+    content: {
+      elem: 'tr',
+      attrs: {
+        style: 'padding: 0; text-align: left; vertical-align: top;',
+      },
+      content: {
+        elem: 'td',
+        attrs: {
+          style: 'Margin: 0; border-collapse: collapse !important; color: #252929; font-family: Arial,sans-serif; font-size: 15px; font-weight: 400; line-height: 19px; margin: 0; padding: 0; text-align: left; vertical-align: top; word-wrap: break-word;',
+        },
+        content: [
+          {
+            block: 'email-unit',
+            mods: { type: 'spacer' },
+            height: '7',
+          }, // spacer
+          {
+            block: 'email-text',
+            mods: { tag: 'p' },
+            color: '#514c46',
+            fontSize: '22px !important',
+            fontWeight: '400 !important',
+            lineHeight: '22px !important',
+            align: 'left',
+            padding: '0 20px 0 0',
+            content: [
+              {
+                tag: 'b',
+                content: ctx.title,
+              },
+              ctx.titleEn && {
+                html: '&nbsp;/&nbsp;',
+              },
+              ctx.titleEn && {
+                tag: 'font',
+                attrs: {
+                  style: 'color:#486482;font-size:17.6px',
+                },
+                content: ctx.titleEn,
+              },
+            ],
+          },
+          {
+            block: 'email-text',
+            mods: { tag: 'p' },
+            color: '#514c46',
+            fontSize: '27px !important',
+            fontWeight: '700 !important',
+            lineHeight: '33px !important',
+            align: 'left',
+            padding: '0 20px 0 0',
+            content: [
+              ctx.content,
+              ctx.contentEn && {
+                tag: 'br',
+              },
+              ctx.contentEn && {
+                tag: 'font',
+                attrs: {
+                  style: 'color:#486482;font-size:21.6px;font-weight:400',
+                },
+                content: ctx.contentEn,
+              },
+            ],
+          },
+          {
+            block: 'email-unit',
+            mods: { type: 'spacer' },
+            height: '3',
+          }, // spacer
+        ],
+      },
+    },
+  } ] ) );
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/_type/email-unit_type_param.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/_type/email-unit_type_param-ticket.bemhtml.js */
+block( 'email-unit' ).mod( 'type', 'param-ticket' )(
+  tag()( 'span' ),
+  content()( ( node, ctx ) => [
+    {
+      tag: 'b',
+      content: ctx.name, //[Взрослый, Льготный, Детский, Иностранный, Дошкольный, Бесплатный, Групповой]
+    },
+    ctx.nameEn && {
+      html: ' / ',
+    },
+    ctx.nameEn && {
+      tag: 'font',
+      attrs: {
+        style: 'color:#486482;font-size:19.2px',
+      },
+      content: ctx.nameEn, //[Adult, Discount, Child, Foreign, Pre-school, Free, Group]
+    },
+    {
+      html: ` — ${ ctx.quantity } шт.`,
+    },
+    {
+      tag: 'br',
+    },
+  ] ) );
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/_type/email-unit_type_param-ticket.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/_type/email-unit_type_tr.bemhtml.js */
+block( 'email-unit' ).mod( 'type', 'tr' )(
+  tag()( 'tr' ),
+  attrs()( ( node, ctx ) => ( {
+    style: `width:${ ctx.width ? `${ ctx.width }px` : 'auto;' };`
+      + `${ ctx.valign ? `vertical-align:${ ctx.valign };` : '' };`
+      + `${ ctx.align ? `text-align:${ ctx.align };` : '' };`,
+    colspan: ctx.colspan ? ctx.colspan : '',
+    rowspan: ctx.rowspan ? ctx.rowspan : '',
+    width: ctx.width ? ctx.width : '',
+    valign: ctx.valign ? ctx.valign : '',
+    align: ctx.align ? ctx.align : '',
+  } ) ),
+  content()( ( node, ctx ) => [
+    ctx.content,
+  ] ) );
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/_type/email-unit_type_tr.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/_type/email-unit_type_td.bemhtml.js */
+block( 'email-unit' ).mod( 'type', 'td' )(
+  tag()( 'td' ),
+  attrs()( ( node, ctx ) => ( {
+    style: `width:${ ctx.width ? `${ ctx.width }px` : 'auto;' };`
+      + `${ ctx.valign ? `vertical-align:${ ctx.valign };` : '' };`
+      + `${ ctx.align ? `text-align:${ ctx.align };` : '' };`
+      + `${ ctx.fontWeight ? `font-weight:${ ctx.fontWeight };` : 'inherit' };`,
+    colspan: ctx.colspan ? ctx.colspan : '',
+    rowspan: ctx.rowspan ? ctx.rowspan : '',
+    width: ctx.width ? ctx.width : '',
+    valign: ctx.valign ? ctx.valign : '',
+    align: ctx.align ? ctx.align : '',
+  } ) ),
+  content()( ( node, ctx ) => [
+    ctx.content,
+  ] ) );
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/_type/email-unit_type_td.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-link/email-link.bemhtml.js */
+block( 'email-link' )(
+  tag()( 'a' ),
+  attrs()( ( node, ctx ) => ( {
+    style: 'Margin:0;Margin-bottom:0;font-family:Arial,sans-serif;margin:0 !important;margin-bottom:0;padding: 0;'
+      + `${ ctx.align ? `text-align:${ ctx.align };` : '' }`
+      + `${ ctx.color ? `color:${ ctx.color };` : '' }`
+      + `${ ctx.fontSize ? `font-size:${ ctx.fontSize };` : '' }`
+      + `${ ctx.fontWeight ? `font-weight:${ ctx.fontWeight };` : '' }`
+      + `${ ctx.letterSpacing ? `letter-spacing:${ ctx.letterSpacing };` : '' }`
+      + `${ ctx.lineHeight ? `line-height:${ ctx.lineHeight };` : '' }`
+      + `${ ctx.textTransform ? `text-transform:${ ctx.textTransform };` : '' }`,
+    align: ctx.align ? ctx.align : '',
+    href: ctx.url ? ctx.url : '',
+    title: ctx.title ? ctx.title : '',
+    target: ctx.target ? ctx.target : '',
+  } ) ),
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-link/email-link.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-map/email-map.bemhtml.js */
+block( 'email-map' )(
+  tag()( 'span' ),
+  content()( ( node, ctx ) => [
+    {
+      block: 'link',
+      url: ctx.link,
+      attrs: {
+        width: '540',
+        style: 'display:block',
+      },
+      content: {
+        block: 'image',
+        url: ctx.image,
+        alt: 'Открыть на яндекс карте / Open map on Yandex',
+        attrs: {
+          width: '540',
+          style: '-ms-interpolation-mode:bicubic;display:inline-block;height:auto;max-width:100%;outline:0;'
+            + 'text-decoration:none;width:540px !important;background-color:#aacbda;text-align:center;padding:0;',
+        },
+      },
+    },
+    {
+      tag: 'center',
+      content: [
+        {
+          block: 'link',
+          url: ctx.link,
+          attrs: {
+            style: 'font-size:19px;text-decoration:underline!important;color:#6999cc!important;margin:0;'
+              + 'line-height:23px;text-align: center;',
+          },
+          content: [
+            {
+              tag: 'b',
+              content: 'Открыть на яндекс карте',
+            },
+            {
+              tag: 'br',
+            },
+            {
+              tag: 'font',
+              attrs: {
+                style: 'color:#486482;font-size:15.2px;line-height:18.4px',
+              },
+              content: 'Open map on Yandex',
+            },
+          ],
+        },
+      ],
+    },
+  ] )
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-map/email-map.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_tag/email-text_tag_span.bemhtml.js */
+block( 'email-text' ).mod( 'tag', 'span' )(
+  tag()( 'span' ),
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_tag/email-text_tag_span.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_style/email-text_style_invisible.bemhtml.js */
+block( 'email-text' ).mod( 'style', 'invisible' )(
+  addAttrs()(
+    {
+      style: 'color:transparent;'
+        + 'font-size:0px;'
+        + 'text-align:center;'
+        + 'display:block;'
+        + 'height:0;'
+        + 'width:0;'
+        + 'overflow:hidden;',
+    },
+  ),
+  content()( ( node, ctx ) => ctx.content ),
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_style/email-text_style_invisible.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/_type/email-unit_type_container.bemhtml.js */
+block( 'email-unit' ).mod( 'type', 'container' )(
+  content()( ( node, ctx ) => [
+    {
+      elem: 'tbody',
+      bgcolor: ctx.bgcolor,
+      content: {
+        elem: 'tr',
+        bgcolor: ctx.bgcolor,
+        content: {
+          elem: 'td',
+          bgcolor: ctx.bgcolor,
+          content: ctx.align==='center'
+            ? {
+              elem: 'center',
+              bgcolor: ctx.bgcolor,
+              content: ctx.content,
+            }
+            : ctx.content,
+        },
+      },
+    },
+  ] ) );
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/_type/email-unit_type_container.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-link/_style/email-link_style_translation.bemhtml.js */
+block( 'email-link' ).mod( 'style', 'translation' )(
+  addAttrs()(
+    {
+      style: 'color:#486482;'
+        + 'display:inline-block;'
+        + 'font-size:.8em;',
+    },
+  ),
+  content()( ( node, ctx ) => ctx.content ),
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-link/_style/email-link_style_translation.bemhtml.js */
 ;
 
 var stringify = function(v) {

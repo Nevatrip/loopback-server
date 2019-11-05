@@ -67,7 +67,7 @@ export const sendEmail = (order: Order, status: Status) => {
     subject:
       status === 'manager'
         ? partnerSubject
-        : `Заказ билетов на «${title}» НТ${number}`,
+        : `E-ticket / Билет на экскурсию «${title}» НТ${number}`,
     text: JSON.stringify(order), // plain text body
   };
 
