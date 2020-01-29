@@ -11,6 +11,7 @@ services:
         - YARN=false
     volumes:
       - ../:/opt/app
+      - exchanges:/opt/app/exchanges
     env_file:
       - ../.env
     entrypoint: run-nodock "npm start"
@@ -73,9 +74,20 @@ services:
     # command: certonly --webroot --webroot-path=/var/www/html --email tech-support@nevatrip.ru --agree-tos --no-eff-email --staging -d api.nevatrip.ru
     command: certonly --webroot --webroot-path=/var/www/html --email tech-support@nevatrip.ru --agree-tos --no-eff-email --force-renewal -d api.nevatrip.ru
 
+  exchange:
+    image: tigpt/cronjobs:latest
+    volumes:
+      - ./exchanges/crontabs/cbr.cron:/etc/crontabs/root
+      # - ./exchanges/crontabs:/etc/cron.d
+      - ./exchanges/scripts:/scripts
+      - exchanges:/exchanges
+    tty: true
+    restart: unless-stopped
+
 volumes:
   certbot-etc:
   certbot-var:
+  exchanges:
   web-root:
     driver: local
     driver_opts:
