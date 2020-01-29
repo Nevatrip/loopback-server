@@ -450,10 +450,10 @@ export class OrderController {
 
       orders.forEach(order => {
         const {
-          TransactionId,
-          InternalId,
+          TransactionId = 0,
+          InternalId = 0,
           // @ts-ignore
-        } = order.payment.Model;
+        } = (order.payment || {}).Model || {};
         order.products.forEach(({product, options}) => {
           options.forEach(({number, direction, tickets}) => {
             const productDirection = product.directions.find(

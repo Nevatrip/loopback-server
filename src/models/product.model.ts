@@ -1,4 +1,5 @@
 import {Entity, model, property} from '@loopback/repository';
+import {Options as RRule} from 'rrule';
 
 export interface Ticket {
   _key: string;
@@ -29,11 +30,14 @@ export interface DirectionProduct extends Direction {
   _type: 'direction';
   schedule: ProductEvent[];
   timeOffset: number;
+  point: Object;
   dates?: Date[];
+  datesOpenTime?: Date[];
   buyTimeOffset?: number;
 }
 
-export interface IAction {
+export interface IAction extends ProductEvent {
+  _id: string;
   _key: string;
   start: Date;
 }
@@ -44,6 +48,8 @@ interface i18nString {
   };
 }
 
+type byweekday = 'mo' | 'tu' | 'we' | 'th' | 'fr' | 'sa' | 'su';
+
 @model()
 class ProductEvent extends Entity {
   _key: string;
@@ -51,14 +57,17 @@ class ProductEvent extends Entity {
   title: string;
   start: Date;
   end: Date;
-  startTimezone?: string;
-  endTimezone?: string;
-  recurrenceRule?: string;
-  recurrenceException?: string;
-  recurrenceID?: string;
-  isAllDay?: boolean;
+  timeZone?: string;
+  rrule?: {
+    freq: 'daily' | 'weekly';
+    until?: Date;
+    byweekday?: byweekday[];
+  };
+  allDay?: boolean;
   description?: string;
   actions: IAction[];
+  tickets?: Ticket[];
+  point?: Object;
 
   constructor(data?: Partial<ProductEvent>) {
     super(data);

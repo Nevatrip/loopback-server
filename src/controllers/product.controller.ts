@@ -1,9 +1,21 @@
 import {inject} from '@loopback/core';
-import {get, param} from '@loopback/rest';
+import {get, param, post, requestBody} from '@loopback/rest';
 import {SanityService} from '../services/sanity.service';
 import {parse, format} from 'date-fns';
 import {findTimeZone, getUTCOffset} from 'timezone-support';
 import {Product, DirectionProduct, IAction} from '../models';
+
+type Dates = {
+  [key: string]: Date[];
+};
+
+const sortDates = (dates: Dates): Date[] => {
+  return Object.keys(dates)
+    .map(date => new Date(date))
+    .sort((a, b) => {
+      return a < b ? -1 : a > b ? 1 : 0;
+    });
+};
 
 export class ProductController {
   constructor(
@@ -43,13 +55,16 @@ export class ProductController {
 
       const {
         buyTimeOffset = 0,
-        schedule: [{startTimezone, start}],
+        schedule: [{timeZone = 'Europe/Moscow', start}],
       } = direction;
-      const timeZone = findTimeZone(startTimezone || 'Europe/Moscow');
-      let dates: {[key: string]: Date[]} = {};
+      let dates: Dates = {};
+      let datesOpenTime: Dates = {};
 
       // Смещение часового пояса в минутах для каждого направления
-      direction.timeOffset = getUTCOffset(new Date(start), timeZone).offset;
+      direction.timeOffset = getUTCOffset(
+        new Date(start),
+        findTimeZone(timeZone),
+      ).offset;
 
       direction.schedule.forEach(event => {
         const offsetDate = new Date();
@@ -62,17 +77,20 @@ export class ProductController {
               actionDate.getMinutes() - direction.timeOffset,
             );
             const dateKey = format(actionDate, 'yyyy-MM-dd');
-            dates[dateKey] = dates[dateKey] || [];
-            dates[dateKey].push(actionDate);
+
+            if (event.allDay) {
+              datesOpenTime[dateKey] = datesOpenTime[dateKey] || [];
+              datesOpenTime[dateKey].push(actionDate);
+            } else {
+              dates[dateKey] = dates[dateKey] || [];
+              dates[dateKey].push(actionDate);
+            }
           }
         });
       });
       delete direction.schedule;
-      direction.dates = Object.keys(dates)
-        .map(date => new Date(date))
-        .sort((a, b) => {
-          return a < b ? -1 : a > b ? 1 : 0;
-        });
+      direction.dates = sortDates(dates);
+      direction.datesOpenTime = sortDates(datesOpenTime);
     });
 
     return product;
@@ -87,7 +105,7 @@ export class ProductController {
     @param.path.string('directionId') directionId: string,
     @param.path.string('date') date: string,
   ) {
-    const [product] = await this.sanityService.getProductById(id);
+    const [product] = await this.sanityService.getProductForCartById(id);
 
     const directions: {[key: string]: DirectionProduct} = {};
     product.directions.forEach(item => {
@@ -104,7 +122,7 @@ export class ProductController {
       offsetDate.setMinutes(offsetDate.getMinutes() + buyTimeOffset);
       const actualDate = parse(date, 'yyyy-MM-dd', offsetDate);
 
-      const timeZone = findTimeZone(event.startTimezone || 'Europe/Moscow');
+      const timeZone = findTimeZone(event.timeZone || 'Europe/Moscow');
       const timeOffset = getUTCOffset(new Date(event.start), timeZone).offset;
 
       event.actions.forEach(action => {
@@ -115,6 +133,9 @@ export class ProductController {
           actionDate > offsetDate &&
           actionDate.toDateString() === actualDate.toDateString()
         ) {
+          action.allDay = event.allDay;
+          action.tickets = event.tickets;
+          action.point = event.point;
           scheduleArray.push(action);
         }
       });
