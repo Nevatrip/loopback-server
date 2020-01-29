@@ -48,7 +48,7 @@ if (!secret) {
 
 const getHash = (string: string) => {
   const sha1 = createHmac('sha1', secret);
-  return sha1.update(string).digest('base64');
+  return sha1.update(string).digest('hex');
 };
 
 const checkHash = (string: string, hash: string): void => {
@@ -266,7 +266,10 @@ export class OrderController {
       // sendEmail(newOrder, 'new');
     } else {
       sendEmail(newOrder, 'paid');
-      // sendEmail(newOrder, 'manager');
+
+      if (order.user.fullName.toLowerCase() !== 'test') {
+        sendEmail(newOrder, 'manager');
+      }
     }
 
     return newOrder;
@@ -339,6 +342,8 @@ export class OrderController {
     order.payment = {
       Model: body,
     };
+
+    order.hash = getHash(order.user.email);
 
     sendEmail(order, 'paid');
 
@@ -577,16 +582,20 @@ export class OrderController {
   async sendEmailById(
     @param.path.string('id') id: string,
     @param.query.string('hash') hash: string,
-  ): Promise<Order> {
+    @param.query.string('email') email?: string,
+  ): Promise<Response> {
     const order = await this.orderRepository.findById(id);
+    const userEmail = order.user.email;
 
-    checkHash(order.user.email, hash);
+    checkHash(userEmail, hash);
 
-    order.hash = getHash(order.user.email);
+    order.hash = getHash(userEmail);
 
-    sendEmail(order, 'paid');
+    sendEmail(order, 'paid', email);
 
-    return order;
+    this.res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+
+    return this.res.send(renderEmail.renderEmail({page: 'email', api: order}));
   }
 
   @get('/orders/{id}/operator', {

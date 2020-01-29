@@ -18,7 +18,7 @@ const getMailContent = (order: Order, status: Status) => {
   return content[status];
 };
 
-export const sendEmail = (order: Order, status: Status) => {
+export const sendEmail = (order: Order, status: Status, _email?: string) => {
   const {
     user: {email},
     products: [
@@ -63,7 +63,7 @@ export const sendEmail = (order: Order, status: Status) => {
     to:
       status === 'manager'
         ? ['info@nevatrip.ru', 'order@nevatrip.ru', partnerEmail]
-        : email, // list of receivers
+        : _email || email, // list of receivers
     subject:
       status === 'manager'
         ? partnerSubject
