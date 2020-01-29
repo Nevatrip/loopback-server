@@ -11,6 +11,16 @@ export class ProductController {
     protected sanityService: SanityService,
   ) {}
 
+  @get('/sanity', {
+    responses: {'200': {description: 'Proxy Sanity'}},
+    summary: 'Get data from Sanity',
+  })
+  async proxySanity(
+    @param.query.string('query') query: string,
+  ): Promise<Object> {
+    return await this.sanityService.proxySanity(query);
+  }
+
   @get('/product/{id}', {
     responses: {'200': {description: 'Product Response'}},
     summary: 'Get Product data by Id',
