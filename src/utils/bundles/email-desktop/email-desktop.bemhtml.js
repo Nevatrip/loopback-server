@@ -2562,6 +2562,9 @@ block( 'email-text' ).mod( 'tag', 'p' )(
 /* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_tag/email-text_tag_b.bemhtml.js */
 block( 'email-text' ).mod( 'tag', 'b' )(
   tag()( 'b' ),
+  attrs()( () => ( {
+    style: ';font-weight:bold;',
+  } ) ),
 );
 
 /* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_tag/email-text_tag_b.bemhtml.js */
@@ -2855,6 +2858,14 @@ block('link')(
 );
 
 /* end: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-components/common.blocks/link/link.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/link/link.bemhtml.js */
+block( 'link' )(
+  addAttrs()( ( node, ctx ) => ( {
+    value: ctx.value,
+  } ) ),
+)
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/link/link.bemhtml.js */
 /* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-unit/_type/email-unit_type_dotted-line.bemhtml.js */
 block( 'email-unit' ).mod( 'type', 'dotted-line' )(
   content()( ( node, ctx ) => [ {

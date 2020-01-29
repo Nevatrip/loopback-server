@@ -2688,6 +2688,14 @@ block('link')(
 );
 
 /* end: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-components/common.blocks/link/link.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/link/link.bemhtml.js */
+block( 'link' )(
+  addAttrs()( ( node, ctx ) => ( {
+    value: ctx.value,
+  } ) ),
+)
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/link/link.bemhtml.js */
 /* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-web/__separator/email-web__separator.bemhtml.js */
 block( 'email-web' ).elem( 'separator' )(
   content()( () => (
@@ -2769,7 +2777,8 @@ block( 'email-web' ).elem( 'param-ticket' )(
   content()( ( node, ctx ) =>
     [
       {
-        tag: 'b',
+        block: 'email-text',
+        mods: { tag: 'b' },
         content: ctx.name, //[Взрослый, Льготный, Детский, Иностранный, Дошкольный, Бесплатный, Групповой]
       },
       ctx.nameEn && {
@@ -2791,6 +2800,24 @@ block( 'email-web' ).elem( 'param-ticket' )(
 );
 
 /* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-web/__param-ticket/email-web__param-ticket.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/email-text.bemhtml.js */
+block( 'email-text' )(
+  attrs()( ( node, ctx ) => ( {
+    style: 'Margin:0;Margin-bottom:0;font-family:Arial,sans-serif;margin:0 !important;margin-bottom:0;padding: 0;'
+      + `${ ctx.align ? `text-align:${ ctx.align };` : '' }`
+      + `${ ctx.color ? `color:${ ctx.color };` : '' }`
+      + `${ ctx.fontSize ? `font-size:${ ctx.fontSize };` : '' }`
+      + `${ ctx.fontWeight ? `font-weight:${ ctx.fontWeight };` : '' }`
+      + `${ ctx.letterSpacing ? `letter-spacing:${ ctx.letterSpacing };` : '' }`
+      + `${ ctx.lineHeight ? `line-height:${ ctx.lineHeight };` : '' }`
+      + `${ ctx.padding ? `padding:${ ctx.padding };` : '' }`
+      + `${ ctx.textTransform ? `text-transform:${ ctx.textTransform };` : '' }`
+      + `${ ctx.textDecoration ? `text-decoration:${ ctx.textDecoration };` : '' }`,
+    align: ctx.align ? ctx.align : '',
+  } ) ),
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/email-text.bemhtml.js */
 /* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-map/email-map.bemhtml.js */
 block( 'email-map' )(
   tag()( 'span' ),
@@ -2846,6 +2873,15 @@ block( 'email-map' )(
 );
 
 /* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-map/email-map.bemhtml.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_tag/email-text_tag_b.bemhtml.js */
+block( 'email-text' ).mod( 'tag', 'b' )(
+  tag()( 'b' ),
+  attrs()( () => ( {
+    style: ';font-weight:bold;',
+  } ) ),
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_tag/email-text_tag_b.bemhtml.js */
 ;
 
 var stringify = function(v) {
