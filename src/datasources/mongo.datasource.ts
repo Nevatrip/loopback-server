@@ -3,11 +3,6 @@ import {readFileSync} from 'fs';
 
 import {inject} from '@loopback/core';
 import {juggler} from '@loopback/repository';
-// import * as JSONConfig from './mongo.datasource.json';
-
-// const config = { ...JSONConfig };
-
-// config.host = process.env.MONGO_HOST || JSONConfig.host;
 
 const mongoUser = process.env.MONGO_USER;
 const mongoPass = process.env.MONGO_PASS;
