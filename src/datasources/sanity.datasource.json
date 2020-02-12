@@ -53,13 +53,14 @@
         "method": "GET",
         "url": "https://39dycnz5.api.sanity.io/v1/data/query/develop",
         "query": {
-          "query": "*[_id=='{id}']\u007B_id,oldId,title\u007Bru\u007B'key':key.current,name\u007D\u007D,'directions':directions[]\u007B_key,_type,title,buyTimeOffset,'point':point->\u007B'coords':coords\u007Blat,lng\u007D,description,'key':key.current,'title':title.ru\u007D,'schedule':schedule[]\u007B...,'point':point->\u007B'coords':coords\u007Blat,lng\u007D,'description':description.ru,'key':key.current,'title':title.ru\u007D,'ticket':ticket[]->\u007D,'tickets':tickets[]\u007B...,'category':category->\u007B'name':name.current,title\u007D,'ticket':ticket[]->\u007B'name':name.current,title\u007D\u007D\u007D\u007D"
+          "query": "*[_id=='{id}']\u007B_id,oldId,'title': title.{lang}.name,'key': title.{lang}.key.current,'directions': directions[]\u007B_key,_type,title,buyTimeOffset,'point': point->\u007B'coords': coords\u007Blat,lng\u007D,description,'key': key.current,'title': title.{lang}\u007D,'schedule': schedule[]\u007B...,'point': point->\u007B'coords': coords\u007Blat,lng\u007D,'description': description.{lang},'key': key.current,'title': title.{lang}\u007D,'ticket': ticket[]->\u007D,'tickets': tickets[]\u007B...,'category': category->\u007B'name': name.current,title\u007D,'ticket': ticket[]->\u007B'name': name.current,title\u007D\u007D\u007D\u007D"
         },
         "responsePath": "$.result[0]"
       },
       "functions": {
         "getProductForCartById": [
-          "id"
+          "id",
+          "lang"
         ]
       }
     },

@@ -47,8 +47,11 @@ export class ProductController {
     responses: {'200': {description: 'Product Response'}},
     summary: 'Get Product data for cart by Id',
   })
-  async getProductForCartById(@param.path.string('id') id: string) {
-    const [product] = await this.sanityService.getProductForCartById(id);
+  async getProductForCartById(
+    @param.path.string('id') id: string,
+    @param.query.string('lang') lang: string = 'ru',
+  ) {
+    const [product] = await this.sanityService.getProductForCartById(id, lang);
 
     product.directions.forEach(direction => {
       if (direction._type !== 'direction') return;
@@ -104,8 +107,9 @@ export class ProductController {
     @param.path.string('id') id: string,
     @param.path.string('directionId') directionId: string,
     @param.path.string('date') date: string,
+    @param.query.string('lang') lang: string = 'ru',
   ) {
-    const [product] = await this.sanityService.getProductForCartById(id);
+    const [product] = await this.sanityService.getProductForCartById(id, lang);
 
     const directions: {[key: string]: DirectionProduct} = {};
     product.directions.forEach(item => {
