@@ -53,9 +53,10 @@ export class ProductController {
   ) {
     const [product] = await this.sanityService.getProductForCartById(id, lang);
 
-    product.directions.forEach(direction => {
+    (product.directions || []).forEach(direction => {
       if (direction._type !== 'direction') return;
 
+      if (!direction.schedule || !direction.schedule.length) return;
       const {
         buyTimeOffset = 0,
         schedule: [{timeZone = 'Europe/Moscow', start}],
