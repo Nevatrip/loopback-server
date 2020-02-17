@@ -12,12 +12,12 @@ if (require.main === module) {
         // useful when used with OASGraph to locate your application
         // setServersFromRequest: true,
         info: {
-          title: 'NevaTrip API',
+          title: `${ process.env.APP_NAME || '' } API`,
           version: '0.1.0',
         },
         servers: [
           {
-            url: process.env.SERVER_URL,
+            url: `https://${process.env.SERVER_URL}`,
           },
         ],
       },
