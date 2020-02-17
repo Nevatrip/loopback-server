@@ -21,6 +21,9 @@ export class CartProductOptions extends Entity {
   @property({item: 'object'})
   event: IAction;
 
+  @property()
+  date?: Date;
+
   @property.array(Object)
   schedule?: IAction[]; // Schedule for open time
 
