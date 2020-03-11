@@ -17,15 +17,15 @@ const mongoSSLCA = process.env.MONGO_SSLCA;
 const config = {
   name: 'mongo',
   connector: 'mongodb',
-  url: format(
-    'mongodb://%s:%s@%s/%s?replicaSet=%s&authSource=%s&ssl=true',
-    mongoUser,
-    mongoPass,
-    [`${mongoHost}:${mongoPort}`].join(','),
-    mongoDBName,
-    mongoReplica,
-    mongoDBName,
-  ),
+  // url: format(
+  //   'mongodb://%s:%s@%s/%s?replicaSet=%s&authSource=%s&ssl=true',
+  //   mongoUser,
+  //   mongoPass,
+  //   [`${mongoHost}:${mongoPort}`].join(','),
+  //   mongoDBName,
+  //   mongoReplica,
+  //   mongoDBName,
+  // ),
   sslCA: mongoSSLCA ? readFileSync(mongoSSLCA) : '',
   host: mongoHost,
   port: mongoPort,
@@ -34,6 +34,8 @@ const config = {
   database: mongoDBName,
   useNewUrlParser: true,
 };
+
+console.log('config', config);
 
 export class MongoDataSource extends juggler.DataSource {
   static dataSourceName = 'mongo';

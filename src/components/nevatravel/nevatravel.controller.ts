@@ -8,10 +8,9 @@ import {
   requestBody,
   HttpErrors,
 } from '@loopback/rest';
-import {NevatravelService} from '../services/nevatravel.service';
+import {NevatravelService} from './nevatravel.service';
 import {parse, format} from 'date-fns';
-import {NevatravelOrder} from '../models';
-
+import {NevatravelOrder} from './nevatravel.model';
 
 export class NevatravelController {
   private apiKey: string;
@@ -184,6 +183,10 @@ export class NevatravelController {
     @param.path.string('order') order: string,
     @requestBody() comment: string,
   ) {
-    return await this.nevatravelService.rejectOrder(this.apiKey, order, comment);
+    return await this.nevatravelService.rejectOrder(
+      this.apiKey,
+      order,
+      comment,
+    );
   }
 }

@@ -1,13 +1,13 @@
 import {getService, juggler} from '@loopback/service-proxy';
 import {inject, Provider} from '@loopback/core';
-import {NevatravelDataSource} from '../datasources';
+import {NevatravelDataSource} from './nevatravel.datasource';
 import {
   NevatravelStatus,
   NevatravelPier,
   NevatravelProgram,
   NevatravelCruise,
   NevatravelTickets,
-} from '../models';
+} from './nevatravel.model';
 
 export interface NevatravelOrderPost {
   status?: string;
@@ -57,13 +57,45 @@ export interface NevatravelService {
   getStatus(authKey: string): Promise<NevatravelStatus>;
   getPiers(authKey: string): Promise<NevatravelPier>[];
   getPrograms(authKey: string): Promise<NevatravelProgram>[];
-  getСruises( authKey: string, service: number, start: string, point?: number, ): Promise<NevatravelCruise>[];
-  postOrderFixedTime( authKey: string, tickets: NevatravelTickets, tour: number, tourBack?: number, ): Promise<NevatravelOrderPost>;
-  postOrderOpenTime( authKey: string, tickets: NevatravelTickets, date: string, point: number, service: number, serviceBack?: number, ): Promise<NevatravelOrderPost>;
-  getOrder( authKey: string, order: string, ): Promise<NevatravelOrderGet | ErrorMessage>;
-  postOrderComment( authKey: string, order: string, comment: string, ): Promise<NevatravelOrderGet | ErrorMessage>;
-  approveOrder( authKey: string, order: string, requireConfirmation: boolean, ): Promise<NevatravelOrderGet | ErrorMessage>;
-  rejectOrder( authKey: string, order: string, comment: string, ): Promise<NevatravelOrderGet | ErrorMessage>;
+  getСruises(
+    authKey: string,
+    service: number,
+    start: string,
+    point?: number,
+  ): Promise<NevatravelCruise>[];
+  postOrderFixedTime(
+    authKey: string,
+    tickets: NevatravelTickets,
+    tour: number,
+    tourBack?: number,
+  ): Promise<NevatravelOrderPost>;
+  postOrderOpenTime(
+    authKey: string,
+    tickets: NevatravelTickets,
+    date: string,
+    point: number,
+    service: number,
+    serviceBack?: number,
+  ): Promise<NevatravelOrderPost>;
+  getOrder(
+    authKey: string,
+    order: string,
+  ): Promise<NevatravelOrderGet | ErrorMessage>;
+  postOrderComment(
+    authKey: string,
+    order: string,
+    comment: string,
+  ): Promise<NevatravelOrderGet | ErrorMessage>;
+  approveOrder(
+    authKey: string,
+    order: string,
+    requireConfirmation: boolean,
+  ): Promise<NevatravelOrderGet | ErrorMessage>;
+  rejectOrder(
+    authKey: string,
+    order: string,
+    comment: string,
+  ): Promise<NevatravelOrderGet | ErrorMessage>;
 }
 
 export class NevatravelServiceProvider implements Provider<NevatravelService> {

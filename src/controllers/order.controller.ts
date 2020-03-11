@@ -20,7 +20,7 @@ import {
   Response,
 } from '@loopback/rest';
 import {inject} from '@loopback/core';
-import {SanityService, NevatripService, AtolService} from '../services';
+import {SanityService} from '../services';
 import {Order, Cart, Product} from '../models';
 import {sendEmail, getPaymentDescription} from '../utils';
 import {OrderRepository, CartRepository} from '../repositories';
@@ -34,6 +34,8 @@ import {ru} from 'date-fns/locale';
 import * as Excel from 'exceljs';
 import * as renderEmail from '../utils/renderEmail';
 import {createHmac} from 'crypto';
+import {AtolService} from '../components/atol/atol.service';
+import {NevatripService} from '../components/nevatrip/nevatrip.service';
 
 const privateKey = process.env.CLOUDPAYMENTS_PRIVATEKEY;
 const publicId = process.env.CLOUDPAYMENTS_PUBLICID;
@@ -67,10 +69,10 @@ export class OrderController {
     public cartRepository: CartRepository,
     @inject('services.SanityService')
     protected sanityService: SanityService,
-    @inject('services.NevatripService')
-    protected nevatripService: NevatripService,
-    @inject('services.AtolService')
-    protected atolService: AtolService,
+    // @inject('services.NevatripService')
+    // protected nevatripService: NevatripService,
+    // @inject('services.AtolService')
+    // protected atolService: AtolService,
     @inject(RestBindings.Http.RESPONSE)
     public res: Response,
   ) {}
@@ -120,11 +122,11 @@ export class OrderController {
       if (!directionData) return;
 
       if (product.oldId && order.promocode) {
-        const getSale = (await this.nevatripService.getSale(
-          product.oldId,
-          order.promocode,
-        ))[0];
-        sale = getSale || 0;
+        // code is ok, but we don't need nevatripService
+        // const getSale = (
+        //   await this.nevatripService.getSale(product.oldId, order.promocode)
+        // )[0];
+        // sale = getSale || 0;
       }
 
       for (const ticket of directionData.tickets) {
@@ -150,55 +152,56 @@ export class OrderController {
 
     // sum = Math.ceil(sum - sum * (sale / 100));
 
-    if (sendToAtol) {
-      if (!ATOLLOGIN || !ATOLTOKEN || !ATOLGROUP) {
-        throw new HttpErrors.Unauthorized(`ATOL credentials is not defined`);
-      }
+    // code is ok, but we don't need atolService
+    // if (sendToAtol) {
+    //   if (!ATOLLOGIN || !ATOLTOKEN || !ATOLGROUP) {
+    //     throw new HttpErrors.Unauthorized(`ATOL credentials is not defined`);
+    //   }
 
-      const atolToken = await this.atolService.getToken(ATOLLOGIN, ATOLTOKEN);
-      const token = atolToken[0].token;
-      const timestamp = _format(new Date(), 'dd.MM.yyyy HH:mm:ss', {
-        locale: ru,
-      });
-      const atolReceipt = {
-        client: {
-          //email: order.user.email,
-          phone: '+' + (order.user.phone.match(/\d+/g) || []).join(''),
-        },
-        company: {
-          email: 'info@nevatrip.ru',
-          sno: 'usn_income',
-          inn: '7802873242',
-          payment_address: 'nevatrip.ru',
-        },
-        items: atolItems,
-        payments: [
-          {
-            type: 1,
-            sum: sum,
-          },
-        ],
-        vats: [
-          {
-            type: 'none',
-            sum: 0,
-          },
-        ],
-        total: sum,
-      };
-      const atolResponse = await this.atolService.postSell(
-        token,
-        ATOLGROUP,
-        timestamp,
-        order.id || 'test_' + order.sessionId,
-        {
-          callback_url: `https://api.nevatrip.ru/orders/${order.id}/ofd`,
-        },
-        atolReceipt,
-      );
+    //   const atolToken = await this.atolService.getToken(ATOLLOGIN, ATOLTOKEN);
+    //   const token = atolToken[0].token;
+    //   const timestamp = _format(new Date(), 'dd.MM.yyyy HH:mm:ss', {
+    //     locale: ru,
+    //   });
+    //   const atolReceipt = {
+    //     client: {
+    //       //email: order.user.email,
+    //       phone: '+' + (order.user.phone.match(/\d+/g) || []).join(''),
+    //     },
+    //     company: {
+    //       email: 'info@nevatrip.ru',
+    //       sno: 'usn_income',
+    //       inn: '7802873242',
+    //       payment_address: 'nevatrip.ru',
+    //     },
+    //     items: atolItems,
+    //     payments: [
+    //       {
+    //         type: 1,
+    //         sum: sum,
+    //       },
+    //     ],
+    //     vats: [
+    //       {
+    //         type: 'none',
+    //         sum: 0,
+    //       },
+    //     ],
+    //     total: sum,
+    //   };
+    //   const atolResponse = await this.atolService.postSell(
+    //     token,
+    //     ATOLGROUP,
+    //     timestamp,
+    //     order.id || 'test_' + order.sessionId,
+    //     {
+    //       callback_url: `https://api.nevatrip.ru/orders/${order.id}/ofd`,
+    //     },
+    //     atolReceipt,
+    //   );
 
-      order.ofd = atolResponse;
-    }
+    //   order.ofd = atolResponse;
+    // }
 
     return sum;
   }
@@ -333,7 +336,8 @@ export class OrderController {
 
     if (!order || !order.id) return {code: 10};
 
-    const sum = await this.getSum(order, true);
+    // const sum = await this.getSum(order, true); // true — sendToAtol
+    const sum = await this.getSum(order, false);
 
     if (sum !== body.Amount) return {code: 10};
 
@@ -565,7 +569,7 @@ export class OrderController {
 
     this.res.setHeader('Content-Type', 'text/html; charset=UTF-8');
 
-    return this.res.send(renderEmail.renderEmail({page: 'email', api}));
+    return this.res.send(renderEmail.renderEmail({page: 'notification', api}));
   }
 
   @get('/orders/{id}/email/send', {
@@ -595,7 +599,9 @@ export class OrderController {
 
     this.res.setHeader('Content-Type', 'text/html; charset=UTF-8');
 
-    return this.res.send(renderEmail.renderEmail({page: 'email', api: order}));
+    return this.res.send(
+      renderEmail.renderEmail({page: 'notification', api: order}),
+    );
   }
 
   @get('/orders/{id}/operator', {
@@ -675,7 +681,7 @@ export class OrderController {
     this.res.setHeader('Access-Control-Allow-Origin', '*');
     this.res.setHeader('X-FRAME-OPTIONS', 'ALLOWALL');
 
-    return this.res.send(renderEmail.renderEmail({page: 'web', api}));
+    return this.res.send(renderEmail.renderEmail({page: 'notification', api}));
   }
 
   @patch('/orders/{id}', {

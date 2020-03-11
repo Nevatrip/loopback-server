@@ -1,6 +1,6 @@
 import {getService, juggler} from '@loopback/service-proxy';
 import {inject, Provider} from '@loopback/core';
-import {AtolDataSource} from '../datasources/';
+import {AtolDataSource} from './atol.datasource';
 
 export interface AtolService {
   getToken(

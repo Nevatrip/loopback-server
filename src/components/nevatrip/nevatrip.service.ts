@@ -1,6 +1,6 @@
 import {getService, juggler} from '@loopback/service-proxy';
 import {inject, Provider} from '@loopback/core';
-import {NevatripDataSource} from '../datasources/nevatrip.datasource';
+import {NevatripDataSource} from './nevatrip.datasource';
 
 export interface NevatripService {
   getSale(id: number, code: string): Promise<number[]>;
