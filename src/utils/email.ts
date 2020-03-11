@@ -2,8 +2,11 @@ import {Order} from '../models';
 import {createTransport} from 'nodemailer';
 import {renderEmail} from '../utils/renderEmail';
 
-const SMTPUser = process.env.SMTP_USER;
-const SMTPPass = process.env.SMTP_PASS;
+const {
+  SMTP_USER: SMTPUser = 'test@test.test',
+  SMTP_PASS: SMTPPass,
+  APP_NAME: appName,
+} = process.env;
 
 type Status = 'new' | 'paid' | 'rejected' | 'manager';
 
@@ -25,7 +28,7 @@ export const sendEmail = (order: Order, status: Status, _email?: string) => {
       {
         product: {
           title: {
-            ru: {name: title},
+            en: {name: title},
           },
           directions,
         },
@@ -58,16 +61,10 @@ export const sendEmail = (order: Order, status: Status, _email?: string) => {
   const mailContent = getMailContent(order, status);
 
   const mailOptions = {
-    from: '"NevaTrip" <order@nevatrip.ru>', // sender address
+    from: `"${appName}" <${SMTPUser}>`,
     html: mailContent,
-    to:
-      status === 'manager'
-        ? ['info@nevatrip.ru', 'order@nevatrip.ru', partnerEmail]
-        : _email || email, // list of receivers
-    subject:
-      status === 'manager'
-        ? partnerSubject
-        : `E-ticket / Билет на экскурсию «${title}» НТ${number}`,
+    to: status === 'manager' ? [partnerEmail, SMTPUser] : _email || email, // list of receivers
+    subject: status === 'manager' ? partnerSubject : 'Thank you for your order', // `E-ticket / Билет на экскурсию «${title}» НТ${number}`,
     text: JSON.stringify(order), // plain text body
   };
 
