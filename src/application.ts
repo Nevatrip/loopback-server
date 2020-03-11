@@ -1,3 +1,4 @@
+import * as path from 'path';
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig} from '@loopback/core';
 import {
@@ -7,7 +8,6 @@ import {
 import {RepositoryMixin} from '@loopback/repository';
 import {RestApplication, RestBindings} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
-import * as path from 'path';
 import {MySequence} from './sequence';
 
 export class NevatripRestApplication extends BootMixin(

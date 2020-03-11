@@ -10,14 +10,14 @@ if (require.main === module) {
       host: process.env.HOST || 'localhost',
       openApiSpec: {
         // useful when used with OASGraph to locate your application
-        // setServersFromRequest: true,
+        setServersFromRequest: !process.env.SERVER_URL,
         info: {
           title: `${ process.env.APP_NAME || '' } API`,
           version: '0.1.0',
         },
         servers: [
           {
-            url: `https://${process.env.SERVER_URL}`,
+            url: `//${process.env.SERVER_URL}`,
           },
         ],
       },
