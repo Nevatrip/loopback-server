@@ -1,57 +1,19 @@
-var BEMHTML;
+var BEMTREE;
 (function(global) {
 function buildBemXjst(libs) {
 var exports;
 /* BEM-XJST Runtime Start */
-var BEMHTML = function(module, exports) {
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.bemhtml = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var BEMTREE = function(module, exports) {
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.bemtree = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var inherits = require('inherits');
-var Match = require('../bemxjst/match').Match;
 var BemxjstEntity = require('../bemxjst/entity').Entity;
 
-/**
- * @class Entity
- * @param {BEMXJST} bemxjst
- * @param {String} block
- * @param {String} elem
- * @param {Array} templates
- */
-function Entity(bemxjst) {
-  this.bemxjst = bemxjst;
-
-  this.jsClass = null;
-
-  // "Fast modes" about HTML
-  this.tag = new Match(this, 'tag');
-  this.attrs = new Match(this, 'attrs');
-  this.bem = new Match(this, 'bem');
-  this.cls = new Match(this, 'cls');
-
+function Entity() {
   BemxjstEntity.apply(this, arguments);
 }
 
 inherits(Entity, BemxjstEntity);
 exports.Entity = Entity;
-
-Entity.prototype.init = function(block, elem) {
-  this.block = block;
-  this.elem = elem;
-
-  // Class for jsParams
-  this.jsClass = this.bemxjst.classBuilder.build(this.block, this.elem);
-};
-
-Entity.prototype._keys = {
-  tag: 1,
-  content: 1,
-  attrs: 1,
-  mix: 1,
-  js: 1,
-  mods: 1,
-  elemMods: 1,
-  cls: 1,
-  bem: 1
-};
 
 Entity.prototype.defaultBody = function(context) {
   context.mods = this.mods.exec(context);
@@ -59,47 +21,30 @@ Entity.prototype.defaultBody = function(context) {
 
   return this.bemxjst.render(context,
                              this,
-                             this.tag.exec(context),
-                             this.js.exec(context),
-                             this.bem.exec(context),
-                             this.cls.exec(context),
-                             this.mix.exec(context),
-                             this.attrs.exec(context),
                              this.content.exec(context),
+                             this.js.exec(context),
+                             this.mix.exec(context),
                              context.mods,
                              context.elemMods);
 };
 
-},{"../bemxjst/entity":5,"../bemxjst/match":8,"inherits":11}],2:[function(require,module,exports){
+},{"../bemxjst/entity":5,"inherits":11}],2:[function(require,module,exports){
 var inherits = require('inherits');
-var utils = require('../bemxjst/utils');
-var Entity = require('./entity').Entity;
 var BEMXJST = require('../bemxjst');
+var Entity = require('./entity').Entity;
+var utils = require('../bemxjst/utils');
 
-function BEMHTML(options) {
+function BEMTREE() {
   BEMXJST.apply(this, arguments);
-
-  this._shortTagCloser = typeof options.xhtml !== 'undefined' &&
-                          options.xhtml ? '/>' : '>';
-
-  this._elemJsInstances = options.elemJsInstances;
-  this._omitOptionalEndTags = options.omitOptionalEndTags;
-  this._singleQuotesForDataAttrs =
-    typeof options.singleQuotesForDataAttrs === 'undefined' ?
-      false :
-      options.singleQuotesForDataAttrs;
-  this._unquotedAttrs = typeof options.unquotedAttrs === 'undefined' ?
-    false :
-    options.unquotedAttrs;
 }
 
-inherits(BEMHTML, BEMXJST);
-module.exports = BEMHTML;
+inherits(BEMTREE, BEMXJST);
+module.exports = BEMTREE;
 
-BEMHTML.prototype.Entity = Entity;
+BEMTREE.prototype.Entity = Entity;
 
-BEMHTML.prototype.runMany = function(arr) {
-  var out = '';
+BEMTREE.prototype.runMany = function(arr) {
+  var out = [];
   var context = this.context;
   var prevPos = context.position;
   var prevNotNewList = context._notNewList;
@@ -114,10 +59,10 @@ BEMHTML.prototype.runMany = function(arr) {
 
   if (this.canFlush) {
     for (var i = 0; i < arr.length; i++)
-      out += context._flush(this._run(arr[i]));
+      out += context._flush(this._run(arr[i])); // TODO: fixme!
   } else {
     for (var i = 0; i < arr.length; i++)
-      out += this._run(arr[i]);
+      out.push(this._run(arr[i]));
   }
 
   if (!prevNotNewList)
@@ -126,278 +71,39 @@ BEMHTML.prototype.runMany = function(arr) {
   return out;
 };
 
-BEMHTML.prototype.render = function(context, entity, tag, js, bem, cls, mix,
-                                           attrs, content, mods, elemMods) {
-  if (tag === undefined)
-    tag = 'div';
-  else if (!tag)
-    return (content || content === 0) ? this._run(content) : '';
+BEMTREE.prototype.render = function(context, entity, content, js, mix, mods,
+                                                                    elemMods) {
+  var ctx = utils.extend({}, context.ctx);
+  var isBEM = !!(ctx.block || ctx.elem || ctx.bem);
 
-  var ctx = context.ctx;
-  var out = '<' + tag;
+  if (typeof js !== 'undefined')
+    ctx.js = js;
 
-  var isBEM = !!(typeof bem !== 'undefined' ?
-    bem : entity.block || entity.elem);
+  if (typeof mix !== 'undefined')
+    ctx.mix = mix;
 
-  if (!isBEM && !cls)
-    return this.renderClose(out, context, tag, attrs, isBEM, ctx, content);
+  if (!entity.elem && mods && Object.keys(mods).length > 0)
+    ctx.mods = utils.extend(ctx.mods || {}, mods);
 
-  if (js === true)
-    js = {};
+  if (entity.elem && elemMods && Object.keys(elemMods).length > 0)
+    ctx.elemMods = utils.extend(ctx.elemMods || {}, elemMods);
 
-  var jsParams;
-  if (js) {
-    jsParams = {};
-    jsParams[entity.jsClass] = js;
-  }
+  if (typeof content === 'undefined')
+    return ctx;
 
-  var addJSInitClass = isBEM && jsParams && (
-    this._elemJsInstances ?
-      entity.block :
-      (entity.block && !entity.elem)
-  );
+  ctx.content = this.renderContent(content, isBEM);
 
-  out += ' class=';
-  var classValue = '';
-  if (isBEM) {
-    classValue += entity.jsClass;
-    classValue += this.buildModsClasses(entity.block, entity.elem,
-                                        entity.elem ? elemMods : mods);
-
-    if (mix) {
-      var m = this.renderMix(entity, mix, jsParams, addJSInitClass);
-      classValue += m.out;
-      jsParams = m.jsParams;
-      addJSInitClass = m.addJSInitClass;
-    }
-
-    if (cls)
-      classValue += ' ' + (typeof cls === 'string' ?
-                    utils.attrEscape(cls).trim() : cls);
-  } else {
-    classValue += typeof cls === 'string' ?
-                           utils.attrEscape(cls).trim() : cls;
-  }
-
-  if (addJSInitClass)
-    classValue += ' i-bem';
-
-  out += this._unquotedAttrs && utils.isUnquotedAttr(classValue) ?
-    classValue :
-    ('"' + classValue + '"');
-
-  if (isBEM && jsParams)
-    out += ' data-bem=\'' + utils.jsAttrEscape(JSON.stringify(jsParams)) + '\'';
-
-  return this.renderClose(out, context, tag, attrs, isBEM, ctx, content);
+  return ctx;
 };
 
-var OPTIONAL_END_TAGS = {
-  // https://www.w3.org/TR/html4/index/elements.html
-  html: 1, head: 1, body: 1, p: 1, li: 1, dt: 1, dd: 1,
-  colgroup: 1, thead: 1, tbody: 1, tfoot: 1, tr: 1, th: 1, td: 1, option: 1,
-
-  // html5 https://www.w3.org/TR/html5/syntax.html#optional-tags
-  /* dl — Neither tag is omissible */ rb: 1, rt: 1, rtc: 1, rp: 1, optgroup: 1
+BEMTREE.prototype._run = function(context) {
+  if (!context || context === true) return context;
+  return BEMXJST.prototype._run.call(this, context);
 };
 
-BEMHTML.prototype.renderClose = function(prefix, context, tag, attrs, isBEM,
-                                         ctx, content) {
-  var out = prefix;
-
-  out += this.renderAttrs(attrs);
-
-  if (utils.isShortTag(tag)) {
-    out += this._shortTagCloser;
-    if (this.canFlush)
-      out = context._flush(out);
-  } else {
-    out += '>';
-    if (this.canFlush)
-      out = context._flush(out);
-
-    // TODO(indutny): skip apply next flags
-    if (content || content === 0)
-      out += this.renderContent(content, isBEM);
-
-    if (!this._omitOptionalEndTags || !OPTIONAL_END_TAGS.hasOwnProperty(tag))
-      out += '</' + tag + '>';
-  }
-
-  if (this.canFlush)
-    out = context._flush(out);
-  return out;
-};
-
-BEMHTML.prototype.renderAttrs = function(attrs) {
-  var out = '';
-
-  // NOTE: maybe we need to make an array for quicker serialization
-  if (utils.isObj(attrs)) {
-
-    /* jshint forin : false */
-    for (var name in attrs) {
-      var attr = attrs[name];
-      if (attr === undefined || attr === false || attr === null)
-        continue;
-
-      if (attr === true) {
-        out += ' ' + name;
-      } else {
-        var attrVal = utils.isSimple(attr) ? attr : this.run(attr);
-        out += ' ' + name + '=';
-        out += (this._singleQuotesForDataAttrs && name.indexOf('data-') === 0) ?
-          this.getAttrValue(attrVal, utils.jsAttrEscape(attrVal), '\'') :
-          this.getAttrValue(attrVal, utils.attrEscape(attrVal), '"');
-      }
-    }
-  }
-
-  return out;
-};
-
-BEMHTML.prototype.getAttrValue = function(attrVal, escapedAttrVal, quote) {
-  return this._unquotedAttrs && utils.isUnquotedAttr(attrVal) ?
-    attrVal :
-    (quote + escapedAttrVal + quote);
-};
-
-BEMHTML.prototype.renderMix = function(entity, mix, jsParams, addJSInitClass) {
-  var visited = {};
-  var context = this.context;
-  var js = jsParams;
-  var addInit = addJSInitClass;
-
-  visited[entity.jsClass] = true;
-
-  // Transform mix to the single-item array if it's not array
-  if (!Array.isArray(mix))
-    mix = [ mix ];
-
-  var classBuilder = this.classBuilder;
-
-  var out = '';
-  for (var i = 0; i < mix.length; i++) {
-    var item = mix[i];
-    if (!item)
-      continue;
-    if (typeof item === 'string')
-      item = { block: item, elem: undefined };
-
-    var hasItem = false;
-
-    if (item.elem) {
-      hasItem = item.elem !== entity.elem && item.elem !== context.elem ||
-        item.block && item.block !== entity.block;
-    } else if (item.block) {
-      hasItem = !(item.block === entity.block && item.mods) ||
-        item.mods && entity.elem;
-    }
-
-    var block = item.block || item._block || context.block;
-    var elem = item.elem || item._elem || context.elem;
-    var key = classBuilder.build(block, elem);
-
-    var classElem = item.elem ||
-                    item._elem ||
-                    (item.block ? undefined : context.elem);
-    if (hasItem)
-      out += ' ' + classBuilder.build(block, classElem);
-
-    out += this.buildModsClasses(block, classElem,
-      (item.elem || !item.block && (item._elem || context.elem)) ?
-        item.elemMods : item.mods);
-
-    if (item.js) {
-      if (!js)
-        js = {};
-
-      js[classBuilder.build(block, item.elem)] =
-          item.js === true ? {} : item.js;
-      if (!addInit)
-        addInit = this._elemJsInstances ?
-          (item.elem || block) :
-          (block && !item.elem);
-    }
-
-    // Process nested mixes from BEMJSON
-    if (item.mix) {
-      var nested = this.renderMix(entity, item.mix, js, addInit);
-      js = utils.extend(js, nested.jsParams);
-      addInit = nested.addJSInitClass;
-      out += nested.out;
-    }
-
-    // Process nested mixes from templates
-    if (!hasItem || visited[key])
-      continue;
-
-    visited[key] = true;
-    var nestedEntity = this.entities[key];
-    if (!nestedEntity)
-      continue;
-
-    var oldBlock = context.block;
-    var oldElem = context.elem;
-    var nestedMix = nestedEntity.mix.exec(context);
-    context.elem = oldElem;
-    context.block = oldBlock;
-
-    if (!nestedMix)
-      continue;
-
-    for (var j = 0; j < nestedMix.length; j++) {
-      var nestedItem = nestedMix[j];
-      if (!nestedItem) continue;
-
-      if (!nestedItem.block &&
-          !nestedItem.elem ||
-          !visited[classBuilder.build(nestedItem.block, nestedItem.elem)]) {
-        if (nestedItem.block) continue;
-
-        nestedItem._block = block;
-        nestedItem._elem = elem;
-        // make a copy, do not modify original array
-        mix = mix.slice(0, i + 1).concat(
-          nestedItem,
-          mix.slice(i + 1)
-        );
-      }
-    }
-  }
-
-  return {
-    out: out,
-    jsParams: js,
-    addJSInitClass: addInit
-  };
-};
-
-BEMHTML.prototype.buildModsClasses = function(block, elem, mods) {
-  if (!mods)
-    return '';
-
-  var res = '';
-
-  var modName;
-
-  /*jshint -W089 */
-  for (modName in mods) {
-    if (!mods.hasOwnProperty(modName) || modName === '')
-      continue;
-
-    var modVal = mods[modName];
-    if (!modVal && modVal !== 0) continue;
-    if (typeof modVal !== 'boolean')
-      modVal += '';
-
-    var builder = this.classBuilder;
-    res += ' ' + (elem ?
-                  builder.buildElemClass(block, elem, modName, modVal) :
-                  builder.buildBlockClass(block, modName, modVal));
-  }
-
-  return res;
+BEMTREE.prototype.runUnescaped = function(context) {
+  this.context._listLength--;
+  return context;
 };
 
 },{"../bemxjst":7,"../bemxjst/utils":10,"./entity":1,"inherits":11}],3:[function(require,module,exports){
@@ -2307,937 +2013,69 @@ if (typeof Object.create === 'function') {
 
 },{}]},{},[2])(2)
 });;
-return module.exports || exports.BEMHTML;
+return module.exports || exports.BEMTREE;
 }({}, {});
-var api = new BEMHTML({"elemJsInstances":true,"runtimeLint":true,"production":true,"requires":{"dateFns":{"commonJS":"date-fns"}},"exportName":"BEMHTML","to":"/Users/realetive/_dev/monorepo/apps/emails"});
+var api = new BEMTREE({"exportName":"BEMTREE","sourceMap":{"from":".error-desktop.bemtree.prepare.js"},"to":"/Users/realetive/_dev/monorepo/apps/emails"});
 api.compile(function(match, block, elem, mod, elemMod, oninit, xjstOptions, wrap, replace, extend, mode, def, content, appendContent, prependContent, attrs, addAttrs, js, addJs, mix, addMix, mods, addMods, addElemMods, elemMods, tag, cls, bem, local, applyCtx, applyNext, apply) {
 /* BEM-XJST User code here: */
-/* begin: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-core/common.blocks/page/page.bemhtml.js */
-block('page')(
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/root/root.bemtree.js */
+const imageUrlBuilder = require( '@sanity/image-url' );
 
-    mode('doctype')(function() {
-        return { html : this.ctx.doctype || '<!DOCTYPE html>' };
-    }),
-
-    wrap()(function() {
-        var ctx = this.ctx;
-        this._nonceCsp = ctx.nonce;
-
-        return [
-            apply('doctype'),
-            {
-                tag : 'html',
-                attrs : { lang : ctx.lang },
-                cls : 'ua_js_no',
-                content : [
-                    {
-                        elem : 'head',
-                        content : [
-                            { tag : 'meta', attrs : { charset : 'utf-8' } },
-                            ctx.uaCompatible === false? '' : {
-                                tag : 'meta',
-                                attrs : {
-                                    'http-equiv' : 'X-UA-Compatible',
-                                    content : ctx.uaCompatible || 'IE=edge'
-                                }
-                            },
-                            { tag : 'title', content : ctx.title },
-                            { block : 'ua', attrs : { nonce : ctx.nonce } },
-                            ctx.head,
-                            ctx.styles,
-                            ctx.favicon? { elem : 'favicon', url : ctx.favicon } : ''
-                        ]
-                    },
-                    ctx
-                ]
-            }
-        ];
-    }),
-
-    tag()('body'),
-
-    content()(function() {
-        return [
-            applyNext(),
-            this.ctx.scripts
-        ];
-    }),
-
-    elem('head')(
-        bem()(false),
-        tag()('head')
-    ),
-
-    elem('meta')(
-        bem()(false),
-        tag()('meta')
-    ),
-
-    elem('link')(
-        bem()(false),
-        tag()('link')
-    ),
-
-    elem('favicon')(
-        bem()(false),
-        tag()('link'),
-        attrs()(function() {
-            return this.extend(applyNext() || {}, { rel : 'shortcut icon', href : this.ctx.url });
-        })
-    )
-
+const builder = imageUrlBuilder(
+  {
+    projectId: '39dycnz5',
+    dataset: 'develop',
+  }
 );
 
-/* end: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-core/common.blocks/page/page.bemhtml.js */
-/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/page/page.bemhtml.js */
-block( 'page' )(
-  def()( ( node, ctx ) => applyCtx( ctx.content ) ),
+block( 'root' ).replace()( ( node, ctx ) => {
+  const level = ctx.level || 'desktop';
+  const config = node.config = ctx.config;
+  const data = node.data = ctx.data;
 
-  wrap()( function () {
-    const ctx = this.ctx;
+  if ( ctx.context ) return ctx.context;
 
-    this._nonceCsp = ctx.nonce;
+  node._urlFor = source => builder.image( source );
 
-    return [
-      apply( 'doctype' ),
-      {
-        tag: 'html',
-        attrs: {
-          lang: 'ru',
-          xmlns: 'http://www.w3.org/1999/xhtml',
-          bgcolor: '#F3F3F3',
-          style: 'Margin:0;margin:0;padding:0;font-family:Arial,sans-serif;max-width:100%;padding:0;width:100%;background:#F3F3F3;',
-        },
-        cls: 'ua_js_no',
-        content: [
-          {
-            elem: 'head',
-            content: [
-              { tag: 'meta', attrs: { charset: 'utf-8' } },
-              ctx.uaCompatible === false ? '' : {
-                tag: 'meta',
-                attrs: {
-                  'http-equiv': 'X-UA-Compatible',
-                  content: ctx.uaCompatible || 'IE=edge',
-                },
-              },
-              { tag: 'title', content: ctx.title },
-              { block: 'ua', attrs: { nonce: ctx.nonce } },
-              ctx.head,
-              ctx.styles,
-              ctx.favicon ? { elem: 'favicon', url: ctx.favicon } : '',
-            ],
-          },
-          ctx,
-          ctx.scripts,
-        ],
-      },
-    ];
-  } ),
-)
-
-
-/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/page/page.bemhtml.js */
-/* begin: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-core/common.blocks/ua/ua.bemhtml.js */
-block('ua')(
-    tag()('script'),
-    bem()(false),
-    content()([
-        '(function(e,c){',
-            'e[c]=e[c].replace(/(ua_js_)no/g,"$1yes");',
-        '})(document.documentElement,"className");'
-    ])
-);
-
-/* end: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-core/common.blocks/ua/ua.bemhtml.js */
-/* begin: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-core/common.blocks/page/__css/page__css.bemhtml.js */
-block('page').elem('css')(
-    bem()(false),
-    tag()('style'),
-    match(function() { return this.ctx.url; })(
-        tag()('link'),
-        attrs()(function() {
-            return this.extend(applyNext() || {}, { rel : 'stylesheet', href : this.ctx.url });
-        })
-    )
-);
-
-/* end: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-core/common.blocks/page/__css/page__css.bemhtml.js */
-/* begin: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-core/common.blocks/page/__js/page__js.bemhtml.js */
-block('page').elem('js')(
-    bem()(false),
-    tag()('script'),
-    attrs()(function() {
-        var attrs = {};
-        if(this.ctx.url) {
-            attrs.src = this.ctx.url;
-        } else if(this._nonceCsp) {
-            attrs.nonce = this._nonceCsp;
-        }
-
-        return this.extend(applyNext() || {}, attrs);
-    })
-);
-
-/* end: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-core/common.blocks/page/__js/page__js.bemhtml.js */
-/* begin: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-core/desktop.blocks/page/__conditional-comment/page__conditional-comment.bemhtml.js */
-block('page').elem('conditional-comment')(
-    tag()(false),
-
-    content()(function() {
-        var ctx = this.ctx,
-            cond = ctx.condition
-                .replace('<', 'lt')
-                .replace('>', 'gt')
-                .replace('=', 'e'),
-            hasNegation = cond.indexOf('!') > -1,
-            includeOthers = ctx.msieOnly === false,
-            hasNegationOrIncludeOthers = hasNegation || includeOthers;
-
-        return [
-            { html : '<!--[if ' + cond + ']>' },
-            includeOthers? { html : '<!' } : '',
-            hasNegationOrIncludeOthers? { html : '-->' } : '',
-            applyNext(),
-            hasNegationOrIncludeOthers? { html : '<!--' } : '',
-            { html : '<![endif]-->' }
-        ];
-    })
-);
-
-/* end: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-core/desktop.blocks/page/__conditional-comment/page__conditional-comment.bemhtml.js */
-/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/thanks/thanks.bemhtml.js */
-block( 'thanks' )(
-  content()( ( node, ctx ) => [
-    {
-      elem: 'wrapper',
-      content: [
-        {
-          elem: 'body',
-          content: [
-            {
-              elem: 'email',
-              content: ctx.content,
-            },
-            {
-              elem: 'content',
-              content: [
-                {
-                  elem: 'capt',
-                  tag: 'p',
-                  content: [
-                    'Спасибо за покупку!',
-                    {
-                      block: 'text-en',
-                      content: 'Thank you for order!',
-                    },
-                  ],
-                },
-                {
-                  elem: 'postcapt',
-                  tag: 'p',
-                  content: [
-                    'Ваш посадочный билет',
-                    {
-                      block: 'text-en',
-                      content: 'Your boarding ticket',
-                    },
-                  ],
-                },
-                {
-                  elem: 'num',
-                  tag: 'p',
-                  content: `NT${ ctx.number }`,
-                },
-                {
-                  elem: 'p',
-                  tag: 'p',
-                  content: [
-                    'Информация о Вашем заказе также отправлена на указанный Вами адрес -',
-                    {
-                      block: 'text-en',
-                      content: 'Information about your order has also been sent to your email address -',
-                    },
-                    ctx.email,
-                    {
-                      tag: 'br',
-                    },
-                    '(Не пришло - проверьте спам).',
-                    {
-                      block: 'text-en',
-                      content: '(Check spam box if you don\'t see the mail).',
-                    },
-                  ],
-                },
-                {
-                  elem: 'p',
-                  tag: 'p',
-                  content: [
-                    'Билет распечатывать не обязательно.',
-                    {
-                      block: 'text-en',
-                      content: 'You don\'t need to print the ticket, just show it from mobile phone.',
-                    },
-                  ],
-                },
-                {
-                  elem: 'promo',
-                  content: [
-                    {
-                      elem: 'promo-capt',
-                      tag: 'h4',
-                      content: {
-                        html: 'Ваш промокод на&nbsp;скидку&nbsp;5% на&nbsp;другую прогулку!',
-                      },
-                    },
-                    {
-                      elem: 'promo-content',
-                      content: [
-                        {
-                          elem: 'promo-btn',
-                          tag: 'p',
-                          content: {
-                            block: 'link',
-                            url: 'https://nevatrip.ru/skidki-i-akcii',
-                            target: '_blank',
-                            mix: { block: 'thanks', elem: 'promo-btn-span' },
-                            content: 'Спасибо',
-                          },
-                        },
-                        {
-                          elem: 'promo-txt',
-                          tag: 'p',
-                          content: [
-                            {
-                              html: 'Для использования скидки по&nbsp;промокоду'
-                                + 'просто введите &laquo;СПАСИБО&raquo; (без кавычек) в'
-                                + 'форме оплаты при оформлении бронирования'
-                                + 'на&nbsp;сайте ',
-                            },
-                            {
-                              block: 'link',
-                              url: 'https://nevatrip.ru/',
-                              content: 'nevatrip.ru',
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-  ] )
-);
-
-/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/thanks/thanks.bemhtml.js */
-/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/text-en/text-en.bemhtml.js */
-block( 'text-en' )(
-  tag()( 'span' ),
-);
-
-/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/text-en/text-en.bemhtml.js */
-/* begin: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-components/common.blocks/link/link.bemhtml.js */
-block('link')(
-    def()(function() {
-        var ctx = this.ctx;
-        typeof ctx.url === 'object' && // url could contain bemjson
-            (ctx.url = this.reapply(ctx.url));
-        return applyNext();
-    }),
-
-    tag()('a'),
-
-    addJs()(true),
-
-    // NOTE: mix below is to satisfy interface of `control`
-    addMix()([{ elem : 'control' }]),
-
-    addAttrs()(function() {
-        var ctx = this.ctx,
-            attrs = { role : 'link' },
-            tabIndex;
-
-        if(!this.mods.disabled) {
-            if(ctx.url) {
-                attrs.href = ctx.url;
-                tabIndex = ctx.tabIndex;
-            } else {
-                tabIndex = ctx.tabIndex || 0;
-            }
-        } else {
-            attrs['aria-disabled'] = 'true';
-        }
-
-        typeof tabIndex === 'undefined' || (attrs.tabindex = tabIndex);
-
-        ctx.title && (attrs.title = ctx.title);
-        ctx.target && (attrs.target = ctx.target);
-
-        return attrs;
-    }),
-
-    mod('disabled', true)
-        .js()(function() {
-            return this.extend(applyNext(), { url : this.ctx.url });
-        })
-);
-
-/* end: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-components/common.blocks/link/link.bemhtml.js */
-/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/link/link.bemhtml.js */
-block( 'link' )(
-  addAttrs()( ( node, ctx ) => ( {
-    value: ctx.value,
-  } ) ),
-)
-
-/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/link/link.bemhtml.js */
-/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-web/__separator/email-web__separator.bemhtml.js */
-block( 'email-web' ).elem( 'separator' )(
-  content()( () => (
-    {
-      block: 'image',
-      mix: { block: 'email-web', elem: 'separator-img' },
-      alt: '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ',
-      url: 'https://nevatrip.ru/assets/img/email/separator_lg.png',
-    }
-  ) )
-);
-
-/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-web/__separator/email-web__separator.bemhtml.js */
-/* begin: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-components/common.blocks/image/image.bemhtml.js */
-block('image')(
-    addAttrs()({ role : 'img' }),
-
-    tag()('span'),
-
-    match(function() { return typeof this.ctx.content === 'undefined'; })(
-        tag()('img'),
-        addAttrs()(function() {
-            var ctx = this.ctx;
-            return this.extend(applyNext(),
-                {
-                    role : undefined,
-                    src : ctx.url,
-                    width : ctx.width,
-                    height : ctx.height,
-                    alt : ctx.alt,
-                    title : ctx.title
-                });
-        })
-    )
-);
-
-/* end: /Users/realetive/_dev/monorepo/apps/emails/node_modules/bem-components/common.blocks/image/image.bemhtml.js */
-/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-web/__param/email-web__param.bemhtml.js */
-block( 'email-web' ).elem( 'param' )(
-  content()( ( node, ctx ) =>
-    [
-      {
-        elem: 'param-h',
-        content: [
-          {
-            tag: 'b',
-            content: ctx.title,
-          },
-          {
-            html: ' / ',
-          },
-          {
-            block: 'text-en',
-            mods: { inline: 'yes' },
-            content: ctx.titleEn,
-          },
-        ],
-      },
-      {
-        elem: 'param-p',
-        content: {
-          tag: 'b',
-          content: [
-            ctx.content,
-            ctx.contentEn && {
-              block: 'text-en',
-              content: ctx.contentEn,
-            },
-          ],
-        },
-      },
-    ]
-  )
-);
-
-/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-web/__param/email-web__param.bemhtml.js */
-/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-web/__param-ticket/email-web__param-ticket.bemhtml.js */
-block( 'email-web' ).elem( 'param-ticket' )(
-  content()( ( node, ctx ) =>
-    [
-      {
-        block: 'email-text',
-        mods: { tag: 'b' },
-        content: ctx.name, //[Взрослый, Льготный, Детский, Иностранный, Дошкольный, Бесплатный, Групповой]
-      },
-      ctx.nameEn && {
-        html: ' / ',
-      },
-      ctx.nameEn && {
-        block: 'text-en',
-        mods: { inline: 'yes' },
-        content: ctx.nameEn, //[Adult, Discount, Child, Foreign, Pre-school, Free, Group]
-      },
-      {
-        html: ` — ${ ctx.quantity } шт.`,
-      },
-      {
-        tag: 'br',
-      },
-    ]
-  )
-);
-
-/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-web/__param-ticket/email-web__param-ticket.bemhtml.js */
-/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/email-text.bemhtml.js */
-block( 'email-text' )(
-  attrs()( ( node, ctx ) => ( {
-    style: 'Margin:0;Margin-bottom:0;font-family:Arial,sans-serif;margin:0 !important;margin-bottom:0;padding: 0;'
-      + `${ ctx.align ? `text-align:${ ctx.align };` : '' }`
-      + `${ ctx.color ? `color:${ ctx.color };` : '' }`
-      + `${ ctx.fontSize ? `font-size:${ ctx.fontSize };` : '' }`
-      + `${ ctx.fontWeight ? `font-weight:${ ctx.fontWeight };` : '' }`
-      + `${ ctx.letterSpacing ? `letter-spacing:${ ctx.letterSpacing };` : '' }`
-      + `${ ctx.lineHeight ? `line-height:${ ctx.lineHeight };` : '' }`
-      + `${ ctx.padding ? `padding:${ ctx.padding };` : '' }`
-      + `${ ctx.textTransform ? `text-transform:${ ctx.textTransform };` : '' }`
-      + `${ ctx.textDecoration ? `text-decoration:${ ctx.textDecoration };` : '' }`,
-    align: ctx.align ? ctx.align : '',
-  } ) ),
-);
-
-/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/email-text.bemhtml.js */
-/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-map/email-map.bemhtml.js */
-block( 'email-map' )(
-  tag()( 'span' ),
-  content()( ( node, ctx ) => [
-    {
-      block: 'link',
-      target: '_blank',
-      url: ctx.link,
-      attrs: {
-        width: '540',
-        style: 'display:block',
-      },
-      content: {
-        block: 'image',
-        url: ctx.image,
-        alt: 'Открыть на яндекс карте / Open map on Yandex',
-        attrs: {
-          width: '540',
-          style: '-ms-interpolation-mode:bicubic;display:inline-block;height:auto;max-width:100%;outline:0;'
-            + 'text-decoration:none;width:540px !important;background-color:#aacbda;text-align:center;padding:0;',
-        },
-      },
-    },
-    {
-      tag: 'center',
-      content: [
-        {
-          block: 'link',
-          target: '_blank',
-          url: ctx.link,
-          attrs: {
-            style: 'font-size:19px;text-decoration:underline!important;color:#6999cc!important;margin:0;'
-              + 'line-height:23px;text-align: center;',
-          },
-          content: [
-            {
-              tag: 'b',
-              content: 'Открыть на яндекс карте',
-            },
-            {
-              tag: 'br',
-            },
-            {
-              tag: 'font',
-              attrs: {
-                style: 'color:#486482;font-size:15.2px;line-height:18.4px',
-              },
-              content: 'Open map on Yandex',
-            },
-          ],
-        },
-      ],
-    },
-  ] )
-);
-
-/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-map/email-map.bemhtml.js */
-/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email/__content/_view/email__content_view_print.bemhtml.js */
-block( 'email' ).elem( 'content' ).elemMod( 'view', 'print' )( {
-  addJs: true,
+  return {
+    block: 'page',
+    doctype: '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">',
+    title: data.title || config.appName,
+    styles: { elem: 'css', url: `/assets/css/${ data.page }-${ level }.min.css` },
+    scripts: { elem: 'js', url: `/assets/js/${ data.page }-${ level }.min.js` },
+    mods: { route: data.view || data.page },
+  };
 } );
 
-/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email/__content/_view/email__content_view_print.bemhtml.js */
-/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_tag/email-text_tag_b.bemhtml.js */
-block( 'email-text' ).mod( 'tag', 'b' )(
-  tag()( 'b' ),
-  attrs()( () => ( {
-    style: ';font-weight:bold;',
-  } ) ),
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/root/root.bemtree.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/page/page.bemtree.js */
+block( 'page' )(
+  content()( () => [
+    apply( 'route' ),
+  ] ),
 );
 
-/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/email-text/_tag/email-text_tag_b.bemhtml.js */
-;
-
-var stringify = function(v) {
-  var cache = [];
-  return JSON.stringify(v, function(key, value) {
-    if (typeof value === 'object' && value !== null) {
-      if (cache.indexOf(value) !== -1) {
-        // Circular reference found, discard key
-        return;
-      }
-      cache.push(value);
-    }
-    return value;
-  });
-};
-
-var collectMixes = function collectMixes(item, res, context) {
-  res = res || [];
-  if (!item)
-    return res;
-
-  context = context || {
-    block: item.block,
-    elem: item.elem,
-    mods: item.mods,
-    elemMods: item.elemMods
-  };
-
-  if (item.block || item.mods) {
-    res.push({
-      block: item.block || context.block,
-      mods: item.mods,
-      js: item.js
-    });
-    if (item.block)
-      context = { block: item.block, mods: item.mods };
-  }
-
-  if (item.elem || (item.elemMods && context.elem)) {
-    res.push({
-      block: item.block || context.block,
-      elem: item.elem || context.elem,
-      elemMods: item.elemMods,
-      js: item.js
-    });
-    if (item.elem)
-      context = {
-        block: item.block || context.block,
-        mods: item.mods || context.mods,
-        elem: item.elem,
-        elemMods: item.elemMods
-      };
-  }
-
-  if (typeof item === 'string')
-    res.push({ block: item });
-
-  if (item.mix) {
-    if (!Array.isArray(item.mix)) item.mix = [ item.mix ];
-    item.mix.map(function(mix) { return collectMixes(mix, res, context); });
-  }
-
-  return res;
-};
-
-var checkMixes = function checkMixes(mix, ctx, mixesFromTmpls) {
-    if (mix.length) {
-      var hash = {};
-      mix.forEach(function(mixItem) {
-        if (!mixItem.elem) {
-          if (!hash[mixItem.block])
-            hash[mixItem.block] = {};
-
-          if (mixItem.mods) {
-            Object.keys(mixItem.mods).forEach(function(modName) {
-              var b = hash[mixItem.block];
-
-              if (!b[modName]) {
-                b[modName] = true;
-              } else {
-                console.warn(
-                  '\nBEM-XJST WARNING: you’re trying to mix block with mods to the same block with the same mods. ' +
-                  '\nctx: ' + stringify(ctx) +
-                  (mixesFromTmpls ? '\nmixes from templates: ' + stringify(mixesFromTmpls) : '')
-                );
-              }
-            });
-          }
-        } else {
-          var key = mixItem.block + '__' + mixItem.elem;
-          if (!hash[key])
-            hash[key] = {};
-
-          if (mixItem.elemMods) {
-            Object.keys(mixItem.elemMods).forEach(function(modName) {
-              var b = hash[key];
-
-              if (!b[modName]) {
-                b[modName] = true;
-              } else {
-                console.warn(
-                  '\nBEM-XJST WARNING: you’re trying to mix block with mods to the same block with the same mods. ' +
-                  '\nctx: ' + stringify(ctx) +
-                  (mixesFromTmpls ? '\nmixes from templates: ' + stringify(mixesFromTmpls) : '')
-                );
-              }
-            });
-          }
-        }
-      });
-    }
-};
-
-// true/false in attributes
-block('*')(
-
-  def()(function() {
-    var ret = applyNext();
-
-    var ctx = this.ctx;
-    var attrs = ctx.attrs;
-    if (attrs) {
-      Object.keys(attrs).forEach(function(key) {
-        if (typeof attrs[key] === 'boolean') {
-          console.warn(
-            '\nBEM-XJST WARNING: boolean attribute value: ' +
-            attrs[key] +
-            ' in BEMJSON: ' +
-            stringify(ctx)
-          );
-          console.warn('Notice what bem-xjst behaviour changed: https://github.com/bem/bem-xjst/releases/tag/v4.3.3');
-        }
-      });
-    }
-
-    return ret;
-  }),
-
-  // mods with elem (instead of elemMods)
-  def()(function() {
-    var ret = applyNext();
-
-    var ctx = this.ctx;
-    if (ctx.mods && ctx.elem && !ctx.elemMods) {
-        console.warn(
-          '\nBEM-XJST WARNING: mods for elem in BEMJSON: ' +
-          stringify(ctx)
-        );
-        console.warn('Notice what bem-xjst behaviour changed: https://github.com/bem/bem-xjst/releases/tag/v5.0.0');
-    }
-
-    return ret;
-  }),
-
-  mode('check-attrs')(function() {
-    var ctx = this.ctx;
-    var attrs = this.check;
-
-    if (attrs.class) {
-        console.warn(
-          '\nBEM-XJST WARNING: looks like you’re trying to set HTML class from attrs field in BEMJSON. ' +
-          'Please use cls() mode for it. See documentation: https://github.com/bem/bem-xjst/blob/master/docs/en/5-templates-syntax.md#cls' +
-          '\nctx: ' + stringify(ctx) +
-          '\nattrs: ' + stringify(attrs)
-        );
-    }
-
-
-    if (attrs['data-bem']) {
-        console.warn(
-          '\nBEM-XJST WARNING: looks like you’re trying to set data-bem attribute from attrs field in BEMJSON. ' +
-          'Please use js() mode for it. See documentation: https://github.com/bem/bem-xjst/blob/master/docs/en/5-templates-syntax.md#js' +
-          '\nctx: ' + stringify(ctx) +
-          '\nattrs: ' + stringify(attrs)
-        );
-    }
-  }),
-
-  attrs()(function() {
-    var attrs = applyNext();
-    if (attrs)
-      apply('check-attrs', { check: attrs });
-
-    return attrs;
-  }),
-
-  def()(function() {
-    if (this.ctx.attrs)
-      apply('check-attrs', { check: this.ctx.attrs });
-
-    return applyNext();
-  }),
-
-  def()(function() {
-    var ctx = this.extend({}, this.ctx);
-    var mix = collectMixes(ctx, []);
-
-    if (ctx.mods || ctx.elemMods)
-      checkMixes(mix, ctx);
-
-    return applyNext();
-  }),
-
-  mix()(function() {
-    var ctx = this.extend({}, this.ctx);
-    var mixesFromTmpls = applyNext();
-    var mix;
-
-    if (!this.elem) {
-      mix = collectMixes({
-        block: this.block,
-        mods: this.mods,
-        mix: mixesFromTmpls
-      }, []);
-    } else {
-      mix = collectMixes({
-        block: this.block,
-        elem: this.elem,
-        elemMods: this.elemMods,
-        mix: mixesFromTmpls
-      }, []);
-    }
-
-    if (mixesFromTmpls && mixesFromTmpls.length)
-      checkMixes(mix, ctx, mixesFromTmpls);
-
-    return applyNext();
-  }),
-
-  // Check naming:
-  def()(function() {
-    var _this = this;
-    var cb = this._bemxjst.classBuilder;
-    var ctx = this.ctx;
-
-    var check = function check(str) {
-      if (!str)
-        return;
-
-      str = String(str);
-
-      return str.indexOf(cb.modDelim) !== -1 ||
-        str.indexOf(cb.elemDelim) !== -1;
-    };
-
-    if (check(this.block)) {
-      console.warn(
-        '\nBEM-XJST WARNING: wrong block name. ' +
-        '\nBlock name can not contain modifier delimeter nor elem delimeter. ' +
-        '\nblock: ' + this.block +
-        '\nctx: ' + stringify(ctx)
-      );
-    }
-
-    if (check(this.elem)) {
-      console.warn(
-        '\nBEM-XJST WARNING: wrong elem name. ' +
-        '\nElement name can not contain modifier delimeter nor elem delimeter. ' +
-        '\nelem: ' + this.elem +
-        '\nctx: ' + stringify(ctx)
-      );
-    }
-
-    Object.keys(_this.mods).forEach(function(modName) {
-      // modName
-      if (check(modName)) {
-        console.warn(
-          '\nBEM-XJST WARNING: wrong modifier name. ' +
-          '\nModifier name can not contain modifier delimeter nor elem delimeter. ' +
-          '\nmods: ' + stringify(_this.mods) +
-          '\nctx: ' + stringify(ctx)
-        );
-      }
-
-      // modVal
-      if (check(_this.mods[modName])) {
-        console.warn(
-          '\nBEM-XJST WARNING: wrong modifier value. ' +
-          '\nModifier value can not contain modifier delimeter nor elem delimeter. ' +
-          '\nmods: ' + stringify(_this.mods) +
-          '\nctx: ' + stringify(ctx)
-        );
-      }
-    });
-
-    // elemMods
-    Object.keys(_this.elemMods).forEach(function(modName) {
-      // modName
-      if (check(modName)) {
-        console.warn(
-          '\nBEM-XJST WARNING: wrong element modifier name. ' +
-          '\nModifier name can not contain modifier delimeter nor elem delimeter. ' +
-          '\nelemMods: ' + stringify(_this.elemMods) +
-          '\nctx: ' + stringify(ctx)
-        );
-      }
-
-      // modVal
-      if (check(_this.elemMods[modName])) {
-        console.warn(
-          '\nBEM-XJST WARNING: wrong element modifier value. ' +
-          '\nModifier value can not contain modifier delimeter nor elem delimeter. ' +
-          '\nelemMods: ' + stringify(_this.elemMods) +
-          '\nctx: ' + stringify(ctx)
-        );
-      }
-    });
-
-    return applyNext();
-  }),
-
-  def()(function(node, ctx) {
-    if (ctx.mods) {
-      var mods = ctx.mods;
-
-      Object.keys(mods).forEach(function(mod) {
-        var val = mods[mod];
-
-        if (Array.isArray(val)) {
-          console.warn(
-            '\nBEM-XJST WARNING: wrong modifier value. ' +
-            '\nModifier value can be undefined, null, String, Number or Boolean. ' +
-            '\nctx: ' + stringify(ctx)
-          );
-        }
-      });
-    }
-
-    if (ctx.elemMods) {
-      var elemMods = ctx.elemMods;
-
-      Object.keys(elemMods).forEach(function(mod) {
-        var val = elemMods[mod];
-
-        if (Array.isArray(val)) {
-          console.warn(
-            '\nBEM-XJST WARNING: wrong element modifier value. ' +
-            '\nModifier value can be undefined, null, String, Number or Boolean. ' +
-            '\nctx: ' + stringify(ctx)
-          );
-        }
-      });
-    }
-
-    return applyNext();
-  })
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/page/page.bemtree.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/page/_view/page_view_500.bemtree.js */
+block( 'page' ).mod( 'view', '500' )(
+  def()( () => applyNext( { 'data.view': '' } ) ),
+  content()( () => '500' ),
 );
 
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/page/_view/page_view_500.bemtree.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/page/_route/page_route_error.bemtree.js */
+block( 'page' ).mod( 'route', 'error' )( {
+  route: 'Error…',
+} )
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/page/_route/page_route_error.bemtree.js */
+/* begin: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/page/_view/page_view_404.bemtree.js */
+block( 'page' ).mod( 'view', '404' )(
+  def()( () => applyNext( { 'data.view': '' } ) ),
+  content()( () => '404' ),
+);
+
+/* end: /Users/realetive/_dev/monorepo/apps/emails/components/common.blocks/page/_view/page_view_404.bemtree.js */
 
 ;oninit(function(exports, context) {
 var BEMContext = exports.BEMContext || context.BEMContext;
@@ -3255,20 +2093,21 @@ var glob = this.window || this.global || this;
 var exp = typeof exports !== "undefined" ? exports : global;
 if (typeof modules === "object") {
 
-modules.define("dateFns",function(provide, prev) {provide(require("date-fns") || prev);});
 
-modules.define("BEMHTML",["dateFns"],function(provide,dep0) { var engine = buildBemXjst({"dateFns":dep0});engine.libs = {"dateFns":dep0};provide(engine);});
+
+modules.define("BEMTREE",[],function(provide) { var engine = buildBemXjst({});provide(engine);});
 } else {
 var _libs = {};
-_libs["dateFns"] = glob && typeof glob["dateFns"] !== "undefined" ? glob["dateFns"] : require("date-fns");
+
 
 if (Object.keys(_libs).length) {
-BEMHTML = buildBemXjst(_libs);
-exp["BEMHTML"] = BEMHTML;
-exp["BEMHTML"].libs = _libs;
+BEMTREE = buildBemXjst(_libs);
+exp["BEMTREE"] = BEMTREE;
+exp["BEMTREE"].libs = _libs;
 } else {
-BEMHTML= buildBemXjst({});
-exp["BEMHTML"] = BEMHTML;exp["BEMHTML"].libs = {};
+BEMTREE= buildBemXjst(glob);
+exp["BEMTREE"] = BEMTREE;exp["BEMTREE"].libs = glob;
 }
 }
 })(typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : this);
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi5lcnJvci1kZXNrdG9wLmJlbXRyZWUucHJlcGFyZS5qcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQSIsImZpbGUiOiIuZXJyb3ItZGVza3RvcC5iZW10cmVlLnByZXBhcmUuanMifQ==

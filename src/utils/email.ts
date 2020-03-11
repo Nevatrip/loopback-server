@@ -10,7 +10,7 @@ type Status = 'new' | 'paid' | 'rejected' | 'manager';
 const getMailContent = (order: Order, status: Status) => {
   const content = {
     new: JSON.stringify(order),
-    paid: renderEmail({page: 'email', api: order}),
+    paid: renderEmail({page: 'notification', api: order}),
     rejected: `Заказ отменён`,
     manager: renderEmail({page: 'operator', api: order}),
   };
