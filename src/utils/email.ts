@@ -1,6 +1,6 @@
-import {Order} from '../models';
-import {createTransport} from 'nodemailer';
-import {renderEmail} from '../utils/renderEmail';
+import { Order } from '../models';
+import { createTransport } from 'nodemailer';
+import { renderEmail } from '../utils/renderEmail';
 
 const {
   SMTP_USER: SMTPUser = 'test@test.test',
@@ -13,9 +13,9 @@ type Status = 'new' | 'paid' | 'rejected' | 'manager';
 const getMailContent = (order: Order, status: Status) => {
   const content = {
     new: JSON.stringify(order),
-    paid: renderEmail({page: 'notification', api: order}),
+    paid: renderEmail({ page: 'notification', api: order }),
     rejected: `Заказ отменён`,
-    manager: renderEmail({page: 'operator', api: order}),
+    manager: renderEmail({ page: 'operator-en', api: order }),
   };
 
   return content[status];
@@ -23,16 +23,16 @@ const getMailContent = (order: Order, status: Status) => {
 
 export const sendEmail = (order: Order, status: Status, _email?: string) => {
   const {
-    user: {email},
+    user: { email },
     products: [
       {
         product: {
           title: {
-            en: {name: title},
+            en: { name: title },
           },
           directions,
         },
-        options: [{number, direction}],
+        options: [{ number, direction }],
       },
     ],
   } = order;
@@ -43,7 +43,7 @@ export const sendEmail = (order: Order, status: Status, _email?: string) => {
 
   const {
     partnerName: partnerSubject,
-    partner: {email: partnerEmail = 'tech-support@nevatrip.ru'} = {
+    partner: { email: partnerEmail = 'tech-support@nevatrip.ru' } = {
       email: 'tech-support@nevatrip.ru',
     },
   } = selectedDirection;
@@ -63,7 +63,7 @@ export const sendEmail = (order: Order, status: Status, _email?: string) => {
   const mailOptions = {
     from: `"${appName}" <${SMTPUser}>`,
     html: mailContent,
-    to: status === 'manager' ? [partnerEmail, SMTPUser] : _email || email, // list of receivers
+    to: status === 'manager' ? [partnerEmail, SMTPUser, 'elizabeth.zolotaryova@gmail.com', 'order@nevatrip.ru', 'info@prahatrip.cz'] : _email || email, // list of receivers
     subject: status === 'manager' ? partnerSubject : 'Thank you for your order', // `E-ticket / Билет на экскурсию «${title}» НТ${number}`,
     text: JSON.stringify(order), // plain text body
   };
@@ -71,7 +71,7 @@ export const sendEmail = (order: Order, status: Status, _email?: string) => {
   transporter.sendMail(
     mailOptions,
     // tslint:disable-next-line: no-any
-    (error: any, info: {messageId: any; response: any}) => {
+    (error: any, info: { messageId: any; response: any }) => {
       if (error) {
         return console.log(error);
       }

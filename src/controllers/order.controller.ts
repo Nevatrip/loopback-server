@@ -19,23 +19,23 @@ import {
   RestBindings,
   Response,
 } from '@loopback/rest';
-import {inject} from '@loopback/core';
-import {SanityService} from '../services';
-import {Order, Cart, Product} from '../models';
-import {sendEmail, getPaymentDescription} from '../utils';
-import {OrderRepository, CartRepository} from '../repositories';
+import { inject } from '@loopback/core';
+import { SanityService } from '../services';
+import { Order, Cart, Product } from '../models';
+import { sendEmail, getPaymentDescription } from '../utils';
+import { OrderRepository, CartRepository } from '../repositories';
 import {
   ClientService,
   TaxationSystem,
   PaymentSuccessModel,
 } from 'cloudpayments';
-import {format as _format} from 'date-fns';
-import {ru} from 'date-fns/locale';
+import { format as _format } from 'date-fns';
+import { ru } from 'date-fns/locale';
 import * as Excel from 'exceljs';
 import * as renderEmail from '../utils/renderEmail';
-import {createHmac} from 'crypto';
-import {AtolService} from '../components/atol/atol.service';
-import {NevatripService} from '../components/nevatrip/nevatrip.service';
+import { createHmac } from 'crypto';
+import { AtolService } from '../components/atol/atol.service';
+import { NevatripService } from '../components/nevatrip/nevatrip.service';
 
 const privateKey = process.env.CLOUDPAYMENTS_PRIVATEKEY;
 const publicId = process.env.CLOUDPAYMENTS_PUBLICID;
@@ -75,10 +75,10 @@ export class OrderController {
     // protected atolService: AtolService,
     @inject(RestBindings.Http.RESPONSE)
     public res: Response,
-  ) {}
+  ) { }
 
   async getCart(cart: Cart) {
-    const {sessionId} = cart;
+    const { sessionId } = cart;
     const order = await this.cartRepository.get(sessionId);
 
     if (order == null || !order.products.length) {
@@ -96,10 +96,10 @@ export class OrderController {
     let sum = 0;
     let sale = 0;
     let atolItems = [];
-    const products: {[key: string]: Product} = {};
+    const products: { [key: string]: Product } = {};
 
     for (const productItem of order.products) {
-      const {productId, options} = productItem;
+      const { productId, options } = productItem;
 
       if (
         !options ||
@@ -109,7 +109,7 @@ export class OrderController {
       )
         return;
 
-      const [{direction, tickets}] = options;
+      const [{ direction, tickets }] = options;
 
       const product =
         products[productId] ||
@@ -246,7 +246,7 @@ export class OrderController {
     responses: {
       '200': {
         description: 'Order model instance',
-        content: {'application/json': {schema: {'x-ts-type': Order}}},
+        content: { 'application/json': { schema: { 'x-ts-type': Order } } },
       },
     },
   })
@@ -279,7 +279,7 @@ export class OrderController {
   }
 
   @post('/orders/check', {
-    responses: {'200': {description: 'Check CloudPayment'}},
+    responses: { '200': { description: 'Check CloudPayment' } },
   })
   async check(
     @requestBody({
@@ -288,8 +288,8 @@ export class OrderController {
           schema: {
             type: 'object',
             properties: {
-              InvoiceId: {type: 'number'},
-              Amount: {type: 'number'},
+              InvoiceId: { type: 'number' },
+              Amount: { type: 'number' },
             },
           },
         },
@@ -298,17 +298,17 @@ export class OrderController {
     body: PaymentSuccessModel,
   ) {
     const filter: Filter<Order> = {
-      where: {'payment.Model.Number': body.InvoiceId} as Where<Order>,
+      where: { 'payment.Model.Number': body.InvoiceId } as Where<Order>,
     };
     const order = await this.orderRepository.findOne(filter);
 
-    if (!order || (await this.getSum(order)) !== body.Amount) return {code: 10};
+    if (!order || (await this.getSum(order)) !== body.Amount) return { code: 10 };
 
-    return {code: 0};
+    return { code: 0 };
   }
 
   @post('/orders/pay', {
-    responses: {'200': {description: 'pay CloudPayment'}},
+    responses: { '200': { description: 'pay CloudPayment' } },
   })
   async pay(
     @requestBody({
@@ -317,11 +317,11 @@ export class OrderController {
           schema: {
             type: 'object',
             properties: {
-              TransactionId: {type: 'number'},
-              Amount: {type: 'number'},
-              InvoiceId: {type: 'number'},
-              AuthCode: {type: 'string'},
-              Token: {type: 'number'},
+              TransactionId: { type: 'number' },
+              Amount: { type: 'number' },
+              InvoiceId: { type: 'number' },
+              AuthCode: { type: 'string' },
+              Token: { type: 'number' },
             },
           },
         },
@@ -330,16 +330,16 @@ export class OrderController {
     body: PaymentSuccessModel,
   ) {
     const filter: Filter<Order> = {
-      where: {'payment.Model.Number': body.InvoiceId} as Where<Order>,
+      where: { 'payment.Model.Number': body.InvoiceId } as Where<Order>,
     };
     const order = await this.orderRepository.findOne(filter);
 
-    if (!order || !order.id) return {code: 10};
+    if (!order || !order.id) return { code: 10 };
 
     // const sum = await this.getSum(order, true); // true — sendToAtol
     const sum = await this.getSum(order, false);
 
-    if (sum !== body.Amount) return {code: 10};
+    if (sum !== body.Amount) return { code: 10 };
 
     order.status = 'paid';
     order.updated = new Date();
@@ -356,11 +356,11 @@ export class OrderController {
     }
 
     this.orderRepository.updateById(order.id, order);
-    return {code: 0};
+    return { code: 0 };
   }
 
   @post('/orders/fail', {
-    responses: {'200': {description: 'fail CloudPayment'}},
+    responses: { '200': { description: 'fail CloudPayment' } },
   })
   async fail(@requestBody() body: {}) {
     console.log('fail CloudPayment', body);
@@ -371,7 +371,7 @@ export class OrderController {
     responses: {
       '200': {
         description: 'Order model count',
-        content: {'application/json': {schema: CountSchema}},
+        content: { 'application/json': { schema: CountSchema } },
       },
     },
   })
@@ -388,7 +388,7 @@ export class OrderController {
         description: 'Array of Order model instances',
         content: {
           'application/json': {
-            schema: {type: 'array', items: {'x-ts-type': Order}},
+            schema: { type: 'array', items: { 'x-ts-type': Order } },
           },
         },
       },
@@ -434,20 +434,20 @@ export class OrderController {
           showRowStripes: true,
         },
         columns: [
-          {name: 'Имя'},
-          {name: 'Почта'},
-          {name: 'Телефон'},
-          {name: 'Экскурсия'},
-          {name: 'Билет'},
-          {name: 'Количество'},
-          {name: 'Стоимость'},
-          {name: 'Посадочный номер'},
-          {name: 'Создан'},
-          {name: 'Обновлён'},
-          {name: 'Сумма'},
-          {name: 'Транзакция'},
-          {name: 'Статус'},
-          {name: 'Промокод'},
+          { name: 'Имя' },
+          { name: 'Почта' },
+          { name: 'Телефон' },
+          { name: 'Экскурсия' },
+          { name: 'Билет' },
+          { name: 'Количество' },
+          { name: 'Стоимость' },
+          { name: 'Посадочный номер' },
+          { name: 'Создан' },
+          { name: 'Обновлён' },
+          { name: 'Сумма' },
+          { name: 'Транзакция' },
+          { name: 'Статус' },
+          { name: 'Промокод' },
         ],
         rows: [],
       });
@@ -458,14 +458,14 @@ export class OrderController {
           InternalId = 0,
           // @ts-ignore
         } = (order.payment || {}).Model || {};
-        order.products.forEach(({product, options}) => {
-          options.forEach(({number, direction, tickets}) => {
+        order.products.forEach(({ product, options }) => {
+          options.forEach(({ number, direction, tickets }) => {
             const productDirection = product.directions.find(
-              ({_key}) => _key === direction,
+              ({ _key }) => _key === direction,
             );
             if (productDirection) {
               productDirection.tickets.forEach(
-                ({category, name, price, _key}) => {
+                ({ category, name, price, _key }) => {
                   if (tickets[_key]) {
                     // @ts-ignore
                     table.addRow([
@@ -509,7 +509,7 @@ export class OrderController {
       // return this.res.send(Buffer.from(file));
 
       const _this = this;
-      workbook.xlsx.writeBuffer().then(function(buffer) {
+      workbook.xlsx.writeBuffer().then(function (buffer) {
         return _this.res.end(buffer, 'binnary');
         // done
       });
@@ -522,7 +522,7 @@ export class OrderController {
     responses: {
       '200': {
         description: 'Order PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
+        content: { 'application/json': { schema: CountSchema } },
       },
     },
   })
@@ -538,7 +538,7 @@ export class OrderController {
     responses: {
       '200': {
         description: 'Order model instance',
-        content: {'application/json': {schema: {'x-ts-type': Order}}},
+        content: { 'application/json': { schema: { 'x-ts-type': Order } } },
       },
     },
   })
@@ -550,7 +550,7 @@ export class OrderController {
     responses: {
       '200': {
         description: 'Order model instance',
-        content: {'text/html': {schema: {}}},
+        content: { 'text/html': { schema: {} } },
         examples: {
           'text/html': '<html><body>Your HTML text</body></html>',
         },
@@ -569,14 +569,14 @@ export class OrderController {
 
     this.res.setHeader('Content-Type', 'text/html; charset=UTF-8');
 
-    return this.res.send(renderEmail.renderEmail({page: 'notification', api}));
+    return this.res.send(renderEmail.renderEmail({ page: 'notification', api }));
   }
 
   @get('/orders/{id}/email/send', {
     responses: {
       '200': {
         description: 'Order model instance',
-        content: {'text/html': {schema: {}}},
+        content: { 'text/html': { schema: {} } },
         examples: {
           'text/html': '<html><body>Your HTML text</body></html>',
         },
@@ -600,7 +600,7 @@ export class OrderController {
     this.res.setHeader('Content-Type', 'text/html; charset=UTF-8');
 
     return this.res.send(
-      renderEmail.renderEmail({page: 'notification', api: order}),
+      renderEmail.renderEmail({ page: 'notification', api: order }),
     );
   }
 
@@ -608,7 +608,7 @@ export class OrderController {
     responses: {
       '200': {
         description: 'Order model instance',
-        content: {'text/html': {schema: {}}},
+        content: { 'text/html': { schema: {} } },
         examples: {
           'text/html': '<html><body>Your HTML text</body></html>',
         },
@@ -627,14 +627,14 @@ export class OrderController {
 
     this.res.setHeader('Content-Type', 'text/html; charset=UTF-8');
 
-    return this.res.send(renderEmail.renderEmail({page: 'operator', api}));
+    return this.res.send(renderEmail.renderEmail({ page: 'operator-en', api }));
   }
 
   @get('/orders/{id}/print', {
     responses: {
       '200': {
         description: 'Order model instance',
-        content: {'text/html': {schema: {}}},
+        content: { 'text/html': { schema: {} } },
         examples: {
           'text/html': '<html><body>Your HTML text</body></html>',
         },
@@ -653,14 +653,14 @@ export class OrderController {
 
     this.res.setHeader('Content-Type', 'text/html; charset=UTF-8');
 
-    return this.res.send(renderEmail.renderEmail({page: 'print', api}));
+    return this.res.send(renderEmail.renderEmail({ page: 'print', api }));
   }
 
   @get('/orders/{id}/preview', {
     responses: {
       '200': {
         description: 'Order model instance',
-        content: {'text/html': {schema: {}}},
+        content: { 'text/html': { schema: {} } },
         examples: {
           'text/html': '<html><body>Your HTML text</body></html>',
         },
@@ -681,11 +681,11 @@ export class OrderController {
     this.res.setHeader('Access-Control-Allow-Origin', '*');
     this.res.setHeader('X-FRAME-OPTIONS', 'ALLOWALL');
 
-    return this.res.send(renderEmail.renderEmail({page: 'notification', api}));
+    return this.res.send(renderEmail.renderEmail({ page: 'notification', api }));
   }
 
   @patch('/orders/{id}', {
-    responses: {'204': {description: 'Order PATCH success'}},
+    responses: { '204': { description: 'Order PATCH success' } },
   })
   async updateById(
     @param.path.string('id') id: string,
@@ -695,7 +695,7 @@ export class OrderController {
   }
 
   @put('/orders/{id}', {
-    responses: {'204': {description: 'Order PUT success'}},
+    responses: { '204': { description: 'Order PUT success' } },
   })
   async replaceById(
     @param.path.string('id') id: string,
@@ -705,7 +705,7 @@ export class OrderController {
   }
 
   @del('/orders/{id}', {
-    responses: {'204': {description: 'Order DELETE success'}},
+    responses: { '204': { description: 'Order DELETE success' } },
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.orderRepository.deleteById(id);
