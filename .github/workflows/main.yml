@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+      - test
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Login
+      run: docker login --username oauth --password ${{ secrets.YC_OAUTH }} cr.yandex
+
+    - name: Build
+      run: docker build . -t cr.yandex/${{ secrets.YC_REGISTRY_ID }}/api:${GITHUB_REF##*/}
+
+    - name: Push
+      run: docker push cr.yandex/${{ secrets.YC_REGISTRY_ID }}/api:${GITHUB_REF##*/}
