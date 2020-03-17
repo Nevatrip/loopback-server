@@ -30,7 +30,7 @@ const config = {
         url: baseURL,
         query: {
           query:
-            "*[_type=='tour' && key.current=='{alias}']\u007B...,'point':point->,'place':place->,'category':category->,'attractions':attractions[]->,'tourLanguage':tourLanguage[]->\u007Btitle,'icon':icon.asset->\u007D,'placeFeatures':placeFeatures[]->\u007Btitle,'icon':icon.asset->\u007D,'titleImage':titleImage.asset->\u007Burl\u007D.url\u007D",
+            "*[_type=='tour' && key.current=='{alias}']\u007B...,'point':point->,'place':place->,'category':category[]->,'attractions':attractions[]->,'tourLanguage':tourLanguage[]->\u007Btitle,'icon':icon.asset->\u007D,'placeFeatures':placeFeatures[]->\u007Btitle,'icon':icon.asset->\u007D,'titleImage':titleImage.asset->\u007Burl\u007D.url\u007D",
         },
         responsePath: '$.result[0]',
       },
@@ -44,7 +44,7 @@ const config = {
         url: baseURL,
         query: {
           query:
-            "*[_type=='tour' && _id=='{id}']\u007B...,'point':point->,'place':place->,'category':category->,'attractions':attractions[]->,'tourLanguage':tourLanguage[]->\u007Btitle,'icon':icon.asset->\u007D,'placeFeatures':placeFeatures[]->\u007Btitle,'icon':icon.asset->\u007D,'titleImage':titleImage.asset->\u007Burl\u007D.url\u007D",
+            "*[_type=='tour' && _id=='{id}']\u007B...,'point':point->,'place':place->,'category':category[]->,'attractions':attractions[]->,'tourLanguage':tourLanguage[]->\u007Btitle,'icon':icon.asset->\u007D,'placeFeatures':placeFeatures[]->\u007Btitle,'icon':icon.asset->\u007D,'titleImage':titleImage.asset->\u007Burl\u007D.url\u007D",
         },
         responsePath: '$.result[0]',
       },
@@ -72,7 +72,7 @@ const config = {
         url: baseURL,
         query: {
           query:
-            "*[_id=='{id}']\u007B_id,oldId,title,'partner':partner->,'category':category->,'directions':directions[]\u007B_key,'ticketInfo':ticketInfo[],_type,title,buyTimeOffset,partnerName,partner->,point->,'tickets':tickets[]\u007B...,'category':category->,'ticket':ticket[]->\u007D\u007D\u007D",
+            "*[_id=='{id}']\u007B_id,oldId,title,'partner':partner->,'category':category[]->,'directions':directions[]\u007B_key,'ticketInfo':ticketInfo[],_type,title,buyTimeOffset,partnerName,partner->,point->,'tickets':tickets[]\u007B...,'category':category[]->,'ticket':ticket[]->\u007D\u007D\u007D",
         },
         responsePath: '$.result[0]',
       },
