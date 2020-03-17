@@ -62,6 +62,3 @@ api-docs/
 
 # Transpiled JavaScript files from Typescript
 /dist
-
-.docker/data
-.config/ca-certificates/Yandex/YandexInternalRootCA.crt
