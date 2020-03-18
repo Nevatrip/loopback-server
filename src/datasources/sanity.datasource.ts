@@ -58,7 +58,7 @@ const config = {
         url: baseURL,
         query: {
           query:
-            "*[_id=='{id}']\u007B_id,oldId,'title': title.{lang}.name,'key': title.{lang}.key.current,'directions': directions[]\u007B_key,_type,title,buyTimeOffset,'point': point->\u007B'coords': coords\u007Blat,lng\u007D,description,'key': key.current,'title': title.{lang}\u007D,'schedule': schedule[]\u007B...,'point': point->\u007B'coords': coords\u007Blat,lng\u007D,'description': description.{lang},'key': key.current,'title': title.{lang}\u007D,'ticket': ticket[]->\u007D,'tickets': tickets[]\u007B...,'category': category->\u007B'name': name.current,title\u007D,'ticket': ticket[]->\u007B'name': name.current,title\u007D\u007D\u007D\u007D",
+            "*[_id=='{id}']\u007B_id,oldId,'title': title.{lang}.name,'key': title.{lang}.key.current,'directions': directions[]\u007B_key,_type,title,buyTimeOffset,'point': point->\u007B'coords': coords\u007Blat,lng\u007D,description,'key': key.current,'title': title.{lang}\u007D,'schedule': schedule[]\u007B...,'point': point->\u007B'coords': coords\u007Blat,lng\u007D,'description': description.{lang},'key': key.current,'title': title.{lang}\u007D,'ticket': ticket[]->\u007D,'tickets': tickets[]\u007B...,'category': category->\u007B'id': _id,'name': name.current,title\u007D,'ticket': ticket[]->\u007B'name': name.current,title\u007D\u007D\u007D\u007D",
         },
         responsePath: '$.result[0]',
       },
