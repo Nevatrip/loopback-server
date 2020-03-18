@@ -64,7 +64,7 @@ export const sendEmail = (order: Order, status: Status, _email?: string) => {
     from: `"${appName}" <${SMTPUser}>`,
     html: mailContent,
     to: status === 'manager' ? [partnerEmail, SMTPUser, 'elizabeth.zolotaryova@gmail.com', 'order@nevatrip.ru', 'info@prahatrip.cz'] : _email || email, // list of receivers
-    subject: status === 'manager' ? partnerSubject : 'Thank you for your order', // `E-ticket / Билет на экскурсию «${title}» НТ${number}`,
+    subject: status === 'manager' ? `${ partnerSubject } Transaction number: PT${ number }` : `Thank you for your order! Transaction number: PT${ number }`, // `E-ticket / Билет на экскурсию «${title}» НТ${number}`,
     text: JSON.stringify(order), // plain text body
   };
 
