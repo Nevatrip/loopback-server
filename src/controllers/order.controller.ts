@@ -321,7 +321,7 @@ export class OrderController {
               Amount: { type: 'number' },
               InvoiceId: { type: 'number' },
               AuthCode: { type: 'string' },
-              Token: { type: 'number' },
+              Token: { type: 'string' },
             },
           },
         },
