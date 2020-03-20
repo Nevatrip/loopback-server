@@ -35,8 +35,6 @@ const config = {
   useNewUrlParser: true,
 };
 
-console.log('config', config);
-
 export class MongoDataSource extends juggler.DataSource {
   static dataSourceName = 'mongo';
 

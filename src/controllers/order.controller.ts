@@ -362,7 +362,22 @@ export class OrderController {
   @post('/orders/fail', {
     responses: { '200': { description: 'fail CloudPayment' } },
   })
-  async fail(@requestBody() body: {}) {
+  async fail(@requestBody({
+    content: {
+      'application/x-www-form-urlencoded': {
+        schema: {
+          type: 'object',
+          properties: {
+            TransactionId: { type: 'number' },
+            Amount: { type: 'number' },
+            InvoiceId: { type: 'number' },
+            AuthCode: { type: 'string' },
+            Token: { type: 'string' },
+          },
+        },
+      },
+    },
+  }) body: {}) {
     console.log('fail CloudPayment', body);
     return body;
   }
