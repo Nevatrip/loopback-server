@@ -9,7 +9,7 @@ const TIMEZONE = process.env.TIMEZONE;
 if (!TIMEZONE) throw new Error('TIMEZONE (env) is not defined');
 
 type Dates = {
-  [key: string]: Date[];
+  [key: string]: {}[]
 };
 
 const sortDates = (dates: Dates): Date[] => {
@@ -60,43 +60,39 @@ export class ProductController {
 
     (product.directions || []).forEach(direction => {
       if (direction._type !== 'direction') return;
-
       if (!direction.schedule || !direction.schedule.length) return;
+
       const {
         buyTimeOffset = 0,
-        schedule: [{timeZone = 'Europe/Moscow', start}],
+        schedule,
       } = direction;
       let dates: Dates = {};
       let datesOpenTime: Dates = {};
 
-      // Смещение часового пояса в минутах для каждого направления
-      direction.timeOffset = getUTCOffset(
-        new Date(start),
-        findTimeZone(timeZone),
-      ).offset;
+      schedule.forEach(event => {
+        const buyTime = new Date();
+        buyTime.setMinutes( buyTime.getMinutes() + buyTimeOffset );
 
-      direction.schedule.forEach(event => {
-        const offsetDate = new Date();
-        offsetDate.setMinutes(offsetDate.getMinutes() + buyTimeOffset);
+        const timeZone = findTimeZone(event.startTimezone || TIMEZONE);
 
         event.actions.forEach(action => {
           const actionDate = new Date(action.start);
-          if (actionDate > offsetDate) {
-            actionDate.setMinutes(
-              actionDate.getMinutes() - direction.timeOffset,
-            );
+
+          if (actionDate > buyTime) {
+            const timeOffset = getUTCOffset(actionDate, timeZone).offset;
+
+            actionDate.setMinutes(actionDate.getMinutes() + actionDate.getTimezoneOffset() - timeOffset );
             const dateKey = format(actionDate, 'yyyy-MM-dd');
 
             if (event.allDay) {
               datesOpenTime[dateKey] = datesOpenTime[dateKey] || [];
-              datesOpenTime[dateKey].push(actionDate);
             } else {
               dates[dateKey] = dates[dateKey] || [];
-              dates[dateKey].push(actionDate);
             }
           }
         });
       });
+
       delete direction.schedule;
       direction.dates = sortDates(dates);
       direction.datesOpenTime = sortDates(datesOpenTime);

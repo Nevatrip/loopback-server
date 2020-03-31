@@ -57,7 +57,8 @@ class ProductEvent extends Entity {
   title: string;
   start: Date;
   end: Date;
-  timeZone?: string;
+  startTimezone?: string;
+  endTimezone?: string;
   rrule?: {
     freq: 'daily' | 'weekly';
     until?: Date;
@@ -104,7 +105,8 @@ export class Product extends Entity {
   key: string;
 
   @property.array(Object, {required: true})
-  directions: (DirectionProduct | DirectionComplex)[];
+  // directions: (DirectionProduct | DirectionComplex)[];
+  directions: DirectionProduct[];
 
   @property.array(String)
   features?: string[];
