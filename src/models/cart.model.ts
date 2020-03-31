@@ -76,6 +76,9 @@ export class Cart extends Entity {
   promocode?: string;
 
   @property()
+  lang?: string;
+
+  @property()
   user: {
     email: string;
     phone: string;
