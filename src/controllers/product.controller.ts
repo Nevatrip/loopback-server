@@ -109,40 +109,37 @@ export class ProductController {
     @param.path.string('id') id: string,
     @param.path.string('directionId') directionId: string,
     @param.path.string('date') date: string,
-    @param.query.string('lang') lang: string = 'ru',
+    @param.query.string('lang') lang: string = 'en',
   ): Promise<IAction[]> {
     if (!TIMEZONE) throw new HttpErrors.NotFound('TIMEZONE (env) is not defined');
     const [product]: Product[] = await this.sanityService.getProductForCartById(id, lang);
 
-    const directions: {[key: string]: DirectionProduct} = {};
-    product.directions.forEach(item => {
-      if (item._type === 'direction') directions[item._key] = item;
-    });
+    const direction = product.directions.find(({ _key }) => _key === directionId);
+    if (!direction) throw new HttpErrors.NotFound(`Direction with directionId ${ directionId } is not found.`);
 
-    if (!directions.hasOwnProperty(directionId)) return;
-    const {schedule, buyTimeOffset = 0} = directions[directionId];
-    if (!schedule || !schedule.length) return;
+    const { schedule, buyTimeOffset = 0 } = direction;
+    if (!schedule || !schedule.length) throw new HttpErrors.NotFound(`Schedule in directionId ${ directionId } is not found.`);
+
+    const parsedDate = parse(date, 'yyyy-MM-dd', new Date());
 
     let scheduleArray: IAction[] = [];
     schedule.forEach(event => {
-      const offsetDate: Date = new Date();
-      offsetDate.setMinutes(offsetDate.getMinutes() + buyTimeOffset);
-      const actualDate = parse(date, 'yyyy-MM-dd', offsetDate);
-
-      const timeZone = findTimeZone(event.timeZone || 'Europe/Moscow');
-      const timeOffset = getUTCOffset(new Date(event.start), timeZone).offset;
+      const timeZone = findTimeZone(event.startTimezone || TIMEZONE);
 
       event.actions.forEach(action => {
+        const buyTime = new Date();
+        buyTime.setMinutes(buyTime.getMinutes() + buyTimeOffset);
         const actionDate = new Date(action.start);
-        actionDate.setMinutes(actionDate.getMinutes() - timeOffset);
+        const isExpired = actionDate <= buyTime;
+        const timeOffset = getUTCOffset(actionDate, timeZone).offset;
+        actionDate.setMinutes(actionDate.getMinutes() + actionDate.getTimezoneOffset() - timeOffset);
 
-        if (
-          actionDate > offsetDate &&
-          actionDate.toDateString() === actualDate.toDateString()
-        ) {
+        if ( actionDate.toDateString() === parsedDate.toDateString() ) {
+          action.timeOffset = timeOffset;
           action.allDay = event.allDay;
           action.tickets = event.tickets;
           action.point = event.point;
+          action.expired = isExpired;
           scheduleArray.push(action);
         }
       });

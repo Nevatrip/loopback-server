@@ -39,7 +39,9 @@ export interface DirectionProduct extends Direction {
 export interface IAction extends ProductEvent {
   _id: string;
   _key: string;
-  start: Date;
+  start: Date; // UTC
+  timeOffset?: number; // timeOffset in minutes
+  expired?: boolean;
 }
 
 interface i18nString {
