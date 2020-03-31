@@ -1,9 +1,12 @@
 import {inject} from '@loopback/core';
-import {get, param, post, requestBody} from '@loopback/rest';
+import {get, param, HttpErrors} from '@loopback/rest';
 import {SanityService} from '../services/sanity.service';
 import {parse, format} from 'date-fns';
 import {findTimeZone, getUTCOffset} from 'timezone-support';
-import {Product, DirectionProduct, IAction} from '../models';
+import {Product, IAction} from '../models';
+
+const TIMEZONE = process.env.TIMEZONE;
+if (!TIMEZONE) throw new Error('TIMEZONE (env) is not defined');
 
 type Dates = {
   [key: string]: Date[];
@@ -51,7 +54,9 @@ export class ProductController {
     @param.path.string('id') id: string,
     @param.query.string('lang') lang: string = 'ru',
   ) {
-    const [product] = await this.sanityService.getProductForCartById(id, lang);
+    if (!TIMEZONE) throw new HttpErrors.NotFound('TIMEZONE (env) is not defined');
+
+    const [product]: Product[] = await this.sanityService.getProductForCartById(id, lang);
 
     (product.directions || []).forEach(direction => {
       if (direction._type !== 'direction') return;
@@ -109,8 +114,9 @@ export class ProductController {
     @param.path.string('directionId') directionId: string,
     @param.path.string('date') date: string,
     @param.query.string('lang') lang: string = 'ru',
-  ) {
-    const [product] = await this.sanityService.getProductForCartById(id, lang);
+  ): Promise<IAction[]> {
+    if (!TIMEZONE) throw new HttpErrors.NotFound('TIMEZONE (env) is not defined');
+    const [product]: Product[] = await this.sanityService.getProductForCartById(id, lang);
 
     const directions: {[key: string]: DirectionProduct} = {};
     product.directions.forEach(item => {
