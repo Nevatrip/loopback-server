@@ -4,7 +4,7 @@ import {juggler} from '@loopback/repository';
 const projectId = process.env.SANITY_STUDIO_API_PROJECT_ID;
 const dataset = process.env.SANITY_STUDIO_API_DATASET;
 
-const baseURL = `https://${projectId}.api.sanity.io/v1/data/query/${dataset}`;
+const baseURL = `https://${projectId}.{CDNDomain=apicdn:string}.sanity.io/v1/data/query/${dataset}`;
 
 const config = {
   name: 'sanity',
@@ -16,12 +16,12 @@ const config = {
         method: 'GET',
         url: baseURL,
         query: {
-          query: '{query}',
+          query: '{!query:string}',
         },
-        responsePath: '$.result[0]',
+        responsePath: '$.result',
       },
       functions: {
-        proxySanity: ['query'],
+        proxySanity: ['query', 'CDNDomain'],
       },
     },
     {
