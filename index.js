@@ -9,12 +9,15 @@ if (require.main === module) {
       port: +process.env.PORT || 3000,
       host: process.env.HOST || 'localhost',
       openApiSpec: {
-        setServersFromRequest: true || !process.env.SERVER_URL,
-        // servers: [
-        //   {
-        //     url: `//${process.env.SERVER_URL}`,
-        //   },
-        // ],
+        // setServersFromRequest: true || !process.env.SERVER_URL,
+        servers: [
+          {
+            url: `https://${process.env.SERVER_URL}`,
+          },
+          {
+            url: `http://localhost:8000`,
+          },
+        ],
       },
       expressSettings: {
         'x-powered-by': false,
