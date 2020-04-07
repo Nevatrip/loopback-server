@@ -159,3 +159,14 @@ export class Product extends Entity {
     super(data);
   }
 }
+
+export class SanityResponse extends Entity {
+  @property({ id: true })
+  query: string
+
+  response: any
+
+  constructor(data?: Partial<SanityResponse>) {
+    super(data);
+  }
+}

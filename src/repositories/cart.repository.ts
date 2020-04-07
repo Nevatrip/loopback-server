@@ -3,7 +3,7 @@ import {Cart, CartProduct} from '../models';
 import {RedisDataSource} from '../datasources';
 import {inject} from '@loopback/core';
 import {promisify} from 'util';
-import * as hash from 'object-hash';
+import hash from 'object-hash';
 
 export class CartRepository extends DefaultKeyValueRepository<Cart> {
   constructor(@inject('datasources.redis') dataSource: RedisDataSource) {

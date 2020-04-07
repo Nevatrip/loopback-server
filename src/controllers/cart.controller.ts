@@ -11,8 +11,8 @@ import {
 import {Cart, CartProduct} from '../models';
 import {CartRepository} from '../repositories';
 
-import * as hash from 'object-hash';
-import * as debugFactory from 'debug';
+import hash from 'object-hash';
+import debugFactory from 'debug';
 const debug = debugFactory('nevatrip:cart');
 
 export class CartController {

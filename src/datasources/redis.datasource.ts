@@ -1,6 +1,6 @@
 import {inject} from '@loopback/core';
 import {juggler} from '@loopback/repository';
-import * as JSONconfig from './redis.datasource.json';
+import * as JSONconfig from './redis.datasource.config.json';
 
 const config = { ...JSONconfig };
 
