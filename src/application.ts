@@ -16,6 +16,15 @@ export class NevatripRestApplication extends BootMixin(
   constructor(options: ApplicationConfig = {}) {
     super(options);
 
+    this.api({
+      openapi: '3.0.0',
+      info: {
+        title: `${ process.env.APP_NAME || '' } API`,
+        version: process.env.npm_package_version || '0.0.0',
+      },
+      paths: {}
+    });
+
     // Set up the custom sequence
     this.sequence(MySequence);
 
