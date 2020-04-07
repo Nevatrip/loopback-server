@@ -1,12 +1,23 @@
 import {inject} from '@loopback/core';
+import {repository} from '@loopback/repository';
 import {get, param, HttpErrors} from '@loopback/rest';
 import {SanityService} from '../services/sanity.service';
+import {SanityRepository} from "../repositories";
 import {parse, format} from 'date-fns';
 import {findTimeZone, getUTCOffset} from 'timezone-support';
 import {Product, IAction} from '../models';
 
 const TIMEZONE = process.env.TIMEZONE;
 if (!TIMEZONE) throw new Error('TIMEZONE (env) is not defined');
+
+const parseCache = (cache: string) => {
+  switch(cache.toLowerCase().trim()){
+    case "true": case "yes": case "1": return true;
+    case "false": case "no": case "0": case null: return false;
+    case "cdn": return 'cdn';
+    default: return Boolean(cache);
+  }
+}
 
 type Dates = {
   [key: string]: {}[]
@@ -24,6 +35,8 @@ export class ProductController {
   constructor(
     @inject('services.SanityService')
     protected sanityService: SanityService,
+    @repository(SanityRepository)
+    protected sanityRepository: SanityRepository
   ) {}
 
   @get('/sanity', {
@@ -32,18 +45,32 @@ export class ProductController {
   })
   async proxySanity(
     @param.query.string('query') query: string,
+    @param.query.string('cache', { description: 'Вернуть данные из кэша (по умолчанию) или из CDN', schema: { type: 'string', default: true, enum: [true, false, 'cdn'] } }) cache: 'true' | 'false' | 'cdn' = 'true',
+    @param.query.number('ttl', { description: 'Срок жизни кэша в миллисекундах (по умолчанию 14400000, т. е. 4 часа)', example: '14400000' }) ttl: number = 1000 * 60 * 60 * 4,
   ): Promise<Object> {
-    return await this.sanityService.proxySanity(query);
-  }
+    const useCache = parseCache(cache);
 
-  @get('/product/{id}', {
-    responses: {'200': {description: 'Product Response'}},
-    summary: 'Get Product data by Id',
-  })
-  async getProductById(@param.path.string('id') id: string): Promise<Product> {
-    const [product] = await this.sanityService.getProductById(id);
+    // TODO: это точно можно переписать на более элегантное решение
+    if (useCache === true) {
+      // Берём данные из Redis
+      const redis = await this.sanityRepository.get(query);
 
-    return product;
+      // Данных нет, делаем новый запрос к Sanity…
+      if (redis === null) {
+        const [response] = await this.sanityService.proxySanity(query);
+        // …и сохраняем его в кэш для следующих запросов
+        await this.sanityRepository.set(query, { query, response }, { ttl });
+        return response;
+      }
+
+      return redis.response;
+    } else {
+      // Берём данные из Sanity
+      const [response] = await this.sanityService.proxySanity(query, useCache === false ? 'api' : 'apicdn' );
+      await this.sanityRepository.set(query, { query, response }, { ttl });
+
+      return response;
+    }
   }
 
   @get('/product/{id}/cart', {
@@ -146,5 +173,16 @@ export class ProductController {
     });
 
     return scheduleArray;
+  }
+
+  @get('/product/{id}', {
+    responses: {'200': {description: 'Product Response'}},
+    summary: 'Get Product data by Id',
+    deprecated: true, // в пользу query-запросов (/sanity)
+  })
+  async getProductById(@param.path.string('id') id: string): Promise<Product> {
+    const [product] = await this.sanityService.getProductById(id);
+
+    return product;
   }
 }
