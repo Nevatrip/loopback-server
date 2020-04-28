@@ -116,7 +116,7 @@ export class OrderController {
         (await this.sanityService.getProductForOrderById(productId))[0];
       productItem.product = product;
       const directionData = product.directions.find(
-        dir => dir._type === 'direction' && dir._key === direction,
+        dir => dir._type === 'direction' && dir._key === direction._key,
       );
 
       if (!directionData) return;
@@ -476,7 +476,7 @@ export class OrderController {
         order.products.forEach(({ product, options }) => {
           options.forEach(({ number, direction, tickets }) => {
             const productDirection = product.directions.find(
-              ({ _key }) => _key === direction,
+              ({ _key }) => _key === direction._key,
             );
             if (productDirection) {
               productDirection.tickets.forEach(
