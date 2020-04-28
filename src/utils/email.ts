@@ -37,7 +37,7 @@ export const sendEmail = (order: Order, status: Status, _email?: string) => {
     ],
   } = order;
 
-  const selectedDirection = directions.find(dir => dir._key === direction);
+  const selectedDirection = directions.find(dir => dir._key === direction._key);
 
   if (!selectedDirection) return;
 

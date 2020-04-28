@@ -80,52 +80,82 @@ export class ProductController {
   async getProductForCartById(
     @param.path.string('id') id: string,
     @param.query.string('lang') lang: string = 'ru',
+    @param.query.string('cache', { description: 'Вернуть данные из кэша (по умолчанию) или из CDN', schema: { type: 'string', default: true, enum: [true, false, 'cdn'] } }) cache: 'true' | 'false' | 'cdn' = 'true',
+    @param.query.number('ttl', { description: 'Срок жизни кэша в миллисекундах (по умолчанию 14400000, т. е. 4 часа)', example: '14400000' }) ttl: number = 1000 * 60 * 60 * 4,
   ) {
     if (!TIMEZONE) throw new HttpErrors.NotFound('TIMEZONE (env) is not defined');
 
-    const [product]: Product[] = await this.sanityService.getProductForCartById(id, lang);
+    const useCache = parseCache(cache);
+    const query = `getProductForCartById(${ id }, ${ lang })`;
 
-    (product.directions || []).forEach(direction => {
-      if (direction._type !== 'direction') return;
-      if (!direction.schedule || !direction.schedule.length) return;
+    const getProductForCartById = async ( id: string, lang: string, cache?: string ) => {
+      const [ product ] = await this.sanityService.getProductForCartById( id, lang, cache );
 
-      const {
-        buyTimeOffset = 0,
-        schedule,
-      } = direction;
-      let dates: Dates = {};
-      let datesOpenTime: Dates = {};
+      (product.directions || []).forEach(direction => {
+        if (direction._type !== 'direction') return;
+        if (!direction.schedule || !direction.schedule.length) return;
 
-      schedule.forEach(event => {
-        const buyTime = new Date();
-        buyTime.setMinutes( buyTime.getMinutes() + buyTimeOffset );
+        const {
+          buyTimeOffset = 0,
+          schedule,
+        } = direction;
+        let dates: Dates = {};
+        let datesOpenTime: Dates = {};
 
-        const timeZone = findTimeZone(event.startTimezone || TIMEZONE);
+        schedule.forEach(event => {
+          const buyTime = new Date();
+          buyTime.setMinutes( buyTime.getMinutes() + buyTimeOffset );
 
-        event.actions.forEach(action => {
-          const actionDate = new Date(action.start);
+          const timeZone = findTimeZone(event.startTimezone || TIMEZONE);
 
-          if (actionDate > buyTime) {
-            const timeOffset = getUTCOffset(actionDate, timeZone).offset;
+          event.actions.forEach(action => {
+            const actionDate = new Date(action.start);
 
-            actionDate.setMinutes(actionDate.getMinutes() + actionDate.getTimezoneOffset() - timeOffset );
-            const dateKey = format(actionDate, 'yyyy-MM-dd');
+            if (actionDate > buyTime) {
+              const timeOffset = getUTCOffset(actionDate, timeZone).offset;
 
-            if (event.allDay) {
-              datesOpenTime[dateKey] = datesOpenTime[dateKey] || [];
-            } else {
-              dates[dateKey] = dates[dateKey] || [];
+              actionDate.setMinutes(actionDate.getMinutes() + actionDate.getTimezoneOffset() - timeOffset );
+              const dateKey = format(actionDate, 'yyyy-MM-dd');
+
+              if (event.allDay) {
+                datesOpenTime[dateKey] = datesOpenTime[dateKey] || [];
+              } else {
+                dates[dateKey] = dates[dateKey] || [];
+              }
             }
-          }
+          });
         });
+
+        delete direction.schedule;
+        direction.dates = sortDates(dates);
+        direction.datesOpenTime = sortDates(datesOpenTime);
       });
 
-      delete direction.schedule;
-      direction.dates = sortDates(dates);
-      direction.datesOpenTime = sortDates(datesOpenTime);
-    });
+      return product;
+    }
 
-    return product;
+    // TODO: это точно можно переписать на более элегантное решение
+    if (useCache === true) {
+      // Берём данные из Redis
+      const redis = await this.sanityRepository.get( query );
+
+      // Данных нет, делаем новый запрос к Sanity…
+      if (redis === null) {
+        const response = await getProductForCartById(id, lang);
+
+        // …и сохраняем его в кэш для следующих запросов
+        await this.sanityRepository.set(query, { query, response }, { ttl });
+        return response;
+      }
+
+      return redis.response;
+    } else {
+      // Берём данные из Sanity
+      const response = await getProductForCartById(id, lang, useCache === false ? 'api' : 'apicdn' );
+      await this.sanityRepository.set(query, { query, response }, { ttl });
+
+      return response;
+    }
   }
 
   @get('/product/{id}/schedule/{directionId}/{date}', {
@@ -137,42 +167,74 @@ export class ProductController {
     @param.path.string('directionId') directionId: string,
     @param.path.string('date') date: string,
     @param.query.string('lang') lang: string = 'en',
+    @param.query.string('cache', { description: 'Вернуть данные из кэша (по умолчанию) или из CDN', schema: { type: 'string', default: true, enum: [true, false, 'cdn'] } }) cache: 'true' | 'false' | 'cdn' = 'true',
+    @param.query.number('ttl', { description: 'Срок жизни кэша в миллисекундах (по умолчанию 14400000, т. е. 4 часа)', example: '14400000' }) ttl: number = 1000 * 60 * 60 * 4,
   ): Promise<IAction[]> {
     if (!TIMEZONE) throw new HttpErrors.NotFound('TIMEZONE (env) is not defined');
-    const [product]: Product[] = await this.sanityService.getProductForCartById(id, lang);
 
-    const direction = product.directions.find(({ _key }) => _key === directionId);
-    if (!direction) throw new HttpErrors.NotFound(`Direction with directionId ${ directionId } is not found.`);
+    const useCache = parseCache(cache);
+    const query = `getScheduleById(${ id }, ${ directionId }, ${ date }, ${ lang })`;
 
-    const { schedule, buyTimeOffset = 0 } = direction;
-    if (!schedule || !schedule.length) throw new HttpErrors.NotFound(`Schedule in directionId ${ directionId } is not found.`);
+    const getScheduleById = async ( id: string, directionId: string, date: string, lang: string, cache?: string ) => {
+      const [product]: Product[] = await this.sanityService.getProductForCartById(id, lang, cache );
 
-    const parsedDate = parse(date, 'yyyy-MM-dd', new Date());
+      const direction = product.directions.find(({ _key }) => _key === directionId);
+      if (!direction) throw new HttpErrors.NotFound(`Direction with directionId ${ directionId } is not found.`);
 
-    let scheduleArray: IAction[] = [];
-    schedule.forEach(event => {
-      const timeZone = findTimeZone(event.startTimezone || TIMEZONE);
+      const { schedule, buyTimeOffset = 0 } = direction;
+      if (!schedule || !schedule.length) throw new HttpErrors.NotFound(`Schedule in directionId ${ directionId } is not found.`);
 
-      event.actions.forEach(action => {
-        const buyTime = new Date();
-        buyTime.setMinutes(buyTime.getMinutes() + buyTimeOffset);
-        const actionDate = new Date(action.start);
-        const isExpired = actionDate <= buyTime;
-        const timeOffset = getUTCOffset(actionDate, timeZone).offset;
-        actionDate.setMinutes(actionDate.getMinutes() + actionDate.getTimezoneOffset() - timeOffset);
+      const parsedDate = parse(date, 'yyyy-MM-dd', new Date());
 
-        if ( actionDate.toDateString() === parsedDate.toDateString() ) {
-          action.timeOffset = timeOffset;
-          action.allDay = event.allDay;
-          action.tickets = event.tickets;
-          action.point = event.point;
-          action.expired = isExpired;
-          scheduleArray.push(action);
-        }
+      let scheduleArray: IAction[] = [];
+      schedule.forEach(event => {
+        const timeZone = findTimeZone(event.startTimezone || TIMEZONE);
+
+        event.actions.forEach(action => {
+          const buyTime = new Date();
+          buyTime.setMinutes(buyTime.getMinutes() + buyTimeOffset);
+          const actionDate = new Date(action.start);
+          const isExpired = actionDate <= buyTime;
+          const timeOffset = getUTCOffset(actionDate, timeZone).offset;
+          actionDate.setMinutes(actionDate.getMinutes() + actionDate.getTimezoneOffset() - timeOffset);
+
+          if ( actionDate.toDateString() === parsedDate.toDateString() ) {
+            action.timeOffset = timeOffset;
+            action.allDay = event.allDay;
+            action.tickets = event.tickets;
+            action.point = event.point;
+            action.expired = isExpired;
+            scheduleArray.push(action);
+          }
+        });
       });
-    });
 
-    return scheduleArray;
+      return scheduleArray;
+
+    }
+
+    // TODO: это точно можно переписать на более элегантное решение
+    if (useCache === true) {
+      // Берём данные из Redis
+      const redis = await this.sanityRepository.get( query );
+
+      // Данных нет, делаем новый запрос к Sanity…
+      if (redis === null) {
+        const response = await getScheduleById( id, directionId, date, lang );
+
+        // …и сохраняем его в кэш для следующих запросов
+        await this.sanityRepository.set(query, { query, response }, { ttl });
+        return response;
+      }
+
+      return redis.response;
+    } else {
+      // Берём данные из Sanity
+      const response = await getScheduleById( id, directionId, date, lang, useCache === false ? 'api' : 'apicdn' );
+      await this.sanityRepository.set(query, { query, response }, { ttl });
+
+      return response;
+    }
   }
 
   @get('/product/{id}', {

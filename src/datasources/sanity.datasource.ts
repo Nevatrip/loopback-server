@@ -63,7 +63,7 @@ const config = {
         responsePath: '$.result[0]',
       },
       functions: {
-        getProductForCartById: ['id', 'lang'],
+        getProductForCartById: ['id', 'lang', 'CDNDomain'],
       },
     },
     {

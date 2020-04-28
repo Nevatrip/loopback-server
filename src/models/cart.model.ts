@@ -11,21 +11,20 @@ export class CartProductOptions extends Entity {
   number?: string;
 
   @property({description: "Direction's ID"})
-  direction: string;
+  direction: {
+    _key: string,
+    title: {
+      [lang: string]: string
+    }
+  };
 
   @property({type: 'object'})
   tickets: {
-    [key: string]: number;
+    [ticketKey: string]: number;
   };
 
   @property({item: 'object'})
   event: IAction;
-
-  @property()
-  date?: Date;
-
-  @property.array(Object)
-  schedule?: IAction[]; // Schedule for open time
 
   constructor(data?: Partial<CartProductOptions>) {
     super(data);

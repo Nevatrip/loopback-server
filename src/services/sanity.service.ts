@@ -7,7 +7,7 @@ export interface SanityService {
   proxySanity(query: string, CDNDomain?: string): Promise<Object[]>;
   getProductByAlias(alias: string): Promise<Product[]>;
   getProductById(id: string): Promise<Product[]>;
-  getProductForCartById(id: string, lang?: string): Promise<Product[]>;
+  getProductForCartById(id: string, lang?: string, CDNDomain?: string): Promise<Product[]>;
   getProductForOrderById(id: string): Promise<Product[]>;
 }
 
