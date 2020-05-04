@@ -92,7 +92,7 @@ export class ProductController {
       const [ product ] = await this.sanityService.getProductForCartById( id, lang, cache );
 
       (product.directions || []).forEach(direction => {
-        if (direction._type !== 'direction') return;
+        if (direction._type !== 'complex') return direction;
         if (!direction.schedule || !direction.schedule.length) return;
 
         const {
