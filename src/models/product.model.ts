@@ -27,7 +27,7 @@ export interface DirectionComplex extends Direction {
 
 export interface DirectionProduct extends Direction {
   start: string | number | Date;
-  _type: 'direction';
+  _type: 'direction' | 'complex';
   schedule: ProductEvent[];
   timeOffset: number;
   point: Object;
