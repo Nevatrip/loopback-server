@@ -23,12 +23,16 @@ export class CartRepository extends DefaultKeyValueRepository<Cart> {
       cart.products = cart.products || [];
       const now = new Date();
       cart.created = cart.created || now;
-      if (cart.created < now) {
-        cart.updated = now;
-      }
 
-      product.key = hash({product, date: now});
-      cart.products.push(product);
+      if (cart.created < now) cart.updated = now;
+
+      const key = hash({product, date: now});
+
+      // Add to cart only unique product
+      if ( !cart.products.find( product => product.key === key ) ) {
+        product.key = key;
+        cart.products.push(product);
+      }
 
       return cart;
     };

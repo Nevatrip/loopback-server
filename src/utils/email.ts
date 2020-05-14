@@ -27,17 +27,14 @@ export const sendEmail = (order: Order, status: Status, _email?: string) => {
     products: [
       {
         product: {
-          title: {
-            en: { name: title },
-          },
           directions,
         },
-        options: [{ number, direction }],
+        options: { number, direction },
       },
     ],
   } = order;
 
-  const selectedDirection = directions.find(dir => dir._key === direction._key);
+  const selectedDirection = directions.find(dir => dir._key === direction);
 
   if (!selectedDirection) return;
 

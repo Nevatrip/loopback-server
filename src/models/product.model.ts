@@ -45,7 +45,7 @@ export interface IAction extends ProductEvent {
 }
 
 interface i18nString {
-  [key: string]: {
+  [lang: string]: {
     name: string;
   };
 }

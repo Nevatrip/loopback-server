@@ -1,30 +1,26 @@
 import {Entity, model, property} from '@loopback/repository';
 import {Product, IAction} from './index';
-const generate = require('nanoid/generate');
+import { Ticket } from './product.model';
+import { customAlphabet } from "nanoid";
 
 @model()
 export class CartProductOptions extends Entity {
   @property({
     description: 'Boarding Ticket Number',
-    default: () => generate('0123456789', 6),
+    default: () => customAlphabet( '0123456789', 6 ),
   })
   number?: string;
 
-  @property({description: "Direction's ID"})
-  direction: {
-    _key: string,
-    title: {
-      [lang: string]: string
-    }
-  };
+  @property()
+  direction: string;
 
-  @property({type: 'object'})
+  @property()
   tickets: {
-    [ticketKey: string]: number;
+    [ticketKey: string]: number
   };
 
-  @property({item: 'object'})
-  event: IAction;
+  @property()
+  event: IAction[];
 
   constructor(data?: Partial<CartProductOptions>) {
     super(data);
@@ -42,11 +38,11 @@ export class CartProduct extends Entity {
   @property({required: true})
   productId: string;
 
+  @property(CartProductOptions)
+  options: CartProductOptions;
+
   @property(Product)
   product: Product;
-
-  @property.array(CartProductOptions)
-  options: CartProductOptions[];
 
   constructor(data?: Partial<CartProduct>) {
     super(data);

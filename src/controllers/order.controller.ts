@@ -103,20 +103,19 @@ export class OrderController {
 
       if (
         !options ||
-        !options[0] ||
-        !options[0].direction ||
-        !options[0].tickets
+        !options.direction ||
+        !options.tickets
       )
         return;
 
-      const [{ direction, tickets }] = options;
+      const { direction, tickets } = options;
 
       const product =
         products[productId] ||
         (await this.sanityService.getProductForOrderById(productId))[0];
       productItem.product = product;
       const directionData = product.directions.find(
-        dir => dir._type === 'direction' && dir._key === direction._key,
+        dir => dir._type === 'direction' && dir._key === direction,
       );
 
       if (!directionData) return;
@@ -244,26 +243,26 @@ export class OrderController {
 
   @post('/orders', {
     responses: {
-      '200': {
+      200: {
         description: 'Order model instance',
         content: { 'application/json': { schema: { 'x-ts-type': Order } } },
       },
     },
   })
   async create(@requestBody() cart: Cart): Promise<Order> {
-    const order = (await this.getCart(cart)) as Order;
-    order.sum = await this.getSum(order);
+    const order = ( await this.getCart( cart ) ) as Order;
+    order.sum = await this.getSum( order );
 
-    if (order.sum) {
-      order.payment = await this.getPayment(order);
+    if ( order.sum ) {
+      order.payment = await this.getPayment( order );
     } else {
       order.status = 'paid';
       order.updated = new Date();
     }
 
-    order.hash = getHash(order.user.email);
+    order.hash = getHash( order.user.email );
 
-    const newOrder = await this.orderRepository.create(order);
+    const newOrder = await this.orderRepository.create( order );
 
     if (order.sum) {
       // sendEmail(newOrder, 'new');
@@ -473,37 +472,35 @@ export class OrderController {
           InternalId = 0,
           // @ts-ignore
         } = (order.payment || {}).Model || {};
-        order.products.forEach(({ product, options }) => {
-          options.forEach(({ number, direction, tickets }) => {
-            const productDirection = product.directions.find(
-              ({ _key }) => _key === direction._key,
+        order.products.forEach(({ product, options: { number, direction, tickets } }) => {
+          const productDirection = product?.directions.find(
+            ({ _key }) => _key === direction,
+          );
+          if (productDirection) {
+            productDirection.tickets.forEach(
+              ({ category, name, price, _key }) => {
+                if (tickets[_key]) {
+                  // @ts-ignore
+                  table.addRow([
+                    order.user.fullName,
+                    order.user.email,
+                    order.user.phone,
+                    product?.title.ru.name,
+                    category.title + ' ' + name,
+                    tickets[_key],
+                    price,
+                    order.status === 'paid' && number ? `НТ${number}` : '',
+                    new Date(order.created),
+                    order.updated ? new Date(order.updated) : '',
+                    order.sum,
+                    order.status === 'paid' ? TransactionId : InternalId,
+                    order.status,
+                    order.promocode,
+                  ]);
+                }
+              },
             );
-            if (productDirection) {
-              productDirection.tickets.forEach(
-                ({ category, name, price, _key }) => {
-                  if (tickets[_key]) {
-                    // @ts-ignore
-                    table.addRow([
-                      order.user.fullName,
-                      order.user.email,
-                      order.user.phone,
-                      product.title.ru.name,
-                      category.title + ' ' + name,
-                      tickets[_key],
-                      price,
-                      order.status === 'paid' && number ? `НТ${number}` : '',
-                      new Date(order.created),
-                      order.updated ? new Date(order.updated) : '',
-                      order.sum,
-                      order.status === 'paid' ? TransactionId : InternalId,
-                      order.status,
-                      order.promocode,
-                    ]);
-                  }
-                },
-              );
-            }
-          });
+          }
         });
       });
 
@@ -557,8 +554,14 @@ export class OrderController {
       },
     },
   })
-  async findById(@param.path.string('id') id: string): Promise<Order> {
-    return await this.orderRepository.findById(id);
+  async findById(
+    @param.path.string('id') id: string,
+    @param.query.string('hash') hash: string,
+  ): Promise<Order> {
+    const api = await this.orderRepository.findById(id);
+    checkHash(api.user.email, hash);
+
+    return api;
   }
 
   @get('/orders/{id}/email', {
@@ -698,7 +701,7 @@ export class OrderController {
 
     return this.res.send(renderEmail.renderEmail({ page: 'notification', api }));
   }
-
+/*
   @patch('/orders/{id}', {
     responses: { '204': { description: 'Order PATCH success' } },
   })
@@ -725,4 +728,5 @@ export class OrderController {
   async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.orderRepository.deleteById(id);
   }
+*/
 }
