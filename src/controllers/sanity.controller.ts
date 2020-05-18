@@ -2,7 +2,7 @@ import { service } from '@loopback/core';
 import { SanityService, SanityProvider } from '../services';
 import { SanityRepository } from '../repositories';
 import { repository } from '@loopback/repository';
-import { get, param, HttpErrors } from '@loopback/rest';
+import { get, param, HttpErrors, del } from '@loopback/rest';
 
 const schema = {
   cache: {
@@ -40,7 +40,7 @@ export class SanityController {
     responses: { '200': { description: 'Proxy Sanity' } },
     summary: 'Get data from Sanity',
   } )
-  async proxySanity(
+  async sanityProxy(
     @param.query.string( 'query' ) query: string,
     @param.query.string( 'cache', schema.cache ) cache: 'true' | 'false' | '1' | '0' | 'yes' | 'no' | 'cdn' = 'true',
     @param.query.number( 'ttl', schema.ttl ) ttl: number = 1000 * 60 * 60 * 4,
@@ -59,5 +59,29 @@ export class SanityController {
     await this.sanityRepository.set( query, { query, result }, { ttl } );
 
     return result;
+  }
+
+  @get( '/sanity/cache', {
+    responses: { '200': { description: 'Proxy Sanity' } },
+    summary: 'Get cached keys',
+  } )
+  async sanityCache() {
+    const keys = await this.sanityRepository.keys({ match: '*' });
+
+    const response = [];
+    for await (let key of keys) {
+      const ttl = await this.sanityRepository.ttl( key );
+      response.push( { key, ttl } );
+    }
+
+    return response;
+  }
+
+  @del( '/sanity/cache', {
+    responses: { '200': { description: 'Proxy Sanity' } },
+    summary: 'Clear cache',
+  } )
+  async sanityCacheClear() {
+    await this.sanityRepository.deleteAll();
   }
 }
