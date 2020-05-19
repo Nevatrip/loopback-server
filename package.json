@@ -57,6 +57,7 @@
     "cloudpayments": "^4.1.1",
     "date-fns": "^2.14.0",
     "loopback-connector-kv-redis": "^3.0.3",
+    "loopback-connector-mongodb": "^4.2.0",
     "loopback-connector-rest": "^3.6.0",
     "nanoid": "^3.1.9",
     "object-hash": "^2.0.3",
