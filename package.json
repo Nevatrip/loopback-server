@@ -54,8 +54,10 @@
     "@loopback/rest": "^4.0.0",
     "@loopback/rest-explorer": "^2.2.0",
     "@loopback/service-proxy": "^2.2.0",
+    "date-fns": "^2.14.0",
     "loopback-connector-kv-redis": "^3.0.3",
     "loopback-connector-rest": "^3.6.0",
+    "timezone-support": "^2.0.2",
     "tslib": "^1.10.0"
   },
   "devDependencies": {

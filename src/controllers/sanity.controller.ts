@@ -62,7 +62,7 @@ export class SanityController {
   }
 
   @get( '/sanity/cache', {
-    responses: { '200': { description: 'Proxy Sanity' } },
+    responses: { '200': { description: 'Get Sanity\'s cache' } },
     summary: 'Get cached keys',
   } )
   async sanityCache() {
@@ -78,10 +78,10 @@ export class SanityController {
   }
 
   @del( '/sanity/cache', {
-    responses: { '200': { description: 'Proxy Sanity' } },
+    responses: { '204': { description: 'Clear cache' } },
     summary: 'Clear cache',
   } )
   async sanityCacheClear() {
-    await this.sanityRepository.deleteAll();
+    return await this.sanityRepository.deleteAll();
   }
 }
