@@ -1,4 +1,4 @@
-import {Entity, model, property} from '@loopback/repository';
+import { model, property } from '@loopback/repository';
 import { SanityEntity } from './sanity.model';
 
 interface Event {
@@ -34,7 +34,9 @@ interface Direction {
 export class Product extends SanityEntity {
   // Define well-known properties here
 
+  @property.array(Object, {required: true})
   directions: Direction[]
+
   // Indexer property to allow additional data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [prop: string]: any;
