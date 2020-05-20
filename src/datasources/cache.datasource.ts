@@ -1,4 +1,4 @@
-import {inject, lifeCycleObserver, LifeCycleObserver} from '@loopback/core';
+import {inject, lifeCycleObserver, LifeCycleObserver, ValueOrPromise} from '@loopback/core';
 import {juggler} from '@loopback/repository';
 
 const {
@@ -6,6 +6,7 @@ const {
   REDIS_PORT: port = 6379,
   REDIS_PASSWORD: password = 'password',
   REDIS_URL: url,
+  REDIS_DB: db = 1,
 } = process.env;
 
 const config = {
@@ -15,7 +16,7 @@ const config = {
   host,
   port,
   password,
-  db: 0,
+  db,
 };
 
 // Observe application's life cycle to disconnect the datasource when
@@ -33,5 +34,13 @@ export class CacheDataSource extends juggler.DataSource
     dsConfig: object = config,
   ) {
     super(dsConfig);
+  }
+
+  /**
+   * Disconnect the datasource when application is stopped. This allows the
+   * application to be shut down gracefully.
+   */
+  stop(): ValueOrPromise<void> {
+    return super.disconnect();
   }
 }

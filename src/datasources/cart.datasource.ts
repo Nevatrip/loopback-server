@@ -6,16 +6,17 @@ const {
   REDIS_PORT: port = 6379,
   REDIS_PASSWORD: password = 'password',
   REDIS_URL: url,
+  REDIS_DB: db = 2,
 } = process.env;
 
 const config = {
-  name: 'cache',
+  name: 'cart',
   connector: 'kv-redis',
   // url,
   host,
   port,
   password,
-  db: 0,
+  db,
 };
 
 // Observe application's life cycle to disconnect the datasource when
