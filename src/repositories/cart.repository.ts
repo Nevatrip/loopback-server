@@ -18,12 +18,12 @@ export class CartRepository extends DefaultKeyValueRepository<
    * Add an product to the shopping cart with optimistic lock to allow concurrent
    * `adding to cart` from multiple devices
    *
-   * @param session User's session id
+   * @param id User's session id
    * @param product product to be added
    */
-  addProduct( session: string, product: CartProduct ) {
+  addProduct( id: string, product: CartProduct ) {
     const addProductToCart = (cart: Cart | null) => {
-      cart = cart || new Cart( { session } );
+      cart = cart || new Cart( { id } );
       cart.products = cart.products || [];
       const now = new Date();
       cart.created = cart.created || now;
@@ -41,10 +41,10 @@ export class CartRepository extends DefaultKeyValueRepository<
       return cart;
     };
 
-    return this.checkAndSet(session, addProductToCart);
+    return this.checkAndSet( id, addProductToCart );
   }
 
-  deleteProduct(session: string, key: string) {
+  deleteProduct( id: string, key: string ) {
     const deleteProductFromCart = ( cart: Cart | null ) => {
       if ( cart!.products.length ) {
         cart!.products = cart!.products.filter( product => product.key !== key );
@@ -55,7 +55,7 @@ export class CartRepository extends DefaultKeyValueRepository<
       return cart;
     };
 
-    return this.checkAndSet( session, deleteProductFromCart );
+    return this.checkAndSet( id, deleteProductFromCart );
   }
 
   /**
@@ -64,13 +64,13 @@ export class CartRepository extends DefaultKeyValueRepository<
    *
    * Ideally, this method should be made available by `KeyValueRepository`.
    *
-   * @param session User's session id
+   * @param id User's session id
    * @param check A function that checks the current value and produces a new
    * value. It returns `null` to abort.
    */
   async checkAndSet(
     session: string,
-    check: (current: Cart | null) => Cart | null,
+    check: ( current: Cart | null ) => Cart | null,
   ) {
     const connector = this.kvModelClass.dataSource!.connector!;
     const execute = promisify( ( cmd: string, args: any[], cb: Function ) => {

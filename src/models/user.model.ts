@@ -34,8 +34,11 @@ export class User extends Entity {
   })
   country: string;
 
-  @hasOne( () => Cart, { keyTo: 'user' } )
+  @hasOne( () => Cart )
   cart?: Cart;
+
+  @hasMany( () => Order )
+  orders?: Order[];
 
   constructor(data?: Partial<User>) {
     super(data);

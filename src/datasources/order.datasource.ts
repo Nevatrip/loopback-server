@@ -1,14 +1,14 @@
 import {format} from 'util';
 import {readFileSync} from 'fs';
 
-import {inject, lifeCycleObserver, LifeCycleObserver} from '@loopback/core';
+import {inject, lifeCycleObserver, LifeCycleObserver, ValueOrPromise} from '@loopback/core';
 import {juggler} from '@loopback/repository';
 
 const {
   MONGO_USERS_USER: user = '',
   MONGO_USERS_PASS: password = '',
   MONGO_USERS_HOST: host = '127.0.0.1',
-  MONGO_USERS_DB_NAME: database = 'user',
+  MONGO_USERS_DB_NAME: database = 'order',
   MONGO_USERS_URL: url,
   MONGO_USERS_REPLICA: replica,
   MONGO_USERS_SSLCA: SSLCA,
@@ -44,15 +44,23 @@ const config = {
 // gracefully. The `stop()` method is inherited from `juggler.DataSource`.
 // Learn more at https://loopback.io/doc/en/lb4/Life-cycle.html
 @lifeCycleObserver('datasource')
-export class UserDataSource extends juggler.DataSource
+export class OrderDataSource extends juggler.DataSource
   implements LifeCycleObserver {
-  static dataSourceName = 'user';
+  static dataSourceName = 'order';
   static readonly defaultConfig = config;
 
   constructor(
-    @inject('datasources.config.user', {optional: true})
+    @inject('datasources.config.order', {optional: true})
     dsConfig: object = config,
   ) {
     super(dsConfig);
+  }
+
+  /**
+   * Disconnect the datasource when application is stopped. This allows the
+   * application to be shut down gracefully.
+   */
+  stop(): ValueOrPromise<void> {
+    return super.disconnect();
   }
 }

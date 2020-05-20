@@ -79,16 +79,16 @@ export class CartController {
     @param.path.string('session') session: string,
     @requestBody({description: 'shopping cart'}) cart: Cart,
   ) {
-    if (session !== cart.session) {
+    if ( session !== cart.id ) {
       throw new HttpErrors.BadRequest(
-        `User id does not match: ${session} !== ${cart.session}`,
+        `User id does not match: ${ session } !== ${ cart.id }`,
       );
     }
 
     cart.created = cart.created || new Date();
     cart.updated = new Date();
-    cart.products.forEach((product: { key: string; }) => {
-      delete product.key;
+    cart.products.forEach( product => {
+      // delete product.key;
       product.key = hash(product);
     });
 
