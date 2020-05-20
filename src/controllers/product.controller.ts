@@ -73,7 +73,7 @@ export class ProductController extends SanityController {
     return product;
   }
 
-  @get( '/product/{id}/cart', {
+  @get( '/products/{id}/cart', {
     responses: { '200': { description: 'Proxy Sanity' } },
     summary: 'Get data from Sanity',
   } )
@@ -129,7 +129,7 @@ export class ProductController extends SanityController {
     return product;
   }
 
-  @get( '/product/{id}/schedule/{directionId}/{date}', {
+  @get( '/products/{id}/schedule/{directionId}/{date}', {
     responses: { '200': { description: 'Product Response' } },
     summary: 'Get Product schedule by Id, direction\'s id and date',
   } )
