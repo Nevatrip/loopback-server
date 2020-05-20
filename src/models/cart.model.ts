@@ -1,6 +1,7 @@
 import { Entity, model, property, belongsTo } from '@loopback/repository';
 import { customAlphabet } from 'nanoid';
 import { User, Product, IAction } from '.';
+import { UserWithRelations } from './user.model';
 
 @model()
 export class CartProductOptions extends Entity {
@@ -18,8 +19,8 @@ export class CartProductOptions extends Entity {
     [ticketKey: string]: number
   };
 
-  @property.array(Object)
-  event: IAction[];
+  @property()
+  event: IAction;
 
   constructor(data?: Partial<CartProductOptions>) {
     super(data);
@@ -37,8 +38,8 @@ export class CartProduct extends Entity {
   @property({required: true})
   productId: string;
 
-  @property( CartProductOptions )
-  options?: CartProductOptions;
+  @property.array( CartProductOptions )
+  options?: CartProductOptions[];
 
   @property( Product )
   product?: Product;
@@ -73,7 +74,7 @@ export class Cart extends Entity {
   lang?: string;
 
   @belongsTo( () => User )
-  user?: string;
+  userId?: string;
 
   constructor(data?: Partial<Cart>) {
     super(data);
@@ -82,6 +83,7 @@ export class Cart extends Entity {
 
 export interface CartRelations {
   // describe navigational properties here
+  user?: UserWithRelations;
 }
 
 export type CartWithRelations = Cart & CartRelations;

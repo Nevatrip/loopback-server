@@ -20,6 +20,7 @@ export class Order extends Cart {
     type: 'string',
     id: true,
     generated: true,
+    mongodb: { dataType: 'ObjectID' },
   })
   id?: string;
 

@@ -9,17 +9,9 @@ export class UserRepository extends DefaultCrudRepository<
   typeof User.prototype.id,
   UserRelations
 > {
-  public orders: HasManyRepositoryFactory<Order, typeof User.prototype.id>
-
   constructor(
     @inject('datasources.user') dataSource: UserDataSource,
-    @repository(OrderRepository) protected orderRepository: OrderRepository
   ) {
     super(User, dataSource);
-
-    this.orders = this.createHasManyRepositoryFactoryFor(
-      'orders',
-      async () => orderRepository
-    )
   }
 }

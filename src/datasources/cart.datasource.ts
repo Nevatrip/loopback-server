@@ -4,7 +4,7 @@ import {juggler} from '@loopback/repository';
 const {
   REDIS_HOST: host = '127.0.0.1',
   REDIS_PORT: port = 6379,
-  REDIS_PASSWORD: password = 'password',
+  REDIS_PASSWORD: password,
   REDIS_URL: url,
   REDIS_DB: db = 2,
 } = process.env;
@@ -15,7 +15,7 @@ const config = {
   // url,
   host,
   port,
-  password,
+  // password,
   db,
 };
 
