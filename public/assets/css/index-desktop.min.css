@@ -1,0 +1,1 @@
+.link{-ms-touch-action:manipulation;touch-action:manipulation}.link_disabled{pointer-events:none}.link{opacity:1;-webkit-transition:opacity .3s ease;transition:opacity .3s ease}.link,.link.active,.link:active,.link:focus,.link:hover,.link:visited{color:inherit;text-decoration:none}.link:hover{opacity:.7}

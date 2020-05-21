@@ -1,0 +1,70 @@
+{
+  "name": "atol",
+  "connector": "rest",
+  "baseURL": "https://online.atol.ru/possystem/v4",
+  "operations": [
+    {
+      "template": {
+        "method": "GET",
+        "url": "https://online.atol.ru/possystem/v4/getToken",
+        "query": {
+          "login": "{login}",
+          "pass": "{pass}"
+        },
+        "responsePath": "$"
+      },
+      "functions": {
+        "getToken": [
+          "login",
+          "pass"
+        ]
+      }
+    },
+    {
+      "template": {
+        "method": "POST",
+        "url": "https://online.atol.ru/possystem/v4/{groupCode}/sell",
+        "responsePath": "$",
+        "headers": {
+          "Token": "{token}"
+        },
+        "query": {
+          "token": "{token}"
+        },
+        "body": {
+          "timestamp": "{timestamp}",
+          "external_id": "{externalId}",
+          "service": "{service}",
+          "receipt": "{receipt}"
+        }
+      },
+      "functions": {
+        "postSell": [
+          "token",
+          "groupCode",
+          "timestamp" ,
+          "externalId",
+          "service",
+          "receipt"
+        ]
+      }
+    },
+    {
+      "template": {
+        "method": "GET",
+        "url": "https://online.atol.ru/possystem/v4/{groupCode}/report/{orderId}",
+        "responsePath": "$",
+        "headers": {
+          "Token": "{token}"
+        }
+      },
+      "functions": {
+        "getReport": [
+          "token",
+          "groupCode",
+          "orderId"
+        ]
+      }
+    }
+  ]
+}

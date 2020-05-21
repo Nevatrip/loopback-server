@@ -1,3 +1,4 @@
+import * as path from 'path';
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig} from '@loopback/core';
 import {
@@ -5,9 +6,8 @@ import {
   RestExplorerComponent,
 } from '@loopback/rest-explorer';
 import {RepositoryMixin} from '@loopback/repository';
-import {RestApplication} from '@loopback/rest';
+import {RestApplication, RestBindings} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
-import * as path from 'path';
 import {MySequence} from './sequence';
 
 export class NevatripRestApplication extends BootMixin(
@@ -16,11 +16,25 @@ export class NevatripRestApplication extends BootMixin(
   constructor(options: ApplicationConfig = {}) {
     super(options);
 
+    this.api({
+      openapi: '3.0.0',
+      info: {
+        title: `${ process.env.APP_NAME || '' } API`,
+        version: process.env.npm_package_version || '0.0.0',
+      },
+      paths: {}
+    });
+
     // Set up the custom sequence
     this.sequence(MySequence);
 
     // Set up default home page
     this.static('/', path.join(__dirname, '../../public'));
+
+    this.bind(RestBindings.REQUEST_BODY_PARSER_OPTIONS).to({
+      limit: '1MB',
+      parameterLimit: 1000000,
+    });
 
     // Customize @loopback/rest-explorer configuration here
     this.bind(RestExplorerBindings.CONFIG).to({

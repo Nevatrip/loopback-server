@@ -9,8 +9,19 @@ if (require.main === module) {
       port: +process.env.PORT || 3000,
       host: process.env.HOST || 'localhost',
       openApiSpec: {
-        // useful when used with OASGraph to locate your application
-        setServersFromRequest: true,
+        // setServersFromRequest: true || !process.env.SERVER_URL,
+        servers: [
+          {
+            url: `https://${process.env.SERVER_URL}`,
+          },
+          {
+            url: `http://localhost:8000`,
+          },
+        ],
+      },
+      expressSettings: {
+        'x-powered-by': false,
+        env: process.env.NODE_ENV || 'production',
       },
     },
   };

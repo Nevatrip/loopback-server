@@ -1,7 +1,7 @@
 import {NevatripRestApplication} from './application';
 import {ApplicationConfig} from '@loopback/core';
 
-export {NevatripRestApplication};
+export { NevatripRestApplication };
 
 export async function main(options: ApplicationConfig = {}) {
   const app = new NevatripRestApplication(options);
