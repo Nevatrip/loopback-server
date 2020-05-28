@@ -1,20 +1,17 @@
-import {getService, juggler} from '@loopback/service-proxy';
-import {inject, Provider} from '@loopback/core';
-import {SanityDataSource} from '../datasources/sanity.datasource';
-import {Product} from '../models';
+import { getService } from '@loopback/service-proxy';
+import { inject, Provider } from '@loopback/core';
+import { SanityDataSource } from '../datasources';
+import { SanityResponse } from '../models';
 
 export interface SanityService {
-  proxySanity(query: string, CDNDomain?: string): Promise<Object[]>;
-  getProductByAlias(alias: string): Promise<Product[]>;
-  getProductById(id: string): Promise<Product[]>;
-  getProductForCartById(id: string, lang?: string, CDNDomain?: string): Promise<Product[]>;
-  getProductForOrderById(id: string): Promise<Product[]>;
+  proxySanity(query: string, CDNDomain?: string): Promise<SanityResponse[]>;
 }
 
-export class SanityServiceProvider implements Provider<SanityService> {
+export class SanityProvider implements Provider<SanityService> {
   constructor(
+    // sanity must match the name property in the datasource json file
     @inject('datasources.sanity')
-    protected dataSource: juggler.DataSource = new SanityDataSource(),
+    protected dataSource: SanityDataSource = new SanityDataSource(),
   ) {}
 
   value(): Promise<SanityService> {

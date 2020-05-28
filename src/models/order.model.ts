@@ -1,33 +1,43 @@
-import {model, property} from '@loopback/repository';
-import {
-  BaseResponse,
-  PaymentResponse,
-  PaymentSuccessModel,
-} from 'cloudpayments';
-import {Cart} from './cart.model';
+import { model, property } from '@loopback/repository';
+import { PaymentResponse } from 'cloudpayments';
+import { Cart } from './cart.model';
 
-@model({settings: {strict: false}})
+interface IYandexKassa {
+  type: 'yandexkassa'
+  response: {}
+}
+
+interface ICloudPayments {
+  type: 'cloudpayments'
+  response: PaymentResponse
+}
+
+type IPayment = ICloudPayments | IYandexKassa;
+
+@model()
 export class Order extends Cart {
-  @property({id: true})
+  @property({
+    type: 'string',
+    id: true,
+    generated: true,
+    mongodb: { dataType: 'ObjectID' },
+  })
   id?: string;
 
-  @property({default: 'new'})
+  @property({
+    type: 'string',
+    required: true,
+  })
   status: 'new' | 'paid' | 'rejected';
 
   @property({default: 'default'})
   source?: string;
 
   @property({type: 'object'})
-  payment?: PaymentResponse | BaseResponse | {Model: PaymentSuccessModel};
-
-  @property()
-  sum?: number;
-
-  @property()
-  isFullDiscount?: string;
+  payment: IPayment
 
   @property({type: 'object'})
-  ofd?: object;
+  reporting?: object; // ОФД
 
   @property()
   hash?: string; // email's hash
@@ -36,3 +46,9 @@ export class Order extends Cart {
     super(data);
   }
 }
+
+export interface OrderRelations {
+  // describe navigational properties here
+}
+
+export type OrderWithRelations = Order & OrderRelations;

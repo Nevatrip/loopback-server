@@ -10,6 +10,7 @@ const PING_RESPONSE: ResponseObject = {
     'application/json': {
       schema: {
         type: 'object',
+        title: 'PingResponse',
         properties: {
           greeting: {type: 'string'},
           date: {type: 'string'},
@@ -42,7 +43,7 @@ export class PingController {
   ping(): object {
     // Reply with a greeting, the current time, the url, and request headers
     return {
-      greeting: 'Hello from NevaTrip REST server',
+      greeting: 'Hello from Anytrip API 👋',
       date: new Date(),
       url: this.req.url,
       headers: Object.assign({}, this.req.headers),

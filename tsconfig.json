@@ -1,21 +1,9 @@
 {
-  "compilerOptions": {
-    "experimentalDecorators": true,
-    "baseUrl": ".",
-    "paths": { "*": ["types/*"] } ,
-    "outDir": "dist",
-    "target": "es2018"
-  },
   "$schema": "http://json.schemastore.org/tsconfig",
   "extends": "@loopback/build/config/tsconfig.common.json",
-  "include": [
-    "src",
-    "test",
-    "index.ts"
-  ],
-  "exclude": [
-    "node_modules/**",
-    "packages/*/node_modules/**",
-    "**/*.d.ts"
-  ]
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["src"]
 }

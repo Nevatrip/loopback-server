@@ -1,16 +1,16 @@
-import {DefaultCrudRepository, juggler} from '@loopback/repository';
-import {Order} from '../models';
-// import {MongoDataSource} from '../datasources';
-import {inject} from '@loopback/core';
+import { DefaultCrudRepository } from '@loopback/repository';
+import { Order, OrderRelations } from '../models';
+import { UserDataSource } from '../datasources';
+import { inject } from '@loopback/core';
 
 export class OrderRepository extends DefaultCrudRepository<
   Order,
-  typeof Order.prototype.id
+  typeof Order.prototype.id,
+  OrderRelations
 > {
   constructor(
-    // @inject('datasources.mongo') dataSource: MongoDataSource,
-    @inject('datasources.mongo') protected datasource: juggler.DataSource,
+    @inject('datasources.user') dataSource: UserDataSource,
   ) {
-    super(Order, datasource);
+    super(Order, dataSource);
   }
 }

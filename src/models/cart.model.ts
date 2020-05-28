@@ -1,29 +1,24 @@
-import {Entity, model, property} from '@loopback/repository';
-import {Product, IAction} from './index';
-const generate = require('nanoid/generate');
+import { Entity, model, property, belongsTo } from '@loopback/repository';
+import { customAlphabet } from 'nanoid';
+import { User, UserWithRelations, Product, IAction } from '.';
 
 @model()
 export class CartProductOptions extends Entity {
   @property({
     description: 'Boarding Ticket Number',
-    default: () => generate('0123456789', 6),
+    default: () => customAlphabet( '0123456789', 6 ),
   })
   number?: string;
 
-  @property({description: "Direction's ID"})
-  direction: {
-    _key: string,
-    title: {
-      [lang: string]: string
-    }
-  };
+  @property()
+  direction: string;
 
-  @property({type: 'object'})
+  @property()
   tickets: {
-    [ticketKey: string]: number;
+    [ticketKey: string]: number
   };
 
-  @property({item: 'object'})
+  @property()
   event: IAction;
 
   constructor(data?: Partial<CartProductOptions>) {
@@ -42,11 +37,11 @@ export class CartProduct extends Entity {
   @property({required: true})
   productId: string;
 
-  @property(Product)
-  product: Product;
+  @property.array( CartProductOptions )
+  options?: CartProductOptions[];
 
-  @property.array(CartProductOptions)
-  options: CartProductOptions[];
+  @property( Product )
+  product?: Product;
 
   constructor(data?: Partial<CartProduct>) {
     super(data);
@@ -57,10 +52,10 @@ export class CartProduct extends Entity {
 export class Cart extends Entity {
   @property({
     id: true,
-    required: true,
+    generated: false,
     example: 'test-test-test',
   })
-  sessionId: string;
+  id?: string;
 
   @property({default: () => new Date()})
   created: Date;
@@ -68,7 +63,7 @@ export class Cart extends Entity {
   @property()
   updated?: Date;
 
-  @property.array(CartProduct)
+  @property.array( CartProduct )
   products: CartProduct[];
 
   @property()
@@ -77,14 +72,17 @@ export class Cart extends Entity {
   @property()
   lang?: string;
 
-  @property()
-  user: {
-    email: string;
-    phone: string;
-    fullName: string;
-  };
+  @belongsTo( () => User )
+  userId?: string;
 
   constructor(data?: Partial<Cart>) {
     super(data);
   }
 }
+
+export interface CartRelations {
+  // describe navigational properties here
+  user?: UserWithRelations;
+}
+
+export type CartWithRelations = Cart & CartRelations;

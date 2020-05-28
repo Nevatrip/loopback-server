@@ -1,10 +1,10 @@
-import {NevatripRestApplication} from './application';
+import {AnytripApiApplication} from './application';
 import {ApplicationConfig} from '@loopback/core';
 
-export { NevatripRestApplication };
+export {AnytripApiApplication};
 
 export async function main(options: ApplicationConfig = {}) {
-  const app = new NevatripRestApplication(options);
+  const app = new AnytripApiApplication(options);
   await app.boot();
   await app.start();
 

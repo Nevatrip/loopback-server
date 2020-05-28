@@ -1,12 +1,16 @@
-import {DefaultKeyValueRepository} from '@loopback/repository';
-import {Cart, CartProduct} from '../models';
-import {RedisDataSource} from '../datasources';
-import {inject} from '@loopback/core';
-import {promisify} from 'util';
+import { DefaultKeyValueRepository } from '@loopback/repository';
+import { inject } from '@loopback/core';
+import { promisify } from 'util';
+import { Cart, CartProduct } from '../models';
+import { CartDataSource } from '../datasources';
 import hash from 'object-hash';
 
-export class CartRepository extends DefaultKeyValueRepository<Cart> {
-  constructor(@inject('datasources.redis') dataSource: RedisDataSource) {
+export class CartRepository extends DefaultKeyValueRepository<
+  Cart
+> {
+  constructor(
+    @inject('datasources.cart') dataSource: CartDataSource,
+  ) {
     super(Cart, dataSource);
   }
 
@@ -14,32 +18,36 @@ export class CartRepository extends DefaultKeyValueRepository<Cart> {
    * Add an product to the shopping cart with optimistic lock to allow concurrent
    * `adding to cart` from multiple devices
    *
-   * @param sessionId User's session id
+   * @param id User's session id
    * @param product product to be added
    */
-  addProduct(sessionId: string, product: CartProduct) {
+  addProduct( id: string, product: CartProduct ) {
     const addProductToCart = (cart: Cart | null) => {
-      cart = cart || new Cart( { sessionId } );
+      cart = cart || new Cart( { id } );
       cart.products = cart.products || [];
       const now = new Date();
       cart.created = cart.created || now;
-      if (cart.created < now) {
-        cart.updated = now;
-      }
 
-      product.key = hash({product, date: now});
-      cart.products.push(product);
+      if (cart.created < now) cart.updated = now;
+
+      const key = hash( { product } );
+
+      // Add to cart only unique product
+      if ( !cart.products.find( product => product.key === key ) ) {
+        product.key = key;
+        cart.products.push( product );
+      }
 
       return cart;
     };
 
-    return this.checkAndSet(sessionId, addProductToCart);
+    return this.checkAndSet( id, addProductToCart );
   }
 
-  deleteProduct(sessionId: string, key: string) {
-    const deleteProductFromCart = (cart: Cart | null) => {
-      if (cart!.products.length) {
-        cart!.products = cart!.products.filter((product: CartProduct) => product.key !== key);
+  deleteProduct( id: string, key: string ) {
+    const deleteProductFromCart = ( cart: Cart | null ) => {
+      if ( cart!.products.length ) {
+        cart!.products = cart!.products.filter( product => product.key !== key );
       }
 
       cart!.updated = new Date();
@@ -47,7 +55,7 @@ export class CartRepository extends DefaultKeyValueRepository<Cart> {
       return cart;
     };
 
-    return this.checkAndSet(sessionId, deleteProductFromCart);
+    return this.checkAndSet( id, deleteProductFromCart );
   }
 
   /**
@@ -56,34 +64,34 @@ export class CartRepository extends DefaultKeyValueRepository<Cart> {
    *
    * Ideally, this method should be made available by `KeyValueRepository`.
    *
-   * @param sessionId User's session id
+   * @param id User's session id
    * @param check A function that checks the current value and produces a new
    * value. It returns `null` to abort.
    */
   async checkAndSet(
-    sessionId: string,
-    check: (current: Cart | null) => Cart | null,
+    session: string,
+    check: ( current: Cart | null ) => Cart | null,
   ) {
     const connector = this.kvModelClass.dataSource!.connector!;
-    const execute = promisify((cmd: string, args: any[], cb: Function) => {
-      return connector.execute!(cmd, args, cb);
+    const execute = promisify( ( cmd: string, args: any[], cb: Function ) => {
+      return connector.execute!( cmd, args, cb );
     });
     /**
-     * - WATCH sessionId
-     * - GET sessionId
+     * - WATCH session
+     * - GET session
      * - check(cart)
      * - MULTI
-     * - SET sessionId
+     * - SET session
      * - EXEC
      */
-    await execute( 'WATCH', [ sessionId ] );
-    let cart: Cart | null = await this.get( sessionId );
+    await execute( 'WATCH', [ session ] );
+    let cart: Cart | null = await this.get( session );
     cart = check( cart );
     if ( !cart ) return null;
     await execute( 'MULTI', [] );
-    await this.set( sessionId, cart );
+    await this.set( session, cart );
     // Add TTL to cart (7 days)
-    await this.expire( sessionId, 7 * 24 * 60 * 60 * 1000 );
+    await this.expire( session, 7 * 24 * 60 * 60 * 1000 );
     await execute( 'EXEC', [] );
     return cart;
   }
