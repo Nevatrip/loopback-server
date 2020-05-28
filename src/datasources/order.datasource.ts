@@ -20,7 +20,7 @@ const port = parseInt( _port, 10 );
 const config = {
   name: 'user',
   connector: 'mongodb',
-  url: format(
+  url: url || replica ? format(
     'mongodb://%s:%s@%s/%s?replicaSet=%s&authSource=%s&ssl=true',
     user,
     password,
@@ -28,7 +28,7 @@ const config = {
     database,
     replica,
     database,
-  ),
+  ) : '',
   host,
   port,
   user,
