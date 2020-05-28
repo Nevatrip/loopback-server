@@ -27,7 +27,7 @@ export class OrderController {
 
   @post('/orders', {
     responses: {
-      '200': {
+      200: {
         description: 'Order model instance',
         content: {'application/json': {schema: getModelSchemaRef(Order)}},
       },
@@ -39,7 +39,7 @@ export class OrderController {
         'application/json': {
           schema: getModelSchemaRef(Order, {
             title: 'NewOrder',
-            
+
           }),
         },
       },

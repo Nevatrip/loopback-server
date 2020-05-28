@@ -1,7 +1,6 @@
 import { Entity, model, property, belongsTo } from '@loopback/repository';
 import { customAlphabet } from 'nanoid';
-import { User, Product, IAction } from '.';
-import { UserWithRelations } from './user.model';
+import { User, UserWithRelations, Product, IAction } from '.';
 
 @model()
 export class CartProductOptions extends Entity {
