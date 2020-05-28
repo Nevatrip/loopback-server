@@ -5,14 +5,14 @@ import {inject, lifeCycleObserver, LifeCycleObserver, ValueOrPromise} from '@loo
 import {juggler} from '@loopback/repository';
 
 const {
-  MONGO_USERS_USER: user = '',
-  MONGO_USERS_PASS: password = '',
-  MONGO_USERS_HOST: host = '127.0.0.1',
-  MONGO_USERS_DB_NAME: database = 'order',
-  MONGO_USERS_URL: url,
-  MONGO_USERS_REPLICA: replica,
-  MONGO_USERS_SSLCA: SSLCA,
-  MONGO_USERS_PORT: _port = '27017',
+  MONGO_USER: user = '',
+  MONGO_PASS: password = '',
+  MONGO_HOST: host = '127.0.0.1',
+  MONGO_DB_ORDERS: database = 'order',
+  MONGO_URL: url,
+  MONGO_REPLICA: replica,
+  MONGO_SSLCA: SSLCA,
+  MONGO_PORT: _port = '27017',
 } = process.env;
 
 const port = parseInt( _port, 10 );
@@ -20,21 +20,21 @@ const port = parseInt( _port, 10 );
 const config = {
   name: 'user',
   connector: 'mongodb',
-  // url: format(
-  //   'mongodb://%s:%s@%s/%s?replicaSet=%s&authSource=%s&ssl=true',
-  //   user,
-  //   password,
-  //   [`${host}:${port}`].join(','),
-  //   database,
-  //   replica,
-  //   database,
-  // ),
+  url: format(
+    'mongodb://%s:%s@%s/%s?replicaSet=%s&authSource=%s&ssl=true',
+    user,
+    password,
+    [ `${ host }:${ port }` ].join( ',' ),
+    database,
+    replica,
+    database,
+  ),
   host,
   port,
   user,
   password,
   database,
-  // sslCA: SSLCA ? readFileSync( SSLCA ) : '',
+  sslCA: SSLCA ? readFileSync( SSLCA ) : '',
   useNewUrlParser: true,
   useUnifiedTopology: true,
 };
