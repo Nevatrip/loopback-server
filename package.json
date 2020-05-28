@@ -25,7 +25,7 @@
     "posttest": "npm run lint",
     "test:dev": "lb-mocha --allow-console-logs dist/__tests__/**/*.js && npm run posttest",
     "docker:build": "docker build -t api .",
-    "docker:run": "docker run -p 3000:3000 -d api",
+    "docker:run": "docker run -p 8000:8000 -d api",
     "migrate": "node ./dist/migrate",
     "prestart": "npm run build",
     "start": "node -r source-map-support/register .",
