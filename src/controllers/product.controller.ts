@@ -30,6 +30,7 @@ export class ProductController extends SanityController {
       _id,
       oldId,
       title,
+      category,
       'key': title.${ lang }.key.current,
       'directions': directions[]{
         _key,
