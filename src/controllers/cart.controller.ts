@@ -63,6 +63,44 @@ export class CartController {
   }
 
   /**
+   * Retrieve the cart sum by user id
+   * @param session User's session
+   */
+  @get('/carts/{session}/sum', {
+    responses: {'200': {description: 'Cart Sum Response'}},
+    summary: 'Get Cart Sum by session Id',
+  })
+  async getCartSum(@param.path.string('session') session: string) {
+    const cart = await this.cartRepository.get( session );
+    if (cart == null) {
+      throw new HttpErrors.NotFound(
+        `Shopping cart not found for user: ${ session }`,
+      );
+    } else {
+      const productController = new ProductController( this.sanityService, this.sanityRepository );
+      const products: { [productId: string]: Product } = {};
+
+      const result = await cart.products.reduce( async ( sum, { productId, options } ) => {
+        products[ productId ] = products[ productId ] ?? await productController.getProductForCart( productId, cart.lang );
+        const product = products[ productId ];
+
+        const ticketsSum = options?.reduce( ( subSum, option ) => {
+          const direction = product.directions.find( direction => direction._key === option.direction );
+          direction?.tickets.forEach( ({ _key, price }) => {
+            const count = option.tickets[ _key ] || 0;
+            subSum += price * count;
+          } );
+          return subSum;
+        }, 0 ) || 0;
+
+        return (await sum) + ticketsSum;
+      }, Promise.resolve( 0 ) );
+
+      return result;
+    }
+  }
+
+  /**
    * Create or update the shopping cart for a given user
    * @param session User's session
    * @param cart Shopping cart

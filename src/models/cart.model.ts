@@ -40,8 +40,8 @@ export class CartProduct extends Entity {
   @property.array( CartProductOptions )
   options?: CartProductOptions[];
 
-  @property( Product )
-  product?: Product;
+  // @property( Product )
+  // product?: Product;
 
   constructor(data?: Partial<CartProduct>) {
     super(data);
@@ -55,7 +55,7 @@ export class Cart extends Entity {
     generated: false,
     example: 'test-test-test',
   })
-  id?: string;
+  id: string;
 
   @property({default: () => new Date()})
   created: Date;
