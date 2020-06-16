@@ -427,7 +427,7 @@
     loopback-datasource-juggler "^4.21.2"
     tslib "^2.0.0"
 
-"@loopback/rest-explorer@^2.2.0":
+"@loopback/rest-explorer@^2.2.0", "@loopback/rest-explorer@^2.2.4":
   version "2.2.4"
   resolved "https://registry.yarnpkg.com/@loopback/rest-explorer/-/rest-explorer-2.2.4.tgz#3370e80c89d1e9fdaabbce593b9261b6af88e2f4"
   integrity sha512-Y+yYjB0hWffz0OcyQNs3YHGeFupDUik+wwYMwooMIMpoPIVjA4hCI5T9ektasYvyVUiQmZzukADOl3HmXp4OaA==
@@ -4102,7 +4102,7 @@ saslprep@^1.0.0:
   dependencies:
     sparse-bitfield "^3.0.3"
 
-semver@^5.1.0, semver@^5.4.1, semver@^5.5.0:
+semver@^5.1.0, semver@^5.4.1, semver@^5.5.0, semver@^5.6.0:
   version "5.7.1"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.7.1.tgz#a954f931aeba508d307bbf069eff0c01c96116f7"
   integrity sha512-sauaDf/PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ==
