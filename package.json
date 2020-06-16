@@ -46,6 +46,8 @@
     "!*/__tests__"
   ],
   "dependencies": {
+    "@loopback/authentication": "^4.2.7",
+    "@loopback/authentication-jwt": "^0.4.1",
     "@loopback/boot": "^2.2.0",
     "@loopback/context": "^3.7.0",
     "@loopback/core": "^2.5.0",
@@ -53,7 +55,9 @@
     "@loopback/repository": "^2.4.0",
     "@loopback/rest": "^4.0.0",
     "@loopback/rest-explorer": "^2.2.0",
+    "@loopback/security": "^0.2.12",
     "@loopback/service-proxy": "^2.2.0",
+    "bcryptjs": "^2.4.3",
     "cloudpayments": "^4.1.1",
     "date-fns": "^2.14.0",
     "loopback-connector-kv-redis": "^3.0.3",
