@@ -28,7 +28,7 @@ export class ProductController extends SanityController {
   ) {
     const query = `*[_id=="${ id }"]{
       _id,
-      oldId,
+      category,
       title,
       'key': title.${ lang }.key.current,
       'directions': directions[]{
@@ -57,8 +57,8 @@ export class ProductController extends SanityController {
         'tickets': tickets[]{
           ...,
           'category': category->{
-            'name': name.current
-            ,title
+            'name': name.current,
+            title
           },
           'ticket': ticket[]->{
             'name': name.current,
