@@ -1,6 +1,7 @@
-import { model, property } from '@loopback/repository';
+import { model, property, belongsTo } from '@loopback/repository';
 import { PaymentResponse } from 'cloudpayments';
 import { Cart } from './cart.model';
+import { User, UserWithRelations } from './user.model';
 
 interface IYandexKassa {
   type: 'yandexkassa'
@@ -20,9 +21,9 @@ export class Order extends Cart {
     type: 'string',
     id: true,
     generated: true,
-    mongodb: { dataType: 'ObjectID' },
+    // mongodb: { dataType: 'ObjectID' },
   })
-  id?: string;
+  id: string;
 
   @property({
     type: 'string',
@@ -34,13 +35,16 @@ export class Order extends Cart {
   source?: string;
 
   @property({type: 'object'})
-  payment: IPayment
+  payment?: IPayment
 
   @property({type: 'object'})
   reporting?: object; // ОФД
 
   @property()
   hash?: string; // email's hash
+
+  @belongsTo( () => User )
+  userId?: string;
 
   constructor(data?: Partial<Order>) {
     super(data);
@@ -49,6 +53,7 @@ export class Order extends Cart {
 
 export interface OrderRelations {
   // describe navigational properties here
+  user?: UserWithRelations
 }
 
 export type OrderWithRelations = Order & OrderRelations;

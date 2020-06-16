@@ -23,10 +23,10 @@ export class CartRepository extends DefaultKeyValueRepository<
    */
   addProduct( id: string, product: CartProduct ) {
     const addProductToCart = (cart: Cart | null) => {
-      cart = cart || new Cart( { id } );
-      cart.products = cart.products || [];
+      cart = cart ?? new Cart( { id } );
+      cart.products = cart.products ?? [];
       const now = new Date();
-      cart.created = cart.created || now;
+      cart.created = cart.created ?? now;
 
       if (cart.created < now) cart.updated = now;
 

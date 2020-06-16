@@ -1,6 +1,7 @@
 import { Entity, model, property, hasMany, hasOne, embedsOne } from '@loopback/repository';
 import { Order, Cart } from '.';
 import { CartWithRelations } from './cart.model';
+import { OrderWithRelations } from './order.model';
 
 @model()
 export class User extends Entity {
@@ -8,7 +9,7 @@ export class User extends Entity {
     type: 'string',
     id: true,
     generated: true,
-    mongodb: { dataType: 'ObjectID' },
+    // mongodb: { dataType: 'ObjectID' },
   })
   id?: string;
 
@@ -39,6 +40,9 @@ export class User extends Entity {
   @hasOne( () => Cart )
   cart?: Cart;
 
+  @hasMany( () => Order )
+  orders?: Order[];
+
   constructor(data?: Partial<User>) {
     super(data);
   }
@@ -46,7 +50,8 @@ export class User extends Entity {
 
 export interface UserRelations {
   // describe navigational properties here
-  cart: CartWithRelations;
+  cart?: CartWithRelations;
+  orders?: OrderWithRelations;
 }
 
 export type UserWithRelations = User & UserRelations;

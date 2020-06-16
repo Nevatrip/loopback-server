@@ -1,7 +1,15 @@
 import { model, property } from '@loopback/repository';
 import { SanityEntity } from './sanity.model';
 
+interface Ticket {
+  _key: string;
+  _type: 'ticket';
+  count: number;
+  price: number;
+}
+
 interface Event {
+  _key: string;
   start: Date;
   end: Date;
   allDay: boolean;
@@ -25,6 +33,7 @@ interface Direction {
   _type: 'complex' | 'direction';
   schedule: Schedule[];
   buyTimeOffset: number;
+  tickets: Ticket[]
 
   dates?: Date[];
   datesOpenTime?: Date[];

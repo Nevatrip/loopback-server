@@ -17,14 +17,18 @@ import {
   requestBody,
   HttpErrors,
 } from '@loopback/rest';
-import {Cart, CartProduct} from '../models';
-import {CartRepository} from '../repositories';
+import {Cart, CartProduct, Product} from '../models';
+import {CartRepository, SanityRepository} from '../repositories';
 import hash from 'object-hash';
+import { ProductController } from './product.controller';
+import { service } from '@loopback/core';
+import { SanityProvider, SanityService } from '../services';
 
 export class CartController {
   constructor(
-    @repository(CartRepository)
-    public cartRepository : CartRepository,
+    @repository( CartRepository ) public cartRepository : CartRepository,
+    @service( SanityProvider ) protected sanityService: SanityService,
+    @repository( SanityRepository ) protected sanityRepository: SanityRepository,
   ) {}
 
   /**
@@ -51,7 +55,7 @@ export class CartController {
     responses: {'200': {description: 'Cart Response'}},
     summary: 'Get Cart by session Id',
   })
-  async get(@param.path.string('session') session: string) {
+  async getCart(@param.path.string('session') session: string) {
     const cart = await this.cartRepository.get(session);
     if (cart == null) {
       throw new HttpErrors.NotFound(

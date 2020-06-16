@@ -17,18 +17,28 @@ const {
 
 const port = parseInt( _port, 10 );
 
+const urlQuery = [];
+
+if (replica) urlQuery.push( { key: 'replicaSet', value: replica } );
+if (password) urlQuery.push( { key: 'authSource', value: database } );
+if (SSLCA) urlQuery.push( { key: 'ssl', value: 'true' } );
+
+const generateUrlQuery = urlQuery.map( item => `${ item.key }=${ item.value }` ).join( '&' );
+const userPassword = user ? `${ user }:${ encodeURIComponent( password ) }@` : '';
+
 const config = {
-  name: 'user',
+  name: 'order',
   connector: 'mongodb',
-  url: format(
-    'mongodb://%s:%s@%s/%s?replicaSet=%s&authSource=%s&ssl=true',
-    user,
-    password,
-    [ `${ host }:${ port }` ].join( ',' ),
-    database,
-    replica,
-    database,
-  ),
+  // url: format(
+  //   'mongodb://%s:%s@%s/%s?replicaSet=%s&authSource=%s&ssl=true',
+  //   user,
+  //   password,
+  //   [ `${ host }:${ port }` ].join( ',' ),
+  //   database,
+  //   replica,
+  //   database,
+  // ),
+  url: `mongodb://${ userPassword }${ [ `${ host }:${ port }` ].join( ',' ) }/${ database }?${ generateUrlQuery }`,
   host,
   port,
   user,
