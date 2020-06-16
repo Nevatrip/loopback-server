@@ -126,11 +126,11 @@ export class CartController {
     cart.created = cart.created || new Date();
     cart.updated = new Date();
     cart.products.forEach( product => {
-      // delete product.key;
-      product.key = hash(product);
+      delete product.key;
+      product.key = hash( product );
     });
 
-    await this.cartRepository.set(session, cart);
+    await this.cartRepository.set( session, cart );
   }
 
   /**
