@@ -51,7 +51,7 @@ export class User extends Entity {
 export interface UserRelations {
   // describe navigational properties here
   cart?: CartWithRelations;
-  orders?: OrderWithRelations;
+  orders?: OrderWithRelations[];
 }
 
 export type UserWithRelations = User & UserRelations;

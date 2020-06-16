@@ -43,9 +43,6 @@ export class Order extends Cart {
   @property()
   hash?: string; // email's hash
 
-  @belongsTo( () => User )
-  userId?: string;
-
   constructor(data?: Partial<Order>) {
     super(data);
   }
@@ -53,7 +50,6 @@ export class Order extends Cart {
 
 export interface OrderRelations {
   // describe navigational properties here
-  user?: UserWithRelations
 }
 
 export type OrderWithRelations = Order & OrderRelations;
