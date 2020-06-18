@@ -3,17 +3,22 @@ import { PaymentResponse } from 'cloudpayments';
 import { Cart } from './cart.model';
 import { User, UserWithRelations } from './user.model';
 
+interface IFullDiscount {
+  service: 'fullDiscount'
+  request: {}
+}
+
 interface IYandexKassa {
-  type: 'yandexkassa'
-  response: {}
+  service: 'yandexkassa'
+  request: {}
 }
 
 interface ICloudPayments {
-  type: 'cloudpayments'
-  response: PaymentResponse
+  service: 'cloudpayments'
+  request: PaymentResponse
 }
 
-type IPayment = ICloudPayments | IYandexKassa;
+type IPayment = ICloudPayments | IYandexKassa | IFullDiscount;
 
 @model()
 export class Order extends Cart {
@@ -36,7 +41,7 @@ export class Order extends Cart {
   source?: string;
 
   @property({type: 'object'})
-  payment?: IPayment
+  payment?: IPayment;
 
   @property({type: 'object'})
   reporting?: object; // ОФД
