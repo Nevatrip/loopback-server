@@ -1,4 +1,4 @@
-import {DefaultCrudRepository, repository, HasManyRepositoryFactory} from '@loopback/repository';
+import {DefaultCrudRepository, repository, HasManyRepositoryFactory, Filter } from '@loopback/repository';
 import { User, UserRelations, Order } from '../models';
 import { UserDataSource } from '../datasources';
 import { inject, Getter } from '@loopback/core';
@@ -16,7 +16,7 @@ export class UserRepository extends DefaultCrudRepository<
 
   constructor(
     @inject('datasources.user') dataSource: UserDataSource,
-    @repository.getter( 'OrderRepository' ) getOrderRepository: Getter<OrderRepository>
+    @repository.getter( 'OrderRepository' ) getOrderRepository: Getter<OrderRepository>,
   ) {
     super(User, dataSource);
 
@@ -26,5 +26,15 @@ export class UserRepository extends DefaultCrudRepository<
     )
 
     this.registerInclusionResolver('orders', this.orders.inclusionResolver);
+  }
+
+  async findOrCreate( filter: Filter<User>, data: User ): Promise<User> {
+    const user = await this.findOne( filter );
+
+    if ( !user ) {
+      return await this.create( data );
+    }
+
+    return user;
   }
 }

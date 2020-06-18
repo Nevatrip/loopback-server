@@ -9,7 +9,7 @@ export class User extends Entity {
     type: 'string',
     id: true,
     generated: true,
-    // mongodb: { dataType: 'ObjectID' },
+    mongodb: { dataType: 'ObjectID' },
   })
   id?: string;
 
