@@ -40,8 +40,8 @@ export class CartProduct extends Entity {
   @property.array( CartProductOptions )
   options?: CartProductOptions[];
 
-  // @property( Product )
-  // product?: Product;
+  @property( Product )
+  product?: Product;
 
   constructor(data?: Partial<CartProduct>) {
     super(data);
@@ -75,8 +75,33 @@ export class Cart extends Entity {
   @belongsTo( () => User )
   userId?: string;
 
+  @property({ type: 'number' })
+  get sum(): number {
+    return this.calcSum();
+  };
+
   constructor(data?: Partial<Cart>) {
+    if (data) {
+      delete (data as any).sum;
+    }
     super(data);
+  }
+
+  calcSum() {
+    const result = this.products?.reduce( ( sum, { options, product } ) => {
+      const ticketsSum = options?.reduce( ( subSum, option ) => {
+        const direction = product?.directions.find( direction => direction._key === option.direction );
+        direction?.tickets.forEach( ({ _key, price }) => {
+          const count = option.tickets[ _key ] || 0;
+          subSum += price * count;
+        } );
+        return subSum;
+      }, 0 ) || 0;
+
+      return sum + ticketsSum;
+    }, 0 );
+
+    return result || -1;
   }
 }
 

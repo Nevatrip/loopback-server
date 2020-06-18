@@ -12,6 +12,10 @@ export class CartRepository extends DefaultKeyValueRepository<
     @inject('datasources.cart') dataSource: CartDataSource,
   ) {
     super(Cart, dataSource);
+
+    ( this.kvModelClass as any ).observe( 'persist', async (ctx: any) => {
+      delete ctx.data.sum
+    } )
   }
 
   /**
