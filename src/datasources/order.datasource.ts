@@ -8,7 +8,7 @@ const {
   MONGO_USER: user = '',
   MONGO_PASS: password = '',
   MONGO_HOST: host = '127.0.0.1',
-  MONGO_DB_ORDERS: database = 'order',
+  MONGO_DB_ORDERS: database = 'orders',
   MONGO_URL: url,
   MONGO_REPLICA: replica,
   MONGO_SSLCA: SSLCA,
@@ -48,6 +48,8 @@ const config = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 };
+
+console.log( `config`, config );
 
 // Observe application's life cycle to disconnect the datasource when
 // application is stopped. This allows the application to be shut down

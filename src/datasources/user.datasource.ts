@@ -8,7 +8,7 @@ const {
   MONGO_USER: user = '',
   MONGO_PASS: password = '',
   MONGO_HOST: host = '127.0.0.1',
-  MONGO_DB_USER: database = 'user',
+  MONGO_DB_USERS: database = 'users',
   MONGO_URL: url,
   MONGO_REPLICA: replica,
   MONGO_SSLCA: SSLCA,

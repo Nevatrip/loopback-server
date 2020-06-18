@@ -15,7 +15,7 @@ const config = {
   // url,
   host,
   port,
-  // password,
+  password,
   db,
 };
 
