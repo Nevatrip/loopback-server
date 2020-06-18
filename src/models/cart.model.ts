@@ -55,7 +55,7 @@ export class Cart extends Entity {
     generated: false,
     example: 'test-test-test',
   })
-  id: string;
+  session: string;
 
   @property({default: () => new Date()})
   created: Date;

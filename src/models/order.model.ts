@@ -23,7 +23,7 @@ export class Order extends Cart {
     generated: true,
     // mongodb: { dataType: 'ObjectID' },
   })
-  id: string;
+  id?: string;
 
   @property({
     type: 'string',

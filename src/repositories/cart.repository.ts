@@ -21,9 +21,9 @@ export class CartRepository extends DefaultKeyValueRepository<
    * @param id User's session id
    * @param product product to be added
    */
-  addProduct( id: string, product: CartProduct ) {
+  addProduct( session: string, product: CartProduct ) {
     const addProductToCart = (cart: Cart | null) => {
-      cart = cart ?? new Cart( { id } );
+      cart = cart ?? new Cart( { session } );
       cart.products = cart.products ?? [];
       const now = new Date();
       cart.created = cart.created ?? now;
@@ -41,7 +41,7 @@ export class CartRepository extends DefaultKeyValueRepository<
       return cart;
     };
 
-    return this.checkAndSet( id, addProductToCart );
+    return this.checkAndSet( session, addProductToCart );
   }
 
   deleteProduct( id: string, key: string ) {

@@ -121,9 +121,9 @@ export class CartController {
     @param.path.string('session') session: string,
     @requestBody({description: 'shopping cart'}) cart: Cart,
   ) {
-    if ( session !== cart.id ) {
+    if ( session !== cart.session ) {
       throw new HttpErrors.BadRequest(
-        `User id does not match: ${ session } !== ${ cart.id }`,
+        `User id does not match: ${ session } !== ${ cart.session }`,
       );
     }
 
