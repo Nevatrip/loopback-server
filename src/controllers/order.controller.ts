@@ -15,14 +15,15 @@ import {
   put,
   del,
   requestBody,
+  HttpErrors,
 } from '@loopback/rest';
-import {Order, Cart} from '../models';
-import {OrderRepository, CartRepository} from '../repositories';
+import {Order, OrderRequest, Product, User} from '../models';
 
 export class OrderController {
   constructor(
-    @repository(OrderRepository) public orderRepository : OrderRepository,
-    @repository(CartRepository) protected cartRepository: CartRepository,
+    @repository( OrderRepository ) public orderRepository : OrderRepository,
+    @repository( CartRepository ) protected cartRepository: CartRepository,
+    @repository( UserRepository ) protected userRepository: UserRepository,
   ) {}
 
   @post('/orders', {
@@ -37,18 +38,21 @@ export class OrderController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Cart, {
+          schema: getModelSchemaRef(OrderRequest, {
             title: 'NewOrder',
 
           }),
         },
       },
     })
-    cart: Cart,
+    { cart: _cart, user: _user }: OrderRequest,
   ): Promise<Order> {
-    const order = await this.cartRepository.get( cart.id ) as Order;
+    const cart = await this.cartRepository.get( _cart ) as Order;
 
-    return this.orderRepository.create(order);
+    if ( !cart.products?.length ) throw new HttpErrors.NotFound(`Cart is empty`);
+    const user = await this.userRepository.findOrCreate( { where: { email: _user.email } }, _user );
+
+    return await this.userRepository.orders( user.id ).create( cart );
   }
 
   // @post('/orders', {

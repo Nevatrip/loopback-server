@@ -21,13 +21,14 @@ export class Order extends Cart {
     type: 'string',
     id: true,
     generated: true,
-    // mongodb: { dataType: 'ObjectID' },
+    mongodb: { dataType: 'ObjectID' },
   })
   id?: string;
 
   @property({
     type: 'string',
     required: true,
+    default: 'new',
   })
   status: 'new' | 'paid' | 'rejected';
 
