@@ -63,7 +63,7 @@ export class NevatravelController {
     summary: `Get service's shedule on date`,
   })
   async getСruises(
-    @param.path.string('service') service: number,
+    @param.path.string('service') service: string,
     @param.query.string('date') date: string = format(new Date(), 'dd.MM.yyyy'),
     @param.query.string('pier') pier?: number,
   ) {

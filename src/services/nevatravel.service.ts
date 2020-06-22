@@ -49,13 +49,13 @@ export interface ErrorMessage {
 
 export interface NevatravelService {
   getStatus(): Promise<NevatravelStatus>;
-  getPiers(): Promise<NevatravelPier>[];
-  getPrograms(): Promise<NevatravelProgram>[];
+  getPiers(): Promise<NevatravelPier[]>;
+  getPrograms(): Promise<NevatravelProgram[]>;
   getСruises(
-    service: number,
+    service: string,
     start: string,
     point?: number,
-  ): Promise<NevatravelCruise>[];
+  ): Promise<NevatravelCruise[]>;
   postOrderFixedTime(
     tickets: NevatravelTickets,
     tour: number,
