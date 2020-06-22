@@ -5,3 +5,4 @@ export * from './user.model';
 export * from './order.model';
 export * from './order-request.model';
 export * from './nevatravel.model';
+export * from './astramarine.model';

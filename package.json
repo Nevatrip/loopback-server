@@ -63,6 +63,7 @@
     "loopback-connector-kv-redis": "^3.0.3",
     "loopback-connector-mongodb": "^4.2.0",
     "loopback-connector-rest": "^3.6.0",
+    "loopback-connector-soap": "^5.1.0",
     "nanoid": "^3.1.9",
     "object-hash": "^2.0.3",
     "timezone-support": "^2.0.2",
