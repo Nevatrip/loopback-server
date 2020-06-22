@@ -48,23 +48,20 @@ export interface ErrorMessage {
 }
 
 export interface NevatravelService {
-  getStatus(authKey: string): Promise<NevatravelStatus>;
-  getPiers(authKey: string): Promise<NevatravelPier>[];
-  getPrograms(authKey: string): Promise<NevatravelProgram>[];
+  getStatus(): Promise<NevatravelStatus>;
+  getPiers(): Promise<NevatravelPier>[];
+  getPrograms(): Promise<NevatravelProgram>[];
   getСruises(
-    authKey: string,
     service: number,
     start: string,
     point?: number,
   ): Promise<NevatravelCruise>[];
   postOrderFixedTime(
-    authKey: string,
     tickets: NevatravelTickets,
     tour: number,
     tourBack?: number,
   ): Promise<NevatravelOrderPost>;
   postOrderOpenTime(
-    authKey: string,
     tickets: NevatravelTickets,
     date: string,
     point: number,
@@ -72,21 +69,17 @@ export interface NevatravelService {
     serviceBack?: number,
   ): Promise<NevatravelOrderPost>;
   getOrder(
-    authKey: string,
     order: string,
   ): Promise<NevatravelOrderGet | ErrorMessage>;
   postOrderComment(
-    authKey: string,
     order: string,
     comment: string,
   ): Promise<NevatravelOrderGet | ErrorMessage>;
   approveOrder(
-    authKey: string,
     order: string,
     requireConfirmation: boolean,
   ): Promise<NevatravelOrderGet | ErrorMessage>;
   rejectOrder(
-    authKey: string,
     order: string,
     comment: string,
   ): Promise<NevatravelOrderGet | ErrorMessage>;

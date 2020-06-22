@@ -13,18 +13,10 @@ import {parse, format} from 'date-fns';
 import {NevatravelOrder} from '../models';
 
 export class NevatravelController {
-  private apiKey: string;
-
   constructor(
     @inject('services.Nevatravel')
     protected nevatravelService: NevatravelService,
-  ) {
-    if (!process.env.PARTNER_NEVATRAVEL_KEY) {
-      throw new Error('NEVATRAVEL API code is not defined');
-    }
-
-    this.apiKey = process.env.PARTNER_NEVATRAVEL_KEY;
-  }
+  ) {}
 
   @get('/partner/nevatravel', {
     responses: {
@@ -35,7 +27,7 @@ export class NevatravelController {
     summary: `Service's status and version`,
   })
   async getStatus() {
-    return await this.nevatravelService.getStatus(this.apiKey);
+    return await this.nevatravelService.getStatus();
   }
 
   @get('/partner/nevatravel/piers', {
@@ -47,7 +39,7 @@ export class NevatravelController {
     summary: `Piers list`,
   })
   async getPiers() {
-    return await this.nevatravelService.getPiers(this.apiKey);
+    return await this.nevatravelService.getPiers();
   }
 
   @get('/partner/nevatravel/services', {
@@ -59,7 +51,7 @@ export class NevatravelController {
     summary: `Get available programs`,
   })
   async getPrograms() {
-    return await this.nevatravelService.getPrograms(this.apiKey);
+    return await this.nevatravelService.getPrograms();
   }
 
   @get('/partner/nevatravel/services/{service}', {
@@ -79,7 +71,6 @@ export class NevatravelController {
     const dateOutput = format(dateInput, 'yyyy-MM-dd');
 
     return await this.nevatravelService.getСruises(
-      this.apiKey,
       service,
       dateOutput,
       pier,
@@ -101,7 +92,6 @@ export class NevatravelController {
 
     if (order.tour) {
       await this.nevatravelService.postOrderFixedTime(
-        this.apiKey,
         order.tickets,
         order.tour,
         order.tourBack,
@@ -110,7 +100,6 @@ export class NevatravelController {
 
     if (order.date && order.point && order.service) {
       await this.nevatravelService.postOrderOpenTime(
-        this.apiKey,
         order.tickets,
         order.date,
         order.point,
@@ -129,7 +118,7 @@ export class NevatravelController {
     summary: `Get order`,
   })
   async getOrder(@param.path.string('order') order: string) {
-    return await this.nevatravelService.getOrder(this.apiKey, order);
+    return await this.nevatravelService.getOrder(order);
   }
 
   @post('/partner/nevatravel/orders/{order}', {
@@ -145,7 +134,6 @@ export class NevatravelController {
     @requestBody() comment: string,
   ) {
     return await this.nevatravelService.postOrderComment(
-      this.apiKey,
       order,
       comment,
     );
@@ -165,7 +153,6 @@ export class NevatravelController {
     requireConfirmation: boolean = false,
   ) {
     return await this.nevatravelService.approveOrder(
-      this.apiKey,
       order,
       requireConfirmation,
     );
@@ -184,7 +171,6 @@ export class NevatravelController {
     @requestBody() comment: string,
   ) {
     return await this.nevatravelService.rejectOrder(
-      this.apiKey,
       order,
       comment,
     );

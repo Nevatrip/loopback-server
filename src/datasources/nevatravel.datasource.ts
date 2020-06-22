@@ -1,60 +1,66 @@
 import {inject, lifeCycleObserver, LifeCycleObserver} from '@loopback/core';
 import {juggler} from '@loopback/repository';
 
+if (!process.env.PARTNER_NEVATRAVEL_KEY) {
+  throw new Error('NEVATRAVEL API code is not defined');
+}
+
+if (!process.env.PARTNER_NEVATRAVEL_HOST) {
+  throw new Error('NEVATRAVEL HOST is not defined');
+}
+
+const apiKey: string = process.env.PARTNER_NEVATRAVEL_KEY;
+const apiHost: string = process.env.PARTNER_NEVATRAVEL_HOST;
+const apiUrl = `http://${ apiHost }/partner_api`;
+
 const config = {
   name: 'nevatravel',
   connector: 'rest',
-  baseURL: 'http://ntcm.neva.travel:3000/partner_api/',
+  baseURL: apiUrl,
   crud: false,
   operations: [
     {
       template: {
         method: "GET",
-        url: "http://ntcm.neva.travel:3000/partner_api/get_api_status",
+        url: `${ apiUrl }/get_api_status`,
         query: {
-          auth_key: "{authKey}"
+          auth_key: apiKey
         }
       },
       functions: {
-        getStatus: [
-          "authKey"
-        ]
+        getStatus: []
       }
     },
     {
       template: {
         method: "GET",
-        url: "http://ntcm.neva.travel:3000/partner_api/get_piers_info",
+        url: `${ apiUrl }/get_piers_info`,
         query: {
-          auth_key: "{authKey}"
+          auth_key: apiKey
         }
       },
       functions: {
-        getPiers: [
-          "authKey"
-        ]
+        getPiers: []
       }
     },
     {
       template: {
         method: "GET",
-        url: "http://ntcm.neva.travel:3000/partner_api/get_programs_info",
+        url: `${ apiUrl }/get_programs_info`,
         query: {
-          auth_key: "{authKey}"
+          auth_key: apiKey
         }
       },
       functions: {
-        getPrograms: [
-          "authKey"
-        ]
+        getPrograms: []
       }
     },
     {
       template: {
         method: "GET",
-        url: "http://ntcm.neva.travel:3000/partner_api/get_cruises_info",
+        url: `${ apiUrl }/get_cruises_info`,
         query: {
-          auth_key: "{authKey}",
+          auth_key: apiKey,
           program: "{service}",
           start_date: "{start}",
           pier: "{point}"
@@ -62,7 +68,6 @@ const config = {
       },
       functions: {
         getСruises: [
-          "authKey",
           "service",
           "start",
           "point"
@@ -72,9 +77,9 @@ const config = {
     {
       template: {
         method: "GET",
-        url: "http://ntcm.neva.travel:3000/partner_api/request_order",
+        url: `${ apiUrl }/request_order`,
         query: {
-          auth_key: "{authKey}",
+          auth_key: apiKey,
           tickets: "{tickets}",
           cruise_id: "{tour}",
           back_cruise_id: "{tourBack}",
@@ -86,13 +91,11 @@ const config = {
       },
       functions: {
         postOrderFixedTime: [
-          "authKey",
           "tickets",
           "tour",
           "tourBack"
         ],
         postOrderOpenTime: [
-          "authKey",
           "tickets",
           "date",
           "point",
@@ -104,15 +107,14 @@ const config = {
     {
       template: {
         method: "GET",
-        url: "http://ntcm.neva.travel:3000/partner_api/get_order_status",
+        url: `${ apiUrl }/get_order_status`,
         query: {
-          auth_key: "{authKey}",
+          auth_key: apiKey,
           order_id: "{order}"
         }
       },
       functions: {
         getOrder: [
-          "authKey",
           "order"
         ]
       }
@@ -120,16 +122,15 @@ const config = {
     {
       template: {
         method: "GET",
-        url: "http://ntcm.neva.travel:3000/partner_api/comment_order",
+        url: `${ apiUrl }/comment_order`,
         query: {
-          auth_key: "{authKey}",
+          auth_key: apiKey,
           order_id: "{order}",
           comment: "{comment}"
         }
       },
       functions: {
         postOrderComment: [
-          "authKey",
           "order",
           "comment"
         ]
@@ -138,16 +139,15 @@ const config = {
     {
       template: {
         method: "GET",
-        url: "http://ntcm.neva.travel:3000/partner_api/reject_order",
+        url: `${ apiUrl }/reject_order`,
         query: {
-          auth_key: "{authKey}",
+          auth_key: apiKey,
           order_id: "{order}",
           require_confirmation: "{requireConfirmation}"
         }
       },
       functions: {
         approveOrder: [
-          "authKey",
           "order",
           "requireConfirmation"
         ]
@@ -156,16 +156,15 @@ const config = {
     {
       template: {
         method: "GET",
-        url: "http://ntcm.neva.travel:3000/partner_api/reject_order",
+        url: `${ apiUrl }/reject_order`,
         query: {
-          auth_key: "{authKey}",
+          auth_key: apiKey,
           order_id: "{order}",
           comment: "{comment}"
         }
       },
       functions: {
         rejectOrder: [
-          "authKey",
           "order",
           "comment"
         ]
