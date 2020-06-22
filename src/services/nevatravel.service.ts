@@ -1,13 +1,7 @@
-import {getService, juggler} from '@loopback/service-proxy';
+import {getService} from '@loopback/service-proxy';
 import {inject, Provider} from '@loopback/core';
-import {NevatravelDataSource} from './nevatravel.datasource';
-import {
-  NevatravelStatus,
-  NevatravelPier,
-  NevatravelProgram,
-  NevatravelCruise,
-  NevatravelTickets,
-} from './nevatravel.model';
+import {NevatravelDataSource} from '../datasources';
+import { NevatravelTickets, NevatravelStatus, NevatravelPier, NevatravelProgram, NevatravelCruise } from '../models';
 
 export interface NevatravelOrderPost {
   status?: string;
@@ -98,10 +92,11 @@ export interface NevatravelService {
   ): Promise<NevatravelOrderGet | ErrorMessage>;
 }
 
-export class NevatravelServiceProvider implements Provider<NevatravelService> {
+export class NevatravelProvider implements Provider<NevatravelService> {
   constructor(
+    // nevatravel must match the name property in the datasource json file
     @inject('datasources.nevatravel')
-    protected dataSource: juggler.DataSource = new NevatravelDataSource(),
+    protected dataSource: NevatravelDataSource = new NevatravelDataSource(),
   ) {}
 
   value(): Promise<NevatravelService> {

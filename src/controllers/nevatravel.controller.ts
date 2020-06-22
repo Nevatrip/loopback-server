@@ -8,22 +8,22 @@ import {
   requestBody,
   HttpErrors,
 } from '@loopback/rest';
-import {NevatravelService} from './nevatravel.service';
+import {NevatravelService} from '../services';
 import {parse, format} from 'date-fns';
-import {NevatravelOrder} from './nevatravel.model';
+import {NevatravelOrder} from '../models';
 
 export class NevatravelController {
   private apiKey: string;
 
   constructor(
-    @inject('services.NevatravelService')
+    @inject('services.Nevatravel')
     protected nevatravelService: NevatravelService,
   ) {
-    if (!process.env.NEVATRAVEL) {
+    if (!process.env.PARTNER_NEVATRAVEL_KEY) {
       throw new Error('NEVATRAVEL API code is not defined');
     }
 
-    this.apiKey = process.env.NEVATRAVEL;
+    this.apiKey = process.env.PARTNER_NEVATRAVEL_KEY;
   }
 
   @get('/partner/nevatravel', {

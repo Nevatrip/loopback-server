@@ -3,3 +3,4 @@ export * from './cache.datasource';
 export * from './cart.datasource';
 export * from './user.datasource';
 export * from './order.datasource';
+export * from './nevatravel.datasource';
