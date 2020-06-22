@@ -5,3 +5,4 @@ export * from './cart.controller';
 export * from './user.controller';
 export * from './order.controller';
 export * from './nevatravel.controller';
+export * from './partner.controller';
