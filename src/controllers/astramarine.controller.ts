@@ -6,7 +6,7 @@ const email = process.env.PARTNER_ASTRAMARINE_EMAIL;
 
 export class AstramarineController {
   constructor(
-    @inject( 'services.AstramarineService' )
+    @inject( 'services.Astramarine' )
     protected astramarineService: AstramarineService,
   ) {}
 
@@ -19,8 +19,8 @@ export class AstramarineController {
     summary: `Get services on date`,
   } )
   async getServices(
-    @param.query.string( 'dateFrom' ) dateFrom: string,
-    @param.query.string( 'dateTo' ) dateTo: string,
+    @param.query.string( 'dateFrom' ) dateFrom?: string,
+    @param.query.string( 'dateTo' ) dateTo?: string,
   ): Promise<any> {
     const StringJSON = JSON.stringify({
       email,

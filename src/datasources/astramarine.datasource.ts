@@ -11,6 +11,10 @@ if ( !username || !password ) {
   throw new Error('ASTARMARINE username and/or password is not defined');
 }
 
+const token = Buffer
+  .from( `${ username }:${ password }` )
+  .toString('base64');
+
 const config = {
   name: 'astramarine',
   connector: 'soap',
@@ -22,8 +26,11 @@ const config = {
     username,
     password,
   },
+  wsdl_headers: {
+    Authorization: `Basic ${ token }`
+  },
   operations: {
-    getServicesOnDate: {
+    getServices: {
       service: "InternetSaleJSON",
       port: "InternetSaleJSONSoap",
       operation: "ServicesOnDate"
