@@ -1,7 +1,7 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Model, model, property} from '@loopback/repository';
 
 @model()
-export class NevatravelStatus extends Entity {
+export class NevatravelStatus extends Model {
   @property({
     type: 'string',
     default: 'forbidden',
@@ -19,7 +19,7 @@ export class NevatravelStatus extends Entity {
 }
 
 @model()
-export class NevatravelPier extends Entity {
+export class NevatravelPier extends Model {
   @property({
     type: 'string',
     id: true,
@@ -125,7 +125,7 @@ export class NevatravelPier extends Entity {
 }
 
 @model()
-export class NevatravelProgram extends Entity {
+export class NevatravelProgram extends Model {
   @property({
     type: 'string',
     id: true,
@@ -298,7 +298,7 @@ export class NevatravelProgram extends Entity {
 }
 
 @model()
-export class NevatravelCruiseBack extends Entity {
+export class NevatravelCruiseBack extends Model {
   id: string;
   uid: string;
   ship_id: string;
@@ -329,7 +329,7 @@ export class NevatravelCruiseBack extends Entity {
 }
 
 @model()
-export class NevatravelCruise extends Entity {
+export class NevatravelCruise extends Model {
   @property({
     type: 'string',
     id: true,
@@ -418,7 +418,7 @@ export class NevatravelCruise extends Entity {
 }
 
 @model()
-export class NevatravelOrder extends Entity {
+export class NevatravelOrder extends Model {
   @property({
     type: 'object',
     required: true,
