@@ -1,20 +1,23 @@
 // Uncomment these imports to begin using these cool features!
 
 import {inject} from '@loopback/core';
-import { NevatravelService } from '../services';
+import { NevatravelService, AstramarineService } from '../services';
 import { get, param } from '@loopback/rest';
 import { parse, format } from 'date-fns';
 
 interface ScheduleResponse {
-  partner: 'nevatravel' | 'astramarin'
+  partner: 'nevatravel' | 'astramarine'
   direction: 'to' | 'from' | 'both'
-  time: string;
+  time: string
+  tickets: string[]
 }
 
 export class PartnerController {
   constructor(
     @inject('services.Nevatravel')
     protected nevatravelService: NevatravelService,
+    @inject('services.Astramarine')
+    protected astramarineService: AstramarineService,
   ) {}
 
   @get('/partner/schedule/{direction}/{date}', {
@@ -39,10 +42,11 @@ export class PartnerController {
     const output: ScheduleResponse[] = [];
     const dateInput = parse(date, 'dd.MM.yyyy', new Date() );
     const dateOutput = format( dateInput, 'yyyy-MM-dd');
-    const service: string = '1223263874329870352';
+    const nevatravelService: string = '1223263874329870352';
+    const astamarineService: string = '000000004';
 
     const response = await this.nevatravelService.getСruises(
-      service,
+      nevatravelService,
       dateOutput,
     );
 
@@ -52,9 +56,32 @@ export class PartnerController {
           output.push({
             partner: 'nevatravel',
             direction: 'to',
-            time: item.starting_time
+            time: item.starting_time,
+            tickets: [ 'Standard' ]
           })
         } )
+
+        const amResponse = await this.astramarineService.getEvents( {
+          dateFrom: dateOutput,
+          dateTo: dateOutput,
+          serviceID: astamarineService,
+        } )
+
+        const amEventsRequest: Promise<ScheduleResponse>[] = amResponse.events.map( async item => {
+          const categories = await this.astramarineService.getSeatCategories( { eventID: item.eventID } );
+          const time = new Date( item.eventDateTime );
+
+          return {
+            partner: 'astramarine',
+            direction: 'to',
+            time: time.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' } ),
+            tickets: categories.seatCategories.map( category => category.seatCategoryName )
+          } as ScheduleResponse
+        } )
+
+        const amEvents = await Promise.all( amEventsRequest );
+
+        output.push( ...amEvents );
         break;
       }
 
@@ -65,7 +92,8 @@ export class PartnerController {
           output.push({
             partner: 'nevatravel',
             direction: 'from',
-            time: `${ date.getHours() }:${ date.getMinutes() }`
+            time: `${ date.getHours() }:${ date.getMinutes() }`,
+            tickets: [ 'Standard' ]
           })
         } )
         break;
@@ -76,7 +104,8 @@ export class PartnerController {
           output.push({
             partner: 'nevatravel',
             direction: 'to',
-            time: item.starting_time
+            time: item.starting_time,
+            tickets: [ 'Standard' ]
           })
         } )
         const [{ back_cruises: backCruises }] = response;
@@ -85,7 +114,8 @@ export class PartnerController {
           output.push({
             partner: 'nevatravel',
             direction: 'from',
-            time: `${ date.getHours() }:${ date.getMinutes() }`
+            time: `${ date.getHours() }:${ date.getMinutes() }`,
+            tickets: [ 'Standard' ]
           })
         } )
         break;
@@ -94,6 +124,8 @@ export class PartnerController {
       default:
         break;
     }
+
+    output.sort( (a, b) => a.time.localeCompare( b.time ) );
 
     return output;
   }
