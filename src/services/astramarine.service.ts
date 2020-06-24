@@ -11,16 +11,17 @@ interface IGetServicesRequest {
 interface IGetEventsRequest {
   dateFrom?: string
   dateTo?: string
+  serviceID?: string
+  eventID?: string
 }
 
 interface IGetSeatCategoriesRequest {
-  dateFrom?: string
-  dateTo?: string
+  eventID: string
 }
 
 interface IGetSeatsOnEventRequest {
-  dateFrom?: string
-  dateTo?: string
+  eventID: string
+  seatCategoryID?: string
 }
 
 export interface AstramarineService {
