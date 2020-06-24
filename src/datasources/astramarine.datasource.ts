@@ -5,37 +5,77 @@ const {
   PARTNER_ASTRAMARINE_USERNAME: username,
   PARTNER_ASTRAMARINE_PASSWORD: password,
   PARTNER_ASTRAMARINE_URL: url,
+  PARTNER_ASTRAMARINE_EMAIL: email,
 } = process.env;
 
 if ( !username || !password ) {
   throw new Error('ASTARMARINE username and/or password is not defined');
 }
 
-const token = Buffer
-  .from( `${ username }:${ password }` )
-  .toString('base64');
+if ( !url ) {
+  throw new Error('ASTARMARINE url is not defined');
+}
 
 const config = {
   name: 'astramarine',
-  connector: 'soap',
-  url,
-  wsdl: `${ url }?wsdl`,
-  remotingEnabled: false,
-  security: {
-    scheme: "BasicAuth",
-    username,
-    password,
+  connector: 'rest',
+  baseURL: url,
+  crud: false,
+  auth: {
+    user: username,
+    pass: password,
+    sendImmediately: true,
   },
-  wsdl_headers: {
-    Authorization: `Basic ${ token }`
-  },
-  operations: {
-    getServices: {
-      service: "InternetSaleJSON",
-      port: "InternetSaleJSONSoap",
-      operation: "ServicesOnDate"
+  operations: [
+    {
+      template: {
+        method: 'POST',
+        url: `${ url }/getServices`,
+        body: '{body}',
+      },
+      functions: {
+        getServices: [
+          'body'
+        ]
+      }
     },
-  }
+    {
+      template: {
+        method: 'POST',
+        url: `${ url }/getEvents`,
+        body: '{body}',
+      },
+      functions: {
+        getEvents: [
+          'body'
+        ]
+      }
+    },
+    {
+      template: {
+        method: 'POST',
+        url: `${ url }/getSeatCategories`,
+        body: '{body}',
+      },
+      functions: {
+        getSeatCategories: [
+          'body'
+        ]
+      }
+    },
+    {
+      template: {
+        method: 'POST',
+        url: `${ url }/getSeatsOnEvent`,
+        body: '{body}',
+      },
+      functions: {
+        getSeatsOnEvent: [
+          'body'
+        ]
+      }
+    },
+  ]
 };
 
 // Observe application's life cycle to disconnect the datasource when
