@@ -43,7 +43,6 @@ export class PartnerController {
     const dateInput = parse(date, 'dd.MM.yyyy', new Date() );
     const dateOutput = format( dateInput, 'yyyy-MM-dd');
     const nevatravelService: string = '1223263874329870352';
-    const astamarineService: string = '000000004';
 
     const response = await this.nevatravelService.getСruises(
       nevatravelService,
@@ -64,7 +63,7 @@ export class PartnerController {
         const amResponse = await this.astramarineService.getEvents( {
           dateFrom: dateOutput,
           dateTo: dateOutput,
-          serviceID: astamarineService,
+          serviceID: '000000004',
         } )
 
         const amEventsRequest: Promise<ScheduleResponse>[] = amResponse.events.map( async item => {
@@ -96,6 +95,28 @@ export class PartnerController {
             tickets: [ 'Standard' ]
           })
         } )
+
+        const amResponse = await this.astramarineService.getEvents( {
+          dateFrom: dateOutput,
+          dateTo: dateOutput,
+          serviceID: '000000005',
+        } )
+
+        const amEventsRequest: Promise<ScheduleResponse>[] = amResponse.events.map( async item => {
+          const categories = await this.astramarineService.getSeatCategories( { eventID: item.eventID } );
+          const time = new Date( item.eventDateTime );
+
+          return {
+            partner: 'astramarine',
+            direction: 'from',
+            time: format( time, 'HH:mm' ),
+            tickets: categories.seatCategories.map( category => category.seatCategoryName )
+          } as ScheduleResponse
+        } )
+
+        const amEvents = await Promise.all( amEventsRequest );
+
+        output.push( ...amEvents );
         break;
       }
 
