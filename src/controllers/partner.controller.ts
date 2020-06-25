@@ -74,7 +74,7 @@ export class PartnerController {
           return {
             partner: 'astramarine',
             direction: 'to',
-            time: time.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' } ),
+            time: format( dateInput, 'HH:mm' ),
             tickets: categories.seatCategories.map( category => category.seatCategoryName )
           } as ScheduleResponse
         } )
