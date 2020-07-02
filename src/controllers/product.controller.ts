@@ -38,6 +38,10 @@ export class ProductController extends SanityController {
         nested,
         isEveryOwnDate,
         buyTimeOffset,
+        partner{
+          'key': provider->key.current,
+          value
+        },
         'point': point->{
           'coords': coords{lat,lng},
           description,
