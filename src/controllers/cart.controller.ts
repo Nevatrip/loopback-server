@@ -67,12 +67,12 @@ export class CartController {
       );
     } else {
       if ( isWithSum ) {
-      const productController = new ProductController( this.sanityService, this.sanityRepository );
+        const productController = new ProductController( this.sanityService, this.sanityRepository );
         const products: { [ productId: string ]: Product } = {};
 
         cart.products = await Promise.all( cart.products.map( async _product => {
           let { productId } = _product;
-        products[ productId ] = products[ productId ] ?? await productController.getProductForCart( productId, cart.lang );
+          products[ productId ] = products[ productId ] ?? await productController.getProductForCart( productId, cart.lang );
           _product.product = products[ productId ];
 
           return _product;

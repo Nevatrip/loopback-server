@@ -1,21 +1,24 @@
 import { model, property, belongsTo } from '@loopback/repository';
-import { PaymentResponse } from 'cloudpayments';
+import { PaymentResponse, PaymentRequest } from 'cloudpayments';
 import { Cart } from './cart.model';
 import { User, UserWithRelations } from './user.model';
 
-interface IFullDiscount {
+export interface IFullDiscount {
   service: 'fullDiscount'
   request: {}
+  response?: {}
 }
 
-interface IYandexKassa {
+export interface IYandexKassa {
   service: 'yandexkassa'
   request: {}
+  response?: {}
 }
 
-interface ICloudPayments {
+export interface ICloudPayments {
   service: 'cloudpayments'
-  request: PaymentResponse
+  request: PaymentRequest
+  response?: PaymentResponse
 }
 
 type IPayment = ICloudPayments | IYandexKassa | IFullDiscount;

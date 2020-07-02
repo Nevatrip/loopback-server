@@ -19,7 +19,7 @@ import {
 } from '@loopback/rest';
 import {Order, OrderRequest, Product, User} from '../models';
 import {OrderRepository, CartRepository, UserRepository, SanityRepository} from '../repositories';
-import { ClientService, TaxationSystem, ValidCurrency, BaseResponse, CurrencyList, PaymentSuccessResponse } from 'cloudpayments';
+import { ClientService, TaxationSystem, ValidCurrency, CurrencyList, PaymentSuccessModel, PaymentRequest } from 'cloudpayments';
 import { ProductController } from '.';
 import { service } from '@loopback/core';
 import { SanityProvider, SanityService } from '../services';
@@ -34,6 +34,7 @@ export class OrderController {
   ) {}
 
   async getPayment( { sum }: Order, user: User ): Promise< Order[ 'payment' ] > {
+    // checkPaymentCredentials
     const paymentType = process.env.PAYMENT_TYPE?.toLowerCase() || 'cloudpayments';
     const paymentCurrency = process.env.PAYMENT_CURRENCY?.toUpperCase() as ValidCurrency || CurrencyList.EUR;
     const paymentInn: number = parseInt( <string>process.env.PAYMENT_INN, 10 );
@@ -45,6 +46,7 @@ export class OrderController {
     if ( !paymentSecret || !paymentId ) throw new HttpErrors.Unauthorized(`Payment gateway is not defined`);
     if ( !paymentInn ) throw new HttpErrors.Unauthorized(`Payment INN is not defined`);
 
+    // createPayment( paymentProvider )
     if ( sum > 0 ) {
       switch ( paymentType ) {
         case 'cloudpayments':
@@ -60,14 +62,14 @@ export class OrderController {
           const payment = await client.createOrder({
             Amount: sum,
             Currency: paymentCurrency,
-            Description: `Checkout order`,
+            Description: `Checkout order`, // TODO: add i18n description
             email: user.email,
             phone: <string><unknown>user.phone,
           });
 
           if ( payment.isSuccess() ) return {
             service: 'cloudpayments',
-            request: payment.getResponse() as PaymentSuccessResponse
+            request: payment.getResponse() as unknown as PaymentRequest
           }
 
           throw new HttpErrors.NotFound(`Платёж не прошёл…`);
@@ -102,10 +104,9 @@ export class OrderController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(OrderRequest, {
+          schema: getModelSchemaRef( OrderRequest, {
             title: 'NewOrder',
-
-          }),
+          } ),
         },
       },
     })
@@ -113,6 +114,7 @@ export class OrderController {
   ): Promise<Order> {
     const cart = await this.cartRepository.get( _cart ) as Order;
 
+    // addProductsData
     if ( !cart.products?.length ) throw new HttpErrors.NotFound(`Cart is empty`);
 
     const productController = new ProductController( this.sanityService, this.sanityRepository );
@@ -126,11 +128,115 @@ export class OrderController {
       return _product;
     } ) );
 
+    // getPayment
     cart.payment = await this.getPayment( cart, _user )
 
+    // findOrCreateUser
     const user = await this.userRepository.findOrCreate( { where: { email: _user.email } }, _user );
 
+    // createOrder
     return await this.userRepository.orders( user.id ).create( cart );
+  }
+
+  @post('/orders/check', {
+    responses: { '200': { description: 'Check CloudPayment' } },
+  })
+  async check(
+    @requestBody({
+      content: {
+        'application/x-www-form-urlencoded': {
+          schema: {
+            type: 'object',
+            properties: {
+              InvoiceId: { type: 'number' },
+              Amount: { type: 'number' },
+            },
+          },
+        },
+      },
+    })
+    body: PaymentSuccessModel,
+  ) {
+    console.log( `check CloudPayment`, body );
+    const filter: Filter<Order> = {
+      where: { 'payment.request.Model.Number': body.InvoiceId } as Where<Order>,
+    };
+    const order = await this.orderRepository.findOne( filter );
+
+    if ( order?.sum !== body.Amount ) return { code: 10 }; // TODO: inverse condition
+
+    return { code: 0 };
+  }
+
+  @post('/orders/pay', {
+    responses: { '200': { description: 'pay CloudPayment' } },
+  })
+  async pay(
+    @requestBody({
+      content: {
+        'application/x-www-form-urlencoded': {
+          schema: {
+            type: 'object',
+            properties: {
+              TransactionId: { type: 'number' },
+              Amount: { type: 'number' },
+              InvoiceId: { type: 'number' },
+              AuthCode: { type: 'string' },
+              Token: { type: 'string' },
+            },
+          },
+        },
+      },
+    })
+    body: PaymentSuccessModel,
+  ) {
+    console.log( `pay CloudPayment`, body );
+    const filter: Filter<Order> = {
+      where: { 'payment.request.Model.Number': body.InvoiceId } as Where<Order>,
+    };
+    const order = await this.orderRepository.findOne( filter );
+
+    if (!order || !order.id) return { code: 10 };
+
+    if (order.sum !== body.Amount) return { code: 10 };
+
+    order.status = 'paid';
+    order.updated = new Date();
+    (order.payment as any).response = body;
+
+    // order.hash = getHash(order.user.email);
+
+    // sendEmail(order, 'paid');
+
+    // if (order.user.fullName.toLowerCase() !== 'test') {
+      // sendEmail(order, 'manager');
+    // }
+
+    await this.orderRepository.updateById(order.id, order);
+    return { code: 0 };
+  }
+
+  @post('/orders/fail', {
+    responses: { '200': { description: 'fail CloudPayment' } },
+  })
+  async fail(@requestBody({
+    content: {
+      'application/x-www-form-urlencoded': {
+        schema: {
+          type: 'object',
+          properties: {
+            TransactionId: { type: 'number' },
+            Amount: { type: 'number' },
+            InvoiceId: { type: 'number' },
+            AuthCode: { type: 'string' },
+            Token: { type: 'string' },
+          },
+        },
+      },
+    },
+  }) body: {}) {
+    console.log('fail CloudPayment', body);
+    return body;
   }
 
   // @post('/orders', {
