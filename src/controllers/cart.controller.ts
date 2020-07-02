@@ -55,52 +55,32 @@ export class CartController {
     responses: {'200': {description: 'Cart Response'}},
     summary: 'Get Cart by session Id',
   })
-  async getCart(@param.path.string('session') session: string) {
+  async getCart(
+    @param.path.string('session') session: string,
+    @param.query.boolean('isWithSum') isWithSum?: boolean,
+  ) {
     const cart = await this.cartRepository.get(session);
+
     if (cart == null) {
       throw new HttpErrors.NotFound(
         `Shopping cart not found for user: ${session}`,
       );
     } else {
-      return cart;
-    }
-  }
-
-  /**
-   * Retrieve the cart sum by user id
-   * @param session User's session
-   */
-  @get('/carts/{session}/sum', {
-    responses: {'200': {description: 'Cart Sum Response'}},
-    summary: 'Get Cart Sum by session Id',
-  })
-  async getCartSum(@param.path.string('session') session: string) {
-    const cart = await this.cartRepository.get( session );
-    if (cart == null) {
-      throw new HttpErrors.NotFound(
-        `Shopping cart not found for user: ${ session }`,
-      );
-    } else {
+      if ( isWithSum ) {
       const productController = new ProductController( this.sanityService, this.sanityRepository );
-      const products: { [productId: string]: Product } = {};
+        const products: { [ productId: string ]: Product } = {};
 
-      const result = await cart.products.reduce( async ( sum, { productId, options } ) => {
+        cart.products = await Promise.all( cart.products.map( async _product => {
+          let { productId } = _product;
         products[ productId ] = products[ productId ] ?? await productController.getProductForCart( productId, cart.lang );
-        const product = products[ productId ];
+          _product.product = products[ productId ];
 
-        const ticketsSum = options?.reduce( ( subSum, option ) => {
-          const direction = product.directions.find( direction => direction._key === option.direction );
-          direction?.tickets.forEach( ({ _key, price }) => {
-            const count = option.tickets[ _key ] || 0;
-            subSum += price * count;
-          } );
-          return subSum;
-        }, 0 ) || 0;
+          return _product;
+        } ) );
 
-        return (await sum) + ticketsSum;
-      }, Promise.resolve( 0 ) );
+      }
 
-      return result;
+      return cart;
     }
   }
 
