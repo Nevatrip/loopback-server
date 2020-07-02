@@ -78,6 +78,14 @@ export class CartController {
           return _product;
         } ) );
 
+        // const _cart: any = { ...cart };
+
+        // _cart.sum = cart.sum;
+        // cart.products.forEach( product => {
+        //   delete product.product;
+        // } );
+
+        // return _cart;
       }
 
       return cart;

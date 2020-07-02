@@ -26,7 +26,11 @@ export class CartProductOptions extends Entity {
   }
 }
 
-@model()
+@model({
+  settings: {
+    hiddenProperties: [ 'product' ]
+  }
+})
 export class CartProduct extends Entity {
   @property({
     id: true,
