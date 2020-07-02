@@ -21,11 +21,9 @@ const sortDates = (dates: Dates): Date[] => {
 };
 
 export class ProductController extends SanityController {
+  private product?: Product;
 
-  async getProduct(
-    @param.path.string( 'id' ) id: string,
-    @param.query.string( 'lang' ) lang: string = 'en'
-  ) {
+  async getProduct( id: string, lang: string = 'en' ) {
     const query = `*[_id=="${ id }"]{
       _id,
       category,
@@ -77,17 +75,8 @@ export class ProductController extends SanityController {
     return product;
   }
 
-  @get( '/products/{id}/cart', {
-    responses: { '200': { description: 'Proxy Sanity' } },
-    summary: 'Get data from Sanity',
-  } )
-  async getProductForCart(
-    @param.path.string( 'id' ) id: string,
-    @param.query.string( 'lang' ) lang: string = 'en'
-  ) {
+  convertScheduleToDates( product: Product ) {
     if ( !TIMEZONE ) throw new HttpErrors.NotFound( 'TIMEZONE (env) is not defined' );
-
-    const product = await this.getProduct( id, lang );
 
     product.directions?.forEach( direction => {
       const {
@@ -108,18 +97,18 @@ export class ProductController extends SanityController {
         const timeZone = findTimeZone( event.startTimezone || TIMEZONE );
 
         event.actions.forEach( action => {
-          const actionDate = new Date(action.start);
+          const actionDate = new Date( action.start );
 
-          if (actionDate > buyTime) {
-            const timeOffset = getUTCOffset(actionDate, timeZone).offset;
+          if ( actionDate > buyTime ) {
+            const timeOffset = getUTCOffset( actionDate, timeZone ).offset;
 
-            actionDate.setMinutes(actionDate.getMinutes() + actionDate.getTimezoneOffset() - timeOffset );
-            const dateKey = format(actionDate, 'yyyy-MM-dd');
+            actionDate.setMinutes( actionDate.getMinutes() + actionDate.getTimezoneOffset() - timeOffset );
+            const dateKey = format( actionDate, 'yyyy-MM-dd' );
 
-            if (event.allDay) {
-              datesOpenTime[dateKey] = datesOpenTime[dateKey] || [];
+            if ( event.allDay ) {
+              datesOpenTime[ dateKey ] = datesOpenTime[ dateKey ] || [];
             } else {
-              dates[dateKey] = dates[dateKey] || [];
+              dates[ dateKey ] = dates[ dateKey ] || [];
             }
           }
         } )
@@ -130,6 +119,24 @@ export class ProductController extends SanityController {
       direction.datesOpenTime = sortDates( datesOpenTime );
     } )
 
+    return product
+  }
+
+  @get( '/products/{id}/cart', {
+    responses: { '200': { description: 'Proxy Sanity' } },
+    summary: 'Get data from Sanity',
+  } )
+  async getProductForCart(
+    @param.path.string( 'id' ) id: string,
+    @param.query.string( 'lang' ) lang: string = 'en'
+  ): Promise<Product> {
+    const product = await this.getProduct( id, lang )
+      .then( this.convertScheduleToDates )
+
+    /*
+    this.getProduct( _, _ )
+      .
+    */
     return product;
   }
 
@@ -147,15 +154,18 @@ export class ProductController extends SanityController {
 
     const product = await this.getProduct( id, lang );
 
+    // getDirection
     const direction = product.directions.find( ( { _key } ) => _key === directionId );
     if ( !direction ) throw new HttpErrors.NotFound(`Direction "${ directionId }" is not found.`);
 
+    // getEventsOnDate
     const { schedule = [], buyTimeOffset = 0 } = direction;
 
     const parsedDate = parse(date, 'yyyy-MM-dd', new Date());
     const scheduleArray: IAction[] = [];
 
     schedule.forEach( ( { actions = [], end, ...event } ) => {
+      // filterActiveActions
       const timeZone = findTimeZone( event.startTimezone || TIMEZONE );
 
       actions.forEach( action => {
