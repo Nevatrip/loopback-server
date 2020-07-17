@@ -4,6 +4,7 @@ import {inject} from '@loopback/core';
 import { NevatravelService, AstramarineService } from '../services';
 import { get, param } from '@loopback/rest';
 import { parse, format } from 'date-fns';
+import { NevatravelCruise, GetEventsResponse } from '../models';
 
 interface ScheduleResponse {
   partner: 'nevatravel' | 'astramarine'
@@ -42,12 +43,17 @@ export class PartnerController {
     const output: ScheduleResponse[] = [];
     const dateInput = parse(date, 'dd.MM.yyyy', new Date() );
     const dateOutput = format( dateInput, 'yyyy-MM-dd');
-    const nevatravelService: string = '1223263874329870352';
 
-    const response = await this.nevatravelService.getСruises(
-      nevatravelService,
-      dateOutput,
-    );
+    let response: NevatravelCruise[] = [];
+
+    try {
+      response = await this.nevatravelService.getСruises(
+        '1223263874329870352',
+        dateOutput,
+      );
+    } catch (error) {
+      console.error( `Nevatravel return ${ error }` );
+    }
 
     switch ( direction ) {
       case 'to': {
