@@ -76,7 +76,7 @@ export class NevatravelController {
       pier,
     );
   }
-
+/*
   @post('/partner/nevatravel/orders', {
     responses: {
       '200': {
@@ -175,4 +175,5 @@ export class NevatravelController {
       comment,
     );
   }
+*/
 }
